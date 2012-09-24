@@ -2,11 +2,12 @@
 #define _PROGRAMPATH_H
 
 #include"integer.h"
+#include "globals.h"
 
 char* Program_Path;
 char* Path;
 char* GetPath(char* target);
-int GetCurrentDirectory( Uint32 iTarget, Uint32 *iRequired);
+int CDLGetCurrentDirectory();
 void PathDestroy(void);
 
 #endif

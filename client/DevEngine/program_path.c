@@ -5,7 +5,8 @@
 #include <string.h>
 #include <direct.h>
 
-char* getpath(char* target)
+
+char* GetPath(char* target)
 {
 	strcpy (Path ,Program_Path);
 	strcat(Path ,target);
@@ -13,30 +14,28 @@ char* getpath(char* target)
 	return Path;
 }
 
-int CDL_GetCurrentDirectory(Uint32 iTarget, Uint32 *iRequired)
-
-{
+int CDLGetCurrentDirectory() 
+{ //Uint32 iTarget, Uint32 *iRequired
 
   char  *sPath   = NULL;
   char  *sResult = NULL;
   Uint32 iPath   = 0;
   Uint32 iSize   = 1024;
 
-  
-  Program_Path = (char *)malloc(iTarget + 1);
+  Program_Path = (char *)malloc(iSize  + 1);
   sPath = (char *)malloc(iSize);
-  Path = (char *)malloc(iTarget + 1);
+  Path = (char *)malloc(iSize  + 1);
   
   if (Program_Path == NULL)
 	{
-		return -1;
+		return false;
 	}
 
   if (sPath == NULL)
 
   {
 
-    return -1;
+    return false;
 
   }
 
@@ -70,7 +69,7 @@ int CDL_GetCurrentDirectory(Uint32 iTarget, Uint32 *iRequired)
   iPath = strlen(sPath) + 1;
 
 
-  if (Program_Path != NULL && iTarget >= iPath)
+  if (Program_Path != NULL && iSize  >= iPath)
 
   {
 
@@ -79,25 +78,18 @@ int CDL_GetCurrentDirectory(Uint32 iTarget, Uint32 *iRequired)
   }
 
 
-  if (iRequired != NULL)
-
-  {
-
-    *iRequired = iPath;
-
-  }
-
   free(sPath);
-
-  if (Program_Path == NULL || iTarget < iPath)
-
+  strcat(Program_Path ,"\\");
+  if (Program_Path == NULL || iSize  < iPath)
   {
 
-    return -1;
+    return false;
 
   }
 
-  return 0;
+  
+
+  return true;
 
 }
 

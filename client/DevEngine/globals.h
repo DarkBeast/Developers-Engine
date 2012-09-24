@@ -1,4 +1,4 @@
-// Static Varibles defines and Public Varibles
+// Static Variables defines and Public Variables
 #ifndef _GLOBALS_H
 #define _GLOBALS_H
 #include"Integer.h"
@@ -20,13 +20,14 @@ Uint8 DebugMode;
 
 // player defines
 #define MAX_PLAYERS        50  /* # of players the server can support */
-#define MAX_USERNAME_SIZE  16  /* Let's have a resonable size for usernames */
+#define MAX_USERNAME_SIZE  16  /* Let's have a reasonable size for usernames */
 
 // map defines
 #define TILE_SIZE_X     32	//magic pixels
 #define TILE_SIZE_Y     32	//magic pixels
 
-
+#define true 0
+#define false -1
 
 
 // Custom Error flags
