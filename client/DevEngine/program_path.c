@@ -14,6 +14,8 @@ char* GetPath(char* target)
 	return Path;
 }
 
+
+
 int CDLGetCurrentDirectory() 
 { //Uint32 iTarget, Uint32 *iRequired
 
