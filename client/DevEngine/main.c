@@ -49,14 +49,21 @@ int main( )
 	int running = GL_TRUE;
 	GLuint Texture ;
 	int size = 60;
-	//int* width = &size;
-	//int* hieght = 60;
+	int width = 91;
+	int hieght = 69;
 	glGenTextures(1,&Texture);
 CDLGetCurrentDirectory();
 
 
 	//Texture= loadTexture("image\1.png", size, size);
-	read_png_file(GetPath("pngtest.png"));
+	if(!read_png_file(GetPath("pngtest.png")))
+	{
+		exit( EXIT_FAILURE );
+	}
+
+	
+	
+
 	//write_png_file("silly.png");
 	// Initialize GLFW
 	if( !glfwInit() )
@@ -67,7 +74,7 @@ CDLGetCurrentDirectory();
 	glEnable(GL_TEXTURE_2D);
 	
 
-
+	
 	// Finally we can Open an OpenGL window
 	if(!glfwOpenWindow ( 1024, 768, 1,0,0,0,0,0, GLFW_WINDOW ))
 	{
@@ -79,7 +86,7 @@ CDLGetCurrentDirectory();
 	glfwSetWindowTitle( TITLE );//Sets the Windows Name
 	glfwSetWindowSizeCallback(handleResize); //callback function of GLFW to handle window resize
 	glfwSetKeyCallback(handleKeypress); //callback function to handle key press
-
+	Texture = png_texture_load(GetPath("pngtest.png"),NULL,NULL);
 	// Main loop
 	while( running )
 	{
