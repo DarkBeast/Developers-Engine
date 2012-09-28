@@ -39,10 +39,14 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <IncludePath>$(solutionDir)\include;$(VCInstallDir)include;$(VCInstallDir)atlmfc\include;$(WindowsSDK_IncludePath)</IncludePath>
+    <IncludePath>$(solutionDir)\include;$(VCInstallDir)include;$(VCInstallDir)atlmfc\include;$(WindowsSDK_IncludePath);$(solutionDir)\DevEngine</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <LibraryPath>$(solutionDir)\lib;$(LibraryPath)</LibraryPath>
+    <LibraryPath>$(solutionDir)\lib;$(VCInstallDir)lib;$(VCInstallDir)atlmfc\lib;$(WindowsSDK_LibraryPath_x86</LibraryPath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <LibraryPath>$(solutionDir)\lib;$(VCInstallDir)lib;$(VCInstallDir)atlmfc\lib;$(WindowsSDK_LibraryPath_x86</LibraryPath>
+    <IncludePath>$(solutionDir)\include;$(VCInstallDir)include;$(VCInstallDir)atlmfc\include;$(WindowsSDK_IncludePath);$(solutionDir)\DevEngine</IncludePath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -74,6 +78,7 @@
     <ClInclude Include="buffer.h" />
     <ClInclude Include="globals.h" />
     <ClInclude Include="Graphics\Image.h" />
+    <ClInclude Include="Graphics\Render.h" />
     <ClInclude Include="integer.h" />
     <ClInclude Include="program_path.h" />
     <ClInclude Include="String.h" />
@@ -81,6 +86,7 @@
   <ItemGroup>
     <ClCompile Include="buffer.c" />
     <ClCompile Include="Graphics\Image.c" />
+    <ClCompile Include="Graphics\Render.c" />
     <ClCompile Include="main.c" />
     <ClCompile Include="program_path.c" />
     <ClCompile Include="String.c" />

@@ -3,7 +3,7 @@
 
 #include <glfw.h>
 
-GLuint Texture;
+
 GLint uniform_mytexture;
 
 GLuint read_png_file(char* file_name);
