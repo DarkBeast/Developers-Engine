@@ -38,6 +38,7 @@ int bit_depth, color_type, interlace_type, i;
 int number_of_passes;
 png_bytep * row_pointers;
 png_byte * image_data;
+GLuint Texture;
 
 GLuint read_png_file(char* file_name)
 	{
@@ -115,10 +116,11 @@ GLuint read_png_file(char* file_name)
 
 	png_read_image(png_ptr, row_pointers);
 
+
 	glGenTextures(1, &Texture);
    glBindTexture(GL_TEXTURE_2D, Texture);
    glTexImage2D(GL_TEXTURE_2D,0, GL_RGB, width, height, 0,
-       GL_RGB, GL_UNSIGNED_BYTE, (GLvoid*) image_data);
+       GL_RGB, GL_UNSIGNED_BYTE, (GLvoid*) image_data );
    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 	
 	// clean up
