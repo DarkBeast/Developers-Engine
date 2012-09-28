@@ -6,7 +6,7 @@
 #include "graphics/image.h"
 #include "program_path.h"
 //#define GLFW_INCLUDE_GL3
-
+GLuint Texture;
 void GLFWCALL handleKeypress(int key,int press) //The key that was pressed
 
 {
@@ -26,7 +26,7 @@ void GLFWCALL handleResize(int width,int height)
 
 {
     //Tell OpenGL how to convert from coordinates to pixel values
-
+	glEnable( GL_TEXTURE_2D );
     glViewport( 0, 0, width, height );
 
     glMatrixMode( GL_PROJECTION ); //Switch to setting the camera perspective
@@ -35,11 +35,8 @@ void GLFWCALL handleResize(int width,int height)
 
     glLoadIdentity(); //reset the camera
 
-		gluPerspective( 45.0f,                      //camera angle
-
-			(GLfloat)width/(GLfloat)height, //The width to height ratio
-			1.0f,                          //The near z clipping coordinate
-			100.0f );                       //The far z clipping coordinate
+		
+		
 
 }
 
@@ -47,31 +44,25 @@ void GLFWCALL handleResize(int width,int height)
 int main( )
 {
 	int running = GL_TRUE;
-	GLuint Texture ;
-	int size = 60;
-	int width = 91;
-	int hieght = 69;
-	glGenTextures(1,&Texture);
+	
+	
 CDLGetCurrentDirectory();
 
 
-	//Texture= loadTexture("image\1.png", size, size);
-	if(!read_png_file(GetPath("pngtest.png")))
-	{
-		exit( EXIT_FAILURE );
-	}
-
 	
-	
-
-	//write_png_file("silly.png");
 	// Initialize GLFW
 	if( !glfwInit() )
 	{
 		exit( EXIT_FAILURE );
 	}
-	glEnable(GL_DEPTH_TEST);
-	glEnable(GL_TEXTURE_2D);
+	glShadeModel(GL_SMOOTH);
+ 
+     glEnable(GL_LIGHTING);
+     glEnable(GL_LIGHT0);
+     glDisable(GL_DEPTH_TEST);
+ 
+   
+	//glEnable(GL_TEXTURE_2D);
 	
 
 	
@@ -82,92 +73,48 @@ CDLGetCurrentDirectory();
 		exit( EXIT_FAILURE );
 	}
 
-
 	glfwSetWindowTitle( TITLE );//Sets the Windows Name
 	glfwSetWindowSizeCallback(handleResize); //callback function of GLFW to handle window resize
 	glfwSetKeyCallback(handleKeypress); //callback function to handle key press
-	Texture = png_texture_load(GetPath("pngtest.png"),NULL,NULL);
+	glClearColor( 0.0f, 0.0f, 0.0f, 0.0f ); //clear background screen to black
+
 	// Main loop
 	while( running )
 	{
-		glClearColor( 0.0f, 0.0f, 0.0f, 0.0f ); //clear background screen to black
+		
 
  
 
 		//Clear information from last draw
 
 		glClear( GL_COLOR_BUFFER_BIT| GL_DEPTH_BUFFER_BIT);
-
+		glPushAttrib(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
  
 
 		glMatrixMode(GL_MODELVIEW); //Switch to the drawing perspective
 
 		glLoadIdentity(); //Reset the drawing perspective
  
-		glBindTexture(GL_TEXTURE_2D, Texture);
 
-		glBegin(GL_QUADS); //Begin quadrilateral coordinates
-
+		
+		glBegin(GL_QUADS);
+glTexCoord2f(0,1);
+glVertex3f(-1, 1, -1);
+glTexCoord2f(1,1);
+glVertex3f( 1, 1, -1);
+glTexCoord2f(1,0);
+glVertex3f( 1,-1, -1);
+glTexCoord2f(0,0);
+glVertex3f(-1,-1, -1);
+glEnd();
+		 
  
 
-			//Trapezoid
-
-			glVertex3f(-0.7f, -1.5f, -5.0f);
-
-			glVertex3f(0.7f, -1.5f, -5.0f);
-
-			glVertex3f(0.4f, -0.5f, -5.0f);
-
-			glVertex3f(-0.4f, -0.5f, -5.0f);
-
+		//glDisable(GL_TEXTURE_2D);
+		glPopAttrib();
  
-
-		glEnd(); //End quadrilateral coordinates
-
- 
-
-		glBegin(GL_TRIANGLES); //Begin triangle coordinates
-
- 
-
-		//Pentagon
-
-			glVertex3f(0.5f, 0.5f, -5.0f);
-
-			glVertex3f(1.5f, 0.5f, -5.0f);
-
-			glVertex3f(0.5f, 1.0f, -5.0f);
-
- 
-
-			glVertex3f(0.5f, 1.0f, -5.0f);
-
-			glVertex3f(1.5f, 0.5f, -5.0f);
-
-			glVertex3f(1.5f, 1.0f, -5.0f);
-
- 
-
-			glVertex3f(0.5f, 1.0f, -5.0f);
-
-			glVertex3f(1.5f, 1.0f, -5.0f);
-
-			glVertex3f(1.0f, 1.5f, -5.0f);
-
- 
-
-			//Triangle
-
-			glVertex3f(-0.5f, 0.5f, -5.0f);
-
-			glVertex3f(-1.0f, 1.5f, -5.0f);
-
-			glVertex3f(-1.5f, 0.5f, -5.0f);
-
- 
-
-		glEnd(); //End triangle coordinates
-
+     glFlush();
+	
 		glfwSwapBuffers();
 	// Check if ESC key was pressed or window was closed
 		running = glfwGetWindowParam( GLFW_OPENED );
