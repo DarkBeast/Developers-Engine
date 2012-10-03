@@ -76,17 +76,19 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="buffer.h" />
+    <ClInclude Include="Error.h" />
     <ClInclude Include="globals.h" />
-    <ClInclude Include="Graphics\Image.h" />
-    <ClInclude Include="Graphics\Render.h" />
+    <ClInclude Include="Image.h" />
+    <ClInclude Include="Render.h" />
     <ClInclude Include="integer.h" />
     <ClInclude Include="program_path.h" />
     <ClInclude Include="String.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="buffer.c" />
-    <ClCompile Include="Graphics\Image.c" />
-    <ClCompile Include="Graphics\Render.c" />
+    <ClCompile Include="Error.c" />
+    <ClCompile Include="Image.c" />
+    <ClCompile Include="Render.c" />
     <ClCompile Include="main.c" />
     <ClCompile Include="program_path.c" />
     <ClCompile Include="String.c" />
