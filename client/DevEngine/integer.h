@@ -6,7 +6,18 @@
 
 #include <limits.h>
 
+#define GetBit(bitset, index) (!!(bitset & (1 << index)))
+#define SetBit(bitset, index) (bitset |= 1<<index)
+#define ClearBit(bitset, index) (bitset &= ~(1<<index))
+#define ToggleBit(bitset, index) (bitset ^= 1<<index)
+
+#if 0
 #define setbool(b, index, bit) (b = (bit == 0) ? (b | (0 << index)) : b = (b | (1 << index)))
+#endif
+
+#ifndef CBool
+typedef char CBool;
+#endif
 
 /* Unsigned 8-bit integer. */
 #ifndef UINT8_MAX
