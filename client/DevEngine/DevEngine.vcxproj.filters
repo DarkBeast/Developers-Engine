@@ -33,6 +33,18 @@
     <ClInclude Include="Render.h">
       <Filter>Graphics</Filter>
     </ClInclude>
+    <ClInclude Include="Types.h">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="UI.h">
+      <Filter>Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="UIControls.h">
+      <Filter>Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="Keys.h">
+      <Filter>Core</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="buffer.c">
@@ -54,5 +66,14 @@
       <Filter>Graphics</Filter>
     </ClCompile>
     <ClCompile Include="main.c" />
+    <ClCompile Include="UIControls.c">
+      <Filter>Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="UI.c">
+      <Filter>Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="Keys.c">
+      <Filter>Core</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

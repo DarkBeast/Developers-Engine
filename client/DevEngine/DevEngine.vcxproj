@@ -79,18 +79,25 @@
     <ClInclude Include="Error.h" />
     <ClInclude Include="globals.h" />
     <ClInclude Include="Image.h" />
+    <ClInclude Include="Keys.h" />
     <ClInclude Include="Render.h" />
     <ClInclude Include="integer.h" />
     <ClInclude Include="program_path.h" />
     <ClInclude Include="String.h" />
+    <ClInclude Include="Types.h" />
+    <ClInclude Include="UI.h" />
+    <ClInclude Include="UIControls.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="buffer.c" />
     <ClCompile Include="Error.c" />
     <ClCompile Include="Image.c" />
+    <ClCompile Include="Keys.c" />
     <ClCompile Include="Render.c" />
     <ClCompile Include="main.c" />
     <ClCompile Include="program_path.c" />
+    <ClCompile Include="UIControls.c" />
+    <ClCompile Include="UI.c" />
     <ClCompile Include="String.c" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
