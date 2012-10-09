@@ -2,7 +2,7 @@
 #define _image_H
 
 #include <glfw.h>
+#include "Types.h"
 
-
-char *load_png(char *name, int *width, int *height);
+int load_png(char *name, Image *image);
 #endif
