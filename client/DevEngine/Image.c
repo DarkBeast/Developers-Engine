@@ -6,6 +6,8 @@
 #include "integer.h"
 #include "Error.h"
 #include <setjmp.h>
+#include "Render.h"
+
 #define PNG_SIG_BYTES 8
 
 
@@ -18,7 +20,7 @@ png_byte** row_ptrs;
 int i;
 unsigned char header[PNG_SIG_BYTES];
 
-char *load_png(char *name, int *width, int *height)
+int load_png(char *name, Image *image)
 {
 	FILE *png_file = fopen(name, "rb");
 	if (!png_file)
@@ -53,8 +55,8 @@ char *load_png(char *name, int *width, int *height)
 	png_set_sig_bytes(png_ptr, PNG_SIG_BYTES);
 	png_read_info(png_ptr, info_ptr);
 
-	*width = png_get_image_width(png_ptr, info_ptr);
-	*height = png_get_image_height(png_ptr, info_ptr);
+	image->Width = png_get_image_width(png_ptr, info_ptr);
+	image->Height = png_get_image_height(png_ptr, info_ptr);
 
 	
 	bit_depth = png_get_bit_depth(png_ptr, info_ptr);
@@ -82,19 +84,21 @@ char *load_png(char *name, int *width, int *height)
 	png_read_update_info(png_ptr, info_ptr);
 
 	rowbytes = png_get_rowbytes(png_ptr, info_ptr);
-	numbytes = rowbytes*(*height);
+	numbytes = rowbytes*(image->Height);
 	pixels = (png_byte*)malloc(numbytes);
-	row_ptrs = (png_byte**)malloc((*height) * sizeof(png_byte*));
+	row_ptrs = (png_byte**)malloc((image->Height) * sizeof(png_byte*));
 
 	
-	for (i=0; i<(*height); i++)
-	  row_ptrs[i] = pixels + ((*height) - 1 - i)*rowbytes;
+	for (i=0; i<(image->Height); i++)
+	  row_ptrs[i] = pixels + ((image->Height) - 1 - i)*rowbytes;
 
 	png_read_image(png_ptr, row_ptrs);
+
+	image->pixels = (unsigned char *)pixels;
 
 	free(row_ptrs);
 	png_destroy_read_struct(&png_ptr, &info_ptr, &end_info);
 	fclose(png_file);
 
-	return (char *)pixels;
+	return true;
 }
