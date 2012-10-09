@@ -5,51 +5,33 @@
 #include <glfw.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include "Types.h"
+#include "Error.h"
+#include "Image.h"
+#include "integer.h"
 #include "globals.h"
 
-const Uint8 VertexCacheSize = 4;
-
-typedef struct Screen
-{
-int Width;
-int Height;
-
-}Screen;
-
-typedef struct Coords
-{
-int y;
-int x;
-int z;
-}Coords;
-
-typedef struct FCoords
-{
-float y;
-float x;
-float z;
-}FCoords;
-
-typedef struct Vertex
-{
-	Coords position;
-	Coords TexPos;
-
-}Vertex;
-
-typedef struct StatesCache
-    {
-  
-        CBool      glStatesSet;    ///< Are our internal GL states set yet?
-        CBool      viewChanged;    ///< Has the current view changed since last draw?
-        Uint64    lastTextureId;  ///< Cached texture
-        CBool      useVertexCache; ///< Did we previously use the vertex cache?
-        Vertex    vertexCache[VertexCacheSize]; ///< Pre-transformed vertices cache
-    }StatesCache;
 
 Screen screen;
 
+void DrawPush();
+
 void DrawStateReset();
+
 void SetDrawView(int swidth, int sheight);
+
 void SetDrawViewToScreen(Screen s);
+
+int Draw(Image* img, SCoord pos);
+
+int LoadImage(char *name, Image* img, int type);
+
+void GLFWCALL handleResize(int width,int height);
+
+void GLFWCALL handleKeypress(int key,int press);
+
+void ClearScreen(int red, int blue, int green, int alpha);
+
+void InitScreen(int swidth, int sheight, int mode);
+
 #endif
