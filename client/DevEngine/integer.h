@@ -13,6 +13,16 @@
 
 #if 0
 #define setbool(b, index, bit) (b = (bit == 0) ? (b | (0 << index)) : b = (b | (1 << index)))
+
+CBool: an 8bit boolean which cna be used with setbit and getbit to make an 1bit per bits of varible array boolean in one varible.
+int8: -128 to 127
+uint8: 0 to 255
+int16: -32,768 to 32,767
+Uint16: 0 to 65,535
+int32: -2,147,483,648 to 2,147,483,647
+Uint32: 0 to 4,294,967,295
+int64: –9,223,372,036,854,775,808 to 9,223,372,036,854,775,807
+Uint64: 0 to 18,446,744,073,709,551,615
 #endif
 
 #ifndef CBool
