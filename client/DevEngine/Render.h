@@ -2,14 +2,9 @@
 #ifndef _Render_H
 #define _Render_H
 
-#include <glfw.h>
-#include <stdio.h>
-#include <stdlib.h>
+
 #include "Types.h"
-#include "Error.h"
-#include "Image.h"
-#include "integer.h"
-#include "globals.h"
+
 
 
 Screen screen;
