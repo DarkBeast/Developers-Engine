@@ -1,5 +1,6 @@
 #include "Keys.h"
 #include <stdlib.h>
+#include <glfw.h>
 
 void GLFWCALL handleKeypress(int key,int press) //The key that was pressed
 {
