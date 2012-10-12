@@ -2,8 +2,7 @@
 #define _TYPES_H
 
 #include "integer.h"
-
-const int VertexCacheSize = 4;
+#include <glfw.h>
 
 typedef struct Screen
 {
@@ -49,15 +48,5 @@ typedef struct Image
 	unsigned char *pixels;
 	GLuint texID;
 }Image;
-
-
-typedef struct StatesCache
-{
-	CBool      glStatesSet;    ///< Are our internal GL states set yet?
-	CBool      viewChanged;    ///< Has the current view changed since last draw?
-	Uint32    lastTextureId;  ///< Cached texture
-	CBool      useVertexCache; ///< Did we previously use the vertex cache?
-	Vertex    vertexCache[VertexCacheSize]; ///< Pre-transformed vertices cache
-}StatesCache;
 
 #endif
