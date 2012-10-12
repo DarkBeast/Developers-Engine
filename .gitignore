@@ -1,1 +1,6 @@
-﻿client/DevEnginevs10.opensdf
+﻿*.opensdf
+*.ilk
+*.pdb
+*.obj
+*.tlog
+*.log
