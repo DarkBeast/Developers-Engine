@@ -4,7 +4,8 @@
 #include <stdlib.h>
 #include <string.h>
 #include <direct.h>
-
+#include "globals.h"
+#include"integer.h"
 
 char* GetPath(char* target)
 {
@@ -13,8 +14,6 @@ char* GetPath(char* target)
 
 	return Path;
 }
-
-
 
 int CDLGetCurrentDirectory() 
 { //Uint32 iTarget, Uint32 *iRequired
