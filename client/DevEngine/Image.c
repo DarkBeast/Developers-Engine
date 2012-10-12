@@ -7,6 +7,8 @@
 #include "Error.h"
 #include <setjmp.h>
 #include "Render.h"
+#include "globals.h"
+#include <glfw.h>
 
 #define PNG_SIG_BYTES 8
 
@@ -22,13 +24,14 @@ unsigned char header[PNG_SIG_BYTES];
 
 int load_png(char *name, Image *image)
 {
+
 	FILE *png_file = fopen(name, "rb");
 	if (!png_file)
 		FatalError(FILE_ERROR);
 	
 
 	fread(header, 1, PNG_SIG_BYTES, png_file);
-	if(!png_sig_cmp(header, 0, PNG_SIG_BYTES))
+	if(png_sig_cmp(header, 0, PNG_SIG_BYTES))
 		FatalError(FILE_ERROR);
 
 
@@ -47,7 +50,7 @@ int load_png(char *name, Image *image)
 		FatalError(MISC_ERROR);
 
 
-	if(!setjmp(png_jmpbuf(png_ptr)))
+	if(setjmp(png_jmpbuf(png_ptr)))
 		FatalError(IO_ERROR);
 
 
