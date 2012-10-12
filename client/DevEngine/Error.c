@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <glfw.h>
+#include <conio.h>
 
 //TODO: Add Error File Save
 
@@ -37,7 +38,7 @@ void FatalError(int error_flag)
       fputs("An error has occured!\n", stderr);
   }
   fputs("The Application will now close.", stderr);
-  
+  getch();
   ShutDown();
 }
 
@@ -72,11 +73,14 @@ void RenderError(int error_flag)
 	  case GLFWWIN_ERROR:
       fputs("An error has occured: GLFW Did Not Open Window!\n", stderr);
       break;
+	  case IMAGELOADER_ERROR:
+      fputs("An error has occured: Image Did Not Load!\n", stderr);
+      break;
     default:
       fputs("An error has occured!\n", stderr);
   }
   fputs("The Application will now close.", stderr);
-  
+  getch();
   ShutDown();
 }
 

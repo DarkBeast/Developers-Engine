@@ -13,6 +13,7 @@
 #define SOCKET_ADDR_ERROR  7
 #define GLFWINIT_ERROR     8
 #define GLFWWIN_ERROR	   9
+#define IMAGELOADER_ERROR  10
 
 void FatalError(int error_flag);
 void RenderError(int error_flag);
