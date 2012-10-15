@@ -2,6 +2,7 @@
 #define _UICONTROLS_H
 
 #include "Types.h"
+
 typedef struct UI_BUTTON
 {
 	Image image;
