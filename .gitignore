@@ -6,3 +6,7 @@
 *.log
 
 client/DevEnginevs11.opensdf
+*.rar
+*.lnk
+*.idb
+*.pdb
