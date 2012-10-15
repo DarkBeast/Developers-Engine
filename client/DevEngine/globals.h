@@ -2,6 +2,7 @@
 /* Static Variables defines and Public Variables*/
 #ifndef _GLOBALS_H
 #define _GLOBALS_H
+
 #include "Integer.h"
 
 /* Public globals */
