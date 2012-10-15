@@ -3,5 +3,7 @@
 
 #include "Types.h"
 
-int load_png(char *name, Image *image);
+//TODO: Add BMP and TGA and JPEG.
+int load_png(const char *name, Image *image);
+
 #endif
