@@ -1,10 +1,10 @@
 #ifndef _PROGRAMPATH_H
 #define _PROGRAMPATH_H
+//#include "String.h"
 
 char* Program_Path;
-char* Path;
 
-char* GetPath(char* target);
+char* GetPath(const char* target);
 int CDLGetCurrentDirectory();
 void PathDestroy(void);
 
