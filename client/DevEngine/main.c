@@ -1,43 +1,53 @@
+
+#include <glfw.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <glfw.h>
+#include "Error.h"
 #include "globals.h"
+#include "Keys.h"
 #include "image.h"
 #include "program_path.h"
-#include "Error.h"
-#include "Types.h"
 #include "Render.h"
+#include "Types.h"
+
 
 int main( )
 {
 	int running = GL_TRUE;
 	Image img;
-	SCoord pos;
+	Vector2i pos;
+	Vector2f imgpos;
+	char* dapath;
 	CDLGetCurrentDirectory();
 	InitScreen(800,600,GLFW_WINDOW);
-	
-	glfwSetWindowSizeCallback(handleResize); 
+
+	glfwSetWindowSizeCallback(handleResize); //handles resize calls
+	glfwSetKeyCallback(handleKeypress); //handles Key presses
+	initimage(&img);
 	// Main loop
 	while( running )
 	{
-		glClearColor( 0.0f, 0.0f, 0.0f, 0.0f );
-
+		
+		ClearScreen(1,1,1,1);
+	
 		if(LoadImage( GetPath("pngtest.png"), &img, 0))
 		{
 			RenderError(IMAGELOADER_ERROR);
 		}
-
+		
 		DrawStateReset();
-		pos.x1 = 0;
-		pos.x2 = 0;
-		pos.y1 = 0;
-		pos.y2 = 0;
+		pos.x = -90;
+		pos.y = 1;
 
-		Draw(&img, pos);
-        //Clear information from last draw
+		imgpos.x = 1;
+		imgpos.y = 1;
+		
+		Draw(&img, pos, imgpos, 128, 128);
+		//Clear information from last draw
 		glFlush();
 		glfwSwapBuffers();
+		
 		// Check if ESC key was pressed or window was closed
 		running = glfwGetWindowParam( GLFW_OPENED );
 	}
