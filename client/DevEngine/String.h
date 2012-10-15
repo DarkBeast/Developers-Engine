@@ -1,15 +1,16 @@
 /*******************************************************************************
- * Credits:  Anthony                                                           *
- ******************************************************************************/
+* Credits:  Anthony                                                           *
+******************************************************************************/
 #ifndef _STRING_H
 #define _STRING_H
+
 #include"Integer.h"
 
 typedef struct String
 {
-  Uint32* data;
-  Uint32  count;
-  Uint32  size;
+	char* data;
+	size_t  count;
+	size_t  size;
 } String;
 
 /* Creates a new String */
