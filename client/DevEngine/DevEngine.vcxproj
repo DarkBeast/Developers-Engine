@@ -80,6 +80,7 @@
   <ItemGroup>
     <ClInclude Include="buffer.h" />
     <ClInclude Include="Error.h" />
+    <ClInclude Include="function.h" />
     <ClInclude Include="globals.h" />
     <ClInclude Include="Image.h" />
     <ClInclude Include="Keys.h" />
@@ -94,6 +95,7 @@
   <ItemGroup>
     <ClCompile Include="buffer.c" />
     <ClCompile Include="Error.c" />
+    <ClCompile Include="function.c" />
     <ClCompile Include="Image.c" />
     <ClCompile Include="Keys.c" />
     <ClCompile Include="Render.c" />
