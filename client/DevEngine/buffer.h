@@ -5,8 +5,8 @@
 
 struct buffer_t
 {
-  char buff[PACKET_SIZE];
-  int offset;
+	char buff[PACKET_SIZE];
+	int offset;
 };
 
 int  AddBuffer(struct buffer_t *buffer, const void* source, size_t size);
