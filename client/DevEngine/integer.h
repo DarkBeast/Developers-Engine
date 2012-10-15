@@ -10,9 +10,9 @@
 #define SetBit(bitset, index) (bitset |= 1<<index)
 #define ClearBit(bitset, index) (bitset &= ~(1<<index))
 #define ToggleBit(bitset, index) (bitset ^= 1<<index)
+#define setbool(b, index, bit) (b = (bit == 0) ? (b | (0 << index)) : b = (b | (1 << index)))
 
 #if 0
-#define setbool(b, index, bit) (b = (bit == 0) ? (b | (0 << index)) : b = (b | (1 << index)))
 
 CBool: an 8bit boolean which cna be used with setbit and getbit to make an 1bit per bits of varible array boolean in one varible.
 int8: -128 to 127
