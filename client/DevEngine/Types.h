@@ -32,8 +32,8 @@ typedef struct Vector2ui // the coords for placing on screen
 
 typedef struct Vector2f
 {
-    float x;
-    float y;
+	float x;
+	float y;
 }Vector2f;
 
 typedef struct Vector3i //for actule tile coords
