@@ -16,17 +16,17 @@
 
 int load_png(const char *name, Image *image)
 {
-png_structp png_ptr;
-png_infop info_ptr, end_info;
-png_uint_32 rowbytes, numbytes;
-png_uint_32 bit_depth, color_type, interlace_type;
-png_byte* pixelz;
-png_byte** row_ptrs;
-int i;
+	png_structp png_ptr;
+	png_infop info_ptr, end_info;
+	png_uint_32 rowbytes, numbytes;
+	png_uint_32 bit_depth, color_type, interlace_type;
+	png_byte* pixelz;
+	png_byte** row_ptrs;
+	int i;
 
-unsigned char header[PNG_SIG_BYTES];
+	unsigned char header[PNG_SIG_BYTES];
 
-int y = sizeof(image->pixels);
+	int y = sizeof(image->pixels);
 
 	FILE *png_file = fopen(name, "rb");
 
@@ -86,7 +86,7 @@ int y = sizeof(image->pixels);
 		png_set_tRNS_to_alpha(png_ptr);
 	else if(color_type == PNG_COLOR_TYPE_RGB_ALPHA)
 	{
-		 image->Format = GL_RGBA;
+		image->Format = GL_RGBA;
 	}
 	else
 		png_set_filler(png_ptr, 0xff, PNG_FILLER_AFTER);
@@ -109,9 +109,9 @@ int y = sizeof(image->pixels);
 
 	free(pixelz);
 	free(row_ptrs);
-	
+
 	png_destroy_read_struct(&png_ptr, &info_ptr, &end_info);
 	fclose(png_file);
-	
+
 	return true;
 }
