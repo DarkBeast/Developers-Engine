@@ -45,7 +45,9 @@
     <ClInclude Include="Keys.h">
       <Filter>Core</Filter>
     </ClInclude>
-    <ClInclude Include="function.h" />
+    <ClInclude Include="function.h">
+      <Filter>Core</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="buffer.c">
@@ -76,6 +78,8 @@
     <ClCompile Include="Keys.c">
       <Filter>Core</Filter>
     </ClCompile>
-    <ClCompile Include="function.c" />
+    <ClCompile Include="function.c">
+      <Filter>Core</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>
