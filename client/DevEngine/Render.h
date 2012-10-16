@@ -5,12 +5,10 @@
 #include "Types.h"
 
 Screen screen;
-#define ScreenZoom -400
 
 void DrawPush();
 void DrawStateReset();
-void SetDrawView(int swidth, int sheight);
-void SetDrawViewToScreen(Screen s);
+void SetDrawView(int x, int y, int swidth, int sheight);
 int Draw(Image* img, Vector2i vecpos, Vector2f imgpos,int width, int height);
 int LoadImage(char *name, Image* img, int type);
 void reloadimage(Image* img);
