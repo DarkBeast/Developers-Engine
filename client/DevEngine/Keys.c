@@ -1,3 +1,6 @@
+/*******************************************************************************
+* Credits:  Andrew Wheeler/Genusis      
+******************************************************************************/
 
 #include <glfw.h>
 #include <stdlib.h>
@@ -14,23 +17,23 @@ void GLFWCALL handleKeypress(int key,int press) //The key that was pressed
 		exit(0); //Exit the program
 	case GLFW_KEY_UP: 
 		if (pos.y > 0){
-			
-		pos.y = pos.y -1;
+
+			pos.y = pos.y -1;
 		}
 		break;
 	case GLFW_KEY_DOWN: 
 		if (pos.y < screen.Height){
-		pos.y = pos.y +1;
+			pos.y = pos.y +1;
 		}
 		break;
-		case GLFW_KEY_LEFT: 
+	case GLFW_KEY_LEFT: 
 		if (pos.x >0){
-		pos.x = pos.x -1;
+			pos.x = pos.x -1;
 		}
 		break;
-		case GLFW_KEY_RIGHT: 
+	case GLFW_KEY_RIGHT: 
 		if (pos.x < screen.Width){
-		pos.x = pos.x +1;
+			pos.x = pos.x +1;
 		}
 		break;
 	}

@@ -1,3 +1,7 @@
+/*******************************************************************************
+* Credits:  Andrew Wheeler/Genusis
+*           Anthony Ianozi
+******************************************************************************/
 
 /* Static Variables defines and Public Variables*/
 #ifndef _GLOBALS_H
@@ -6,7 +10,7 @@
 #include "Integer.h"
 
 /* Public globals */
-CBool SYSBOOL;
+//CBool SYSBOOL;
 
 /* static globals 
 *  can be const Uint8 test = 5; or #defines

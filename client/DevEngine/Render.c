@@ -1,3 +1,6 @@
+/*******************************************************************************
+* Credits:  Andrew Wheeler/Genusis    
+******************************************************************************/
 
 #include <glfw.h>
 #include <stdio.h>
@@ -66,7 +69,7 @@ void InitScreen(int swidth, int sheight, int mode)
 	glfwSetWindowTitle( TITLE );//Sets the Windows Name
 	screen.Height = sheight;
 	screen.Width = swidth;
-	
+
 }
 
 void ClearScreen(int red, int blue, int green, int alpha)
@@ -84,13 +87,13 @@ void GLFWCALL handleResize(int width,int height)
 	glMatrixMode( GL_PROJECTION ); //Switch to setting the camera perspective
 	//Set the camera perspective
 	glLoadIdentity(); //reset the camera
-	
+
 	glOrtho (0, width, height, 0, 0, 1);
 
 	//set the new screen size from the resize
 	screen.Height = height;
 	screen.Width = width;
-	
+
 }
 
 void initimage(Image* img)
@@ -155,9 +158,9 @@ int Draw(Image* img, Vector2i vecpos, Vector2f imgpos,int width, int height)
 	glEnable (GL_TEXTURE_2D);
 	glBindTexture(GL_TEXTURE_2D, img ->texID);
 	glColor4f(1, 1, 1, 1);// set the image color properties, 1 being highest 0.0000 being lowest
-	
+
 	glBegin (GL_QUADS);
-                           
+
 
 	glTexCoord2f (X1, Y2); 
 	glVertex2i (vecpos.x, vecpos.y);
@@ -170,7 +173,7 @@ int Draw(Image* img, Vector2i vecpos, Vector2f imgpos,int width, int height)
 
 	glTexCoord2f (X1, Y1); 
 	glVertex2i (vecpos.x, vecpos.y +height);
-	
+
 	glEnd ();
 
 

@@ -1,3 +1,6 @@
+/*******************************************************************************
+* Credits:  Andrew Wheeler/Genusis    
+******************************************************************************/
 
 #include <glfw.h>
 #include <stdio.h>
@@ -27,7 +30,7 @@ int main( )
 	glfwSetKeyCallback(handleKeypress); //handles Key presses
 	initimage(&img);
 	pos.x = 0;
-		pos.y = 0;
+	pos.y = 0;
 	// Main loop
 	while( running )
 	{
@@ -42,12 +45,12 @@ int main( )
 
 
 		DrawStateReset();
-		
+
 
 		imgpos.x = 0;
 		imgpos.y = 0;
 
-		
+
 		Draw(&img, pos, imgpos, 128, 128);
 
 		//Clear information from last draw
