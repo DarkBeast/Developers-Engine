@@ -38,18 +38,12 @@ int main( )
 		glfwWaitEvents();
 		ClearScreen(255,255,0,0);
 
-		if(LoadImage( GetPath("pngtest.png"), &img, 0))
-		{
-			RenderError(IMAGELOADER_ERROR);
-		}
-
+		LoadImage( GetPath("pngtest.png"), &img);
 
 		DrawStateReset();
 
-
 		imgpos.x = 0;
 		imgpos.y = 0;
-
 
 		Draw(&img, pos, imgpos, 128, 128);
 
@@ -64,6 +58,6 @@ int main( )
 	glfwTerminate();
 
 	// Exit program
-	exit( EXIT_SUCCESS );
+	exit( true );
 }
 
