@@ -112,7 +112,7 @@ void reloadimage(Image* img)
 	img ->texID = NULL;
 }
 
-int LoadImage(char *name, Image* img, int type)
+void LoadImage(char *name, Image* img)
 {
 
 	if(img->reload == true)//check if its a new image or the first load.
@@ -120,10 +120,8 @@ int LoadImage(char *name, Image* img, int type)
 		GLuint Texture;
 
 		// Read image from file
-		if( load_png( name, img) )
-		{
-			return false;
-		}
+		load_png( name, img);
+		
 
 		glGenTextures( 1, &img ->texID );
 		glBindTexture( GL_TEXTURE_2D, img ->texID );
@@ -137,10 +135,10 @@ int LoadImage(char *name, Image* img, int type)
 		glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MAG_FILTER,GL_LINEAR);
 		img->reload = false;
 	}
-	return true;
+
 }
 
-int Draw(Image* img, Vector2i vecpos, Vector2f imgpos,int width, int height)
+void Draw(Image* img, Vector2i vecpos, Vector2f imgpos,int width, int height)
 {
 	float X2,X1;
 	float Y2,Y1;
@@ -176,6 +174,4 @@ int Draw(Image* img, Vector2i vecpos, Vector2f imgpos,int width, int height)
 
 	glEnd ();
 
-
-	return true;
 }
