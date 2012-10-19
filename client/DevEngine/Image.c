@@ -3,6 +3,8 @@
 *           LibPng Creators
 ******************************************************************************/
 
+
+
 #include <glfw.h>
 #include <setjmp.h>
 #include <stdlib.h>
@@ -14,11 +16,9 @@
 #include "Render.h"
 #include "png.h"
 
-
 #define PNG_SIG_BYTES 8
 
-
-int load_png(const char *name, Image *image)
+void load_png(const char *name, Image *image)
 {
 	png_structp png_ptr;
 	png_infop info_ptr, end_info;
@@ -117,5 +117,5 @@ int load_png(const char *name, Image *image)
 	png_destroy_read_struct(&png_ptr, &info_ptr, &end_info);
 	fclose(png_file);
 
-	return true;
 }
+
