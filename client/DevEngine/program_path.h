@@ -4,13 +4,12 @@
 
 #ifndef _PROGRAMPATH_H
 #define _PROGRAMPATH_H
-//#include "String.h"
 
-char* Program_Path;
+char* program_path;
 
-char* GetPath(const char* target);
-int CDLGetCurrentDirectory();
-void PathDestroy(void);
+char* getpath(const char* target);
+int gpd();//get program directory
+void pathdestroy(void);
 
 #endif
 

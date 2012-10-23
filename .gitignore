@@ -1,10 +1,10 @@
-﻿*.opensdf
+*.opensdf
 *.ilk
 *.pdb
 *.obj
 *.tlog
 *.log
-
+*.xml
 client/DevEnginevs11.opensdf
 *.rar
 *.lnk

@@ -7,10 +7,10 @@
 
 #include <limits.h>
 
-#define GetBit(bitset, index) (!!(bitset & (1 << index)))
-#define SetBit(bitset, index) (bitset |= 1<<index)
-#define ClearBit(bitset, index) (bitset &= ~(1<<index))
-#define ToggleBit(bitset, index) (bitset ^= 1<<index)
+#define getbit(bitset, index) (!!(bitset & (1 << index)))
+#define setbit(bitset, index) (bitset |= 1<<index)
+#define clearbit(bitset, index) (bitset &= ~(1<<index))
+#define togglebit(bitset, index) (bitset ^= 1<<index)
 
 
 #if 0
@@ -26,8 +26,8 @@ int64: –9,223,372,036,854,775,808 to 9,223,372,036,854,775,807
 Uint64: 0 to 18,446,744,073,709,551,615
 #endif
 
-#ifndef CBool
-		typedef char CBool;
+#ifndef cbool
+		typedef char cbool;
 #endif
 
 	   /* Unsigned 8-bit integer. */
@@ -35,14 +35,14 @@ Uint64: 0 to 18,446,744,073,709,551,615
 #define UINT8_MAX 0xFF
 #endif /* UINT8_MAX */
 
-#ifndef Uint8
+#ifndef uint8
 #ifdef UINT8_C
 #undef UINT8_C
 #endif /* UINT8_C */
 
 #if (UCHAR_MAX == UINT8_MAX)
-	   typedef unsigned char                   Uint8;
-#define UINT8_C(v)                      ((Uint8)v)
+	   typedef unsigned char                   uint8;
+#define UINT8_C(v)                      ((uint8)v)
 #else
 #error No unsigned 8-bit integer defined for this platform.
 #endif
@@ -71,17 +71,17 @@ Uint64: 0 to 18,446,744,073,709,551,615
 #define UINT16_MAX 0xFFFF
 #endif /* UINT16_MAX */
 
-#ifndef Uint16
+#ifndef uint16
 #ifdef UINT16_C
 #undef UINT16_C
 #endif /* UINT16_C */
 
 #if (UINT_MAX == UINT16_MAX)
-	   typedef unsigned int                    Uint16;
-#define UINT16_C(v)                     ((Uint16)v)
+	   typedef unsigned int                    uint16;
+#define UINT16_C(v)                     ((uint16)v)
 #elif (USHRT_MAX == UINT16_MAX)
-	   typedef unsigned short                  Uint16;
-#define UINT16_C(v)                     ((Uint16)v)
+	   typedef unsigned short                  uint16;
+#define UINT16_C(v)                     ((uint16)v)
 #else
 #error No unsigned 16-bit integer defined for this platform.
 #endif
@@ -113,20 +113,20 @@ Uint64: 0 to 18,446,744,073,709,551,615
 #define UINT32_MAX (0xFFFFFFFFUL)
 #endif
 
-#ifndef Uint32
+#ifndef uint32
 #ifdef UINT32_C
 #undef UINT32_C
 #endif /* UINT32_C */
 
 #if (ULONG_MAX == UINT32_MAX)
-	   typedef unsigned long                   Uint32;
-#define UINT32_C(v)                     ((Uint32)v)
+	   typedef unsigned long                   uint32;
+#define UINT32_C(v)                     ((uint32)v)
 #elif (UINT_MAX == UINT32_MAX)
-	   typedef unsigned int                    Uint32;
-#define UINT32_C(v)                     ((Uint32)v)
+	   typedef unsigned int                    uint32;
+#define UINT32_C(v)                     ((uint32)v)
 #elif (USHRT_MAX == UINT32_MAX)
-	   typedef unsigned short                  Uint32;
-#define UINT32_C(v)                     ((Uint32)v)
+	   typedef unsigned short                  uint32;
+#define UINT32_C(v)                     ((uint32)v)
 #else
 #error No unsigned 32-bit integer defined for this platform.
 #endif
@@ -157,24 +157,24 @@ Uint64: 0 to 18,446,744,073,709,551,615
 #endif
 
 	   /* Unsigned 64-bit. */
-#ifndef Uint64
+#ifndef uint64
 #ifdef UINT64_C
 #undef UINT64_C
 #endif /* UINT64_C */
 
 #if defined(__GNUC__)
-	   __extension__ typedef unsigned long long Uint64;
-#define UINT64_C(v)                     ((Uint64)v ## ULL)
+	   __extension__ typedef unsigned long long uint64;
+#define UINT64_C(v)                     ((uint64)v ## ULL)
 #elif defined(__MWERKS__) || defined(__SUNPRO_C) || defined(__SUNPRO_CC) || \
 	defined(__APPLE_CC__) || defined(_LONG_LONG) || defined(_CRAYC)
-	   typedef unsigned long long              Uint64;
-#define UINT64_C(v)                     ((Uint64)v ## ULL)
+	   typedef unsigned long long              uint64;
+#define UINT64_C(v)                     ((uint64)v ## ULL)
 #elif (defined(__WATCOMC__) && defined(__WATCOM_INT64__)) || \
 	(defined(_MSC_VER) && _INTEGRAL_MAX_BITS >= 64) || \
 	(defined (__BORLANDC__) && __BORLANDC__ > 0x460) || defined (__alpha) || \
 	defined (__DECC)
-	   typedef unsigned __int64                Uint64;
-#define UINT64_C(v)                     ((Uint64)v ## UI64)
+	   typedef unsigned __int64                uint64;
+#define UINT64_C(v)                     ((uint64)v ## UI64)
 #endif
 #endif /* Uint64 */
 

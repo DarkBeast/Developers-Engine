@@ -7,7 +7,7 @@
 #ifndef _GLOBALS_H
 #define _GLOBALS_H
 
-#include "Integer.h"
+#include "integer.h"
 
 /* Public globals */
 //CBool SYSBOOL;

@@ -19,7 +19,7 @@
 #define GLFWWIN_ERROR	   9
 #define IMAGELOADER_ERROR  10
 
-void FatalError(int error_flag);
-void RenderError(int error_flag);
-void ShutDown();
+void fatalerror(int error_flag);
+void rendererror(int error_flag);
+void shutdown();
 #endif

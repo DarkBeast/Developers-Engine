@@ -8,17 +8,17 @@
 #include <glfw.h>
 #include <setjmp.h>
 #include <stdlib.h>
-#include "Error.h"
+#include "error.h"
 #include "function.h"
 #include "globals.h"
-#include "Image.h"
+#include "image.h"
 #include "integer.h"
-#include "Render.h"
+#include "render.h"
 #include "png.h"
 
 #define PNG_SIG_BYTES 8
 
-void load_png(const char *name, Image *image)
+void load_png(const char *name, image *image)
 {
 	png_structp png_ptr;
 	png_infop info_ptr, end_info;
@@ -35,39 +35,39 @@ void load_png(const char *name, Image *image)
 	FILE *png_file = fopen(name, "rb");
 
 	if (!png_file)
-		FatalError(FILE_ERROR);
+		fatalerror(FILE_ERROR);
 
 
 	fread(header, 1, PNG_SIG_BYTES, png_file);
 	if(png_sig_cmp(header, 0, PNG_SIG_BYTES))
-		FatalError(FILE_ERROR);
+		fatalerror(FILE_ERROR);
 
 
 	png_ptr = png_create_read_struct(PNG_LIBPNG_VER_STRING, NULL, NULL, NULL);
 	if (!png_ptr)
-		FatalError(MISC_ERROR);
+		fatalerror(MISC_ERROR);
 
 
 	info_ptr = png_create_info_struct(png_ptr);
 	if (!info_ptr)
-		FatalError(MISC_ERROR);
+		fatalerror(MISC_ERROR);
 
 
 	end_info = png_create_info_struct(png_ptr);
 	if (!end_info)
-		FatalError(MISC_ERROR);
+		fatalerror(MISC_ERROR);
 
 
 	if(setjmp(png_jmpbuf(png_ptr)))
-		FatalError(IO_ERROR);
+		fatalerror(IO_ERROR);
 
 
 	png_init_io(png_ptr, png_file);
 	png_set_sig_bytes(png_ptr, PNG_SIG_BYTES);
 	png_read_info(png_ptr, info_ptr);
 
-	image->Width = png_get_image_width(png_ptr, info_ptr);
-	image->Height = png_get_image_height(png_ptr, info_ptr);
+	image->width = png_get_image_width(png_ptr, info_ptr);
+	image->height = png_get_image_height(png_ptr, info_ptr);
 
 	bit_depth = png_get_bit_depth(png_ptr, info_ptr);
 	color_type = png_get_color_type(png_ptr, info_ptr);
@@ -90,7 +90,7 @@ void load_png(const char *name, Image *image)
 		png_set_tRNS_to_alpha(png_ptr);
 	else if(color_type == PNG_COLOR_TYPE_RGB_ALPHA)
 	{
-		image->Format = GL_RGBA;
+		image->format = GL_RGBA;
 	}
 	else
 		png_set_filler(png_ptr, 0xff, PNG_FILLER_AFTER);
@@ -98,18 +98,18 @@ void load_png(const char *name, Image *image)
 	png_read_update_info(png_ptr, info_ptr);
 
 	rowbytes = png_get_rowbytes(png_ptr, info_ptr);
-	numbytes = rowbytes*(image->Height);
+	numbytes = rowbytes*(image->height);
 	pixelz = (png_byte*)malloc(numbytes);
-	row_ptrs = (png_byte**)malloc((image->Height) * sizeof(png_byte*));
+	row_ptrs = (png_byte**)malloc((image->height) * sizeof(png_byte*));
 
-	for (i=0; i<(image->Height); i++)
-		row_ptrs[i] = pixelz + ((image->Height) - 1 - i)*rowbytes;
+	for (i=0; i<(image->height); i++)
+		row_ptrs[i] = pixelz + ((image->height) - 1 - i)*rowbytes;
 
 	png_read_image(png_ptr, row_ptrs);
 
 	image->pixels = (unsigned char *)calloc(1, numbytes);
 
-	memcpy(image->pixels, pixelz, image->Width * image->Height * 4);
+	memcpy(image->pixels, pixelz, image->width * image->height * 4);
 
 	free(pixelz);
 	free(row_ptrs);

@@ -5,14 +5,14 @@
 #include <glfw.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include "Error.h"
+#include "error.h"
 #include "globals.h"
-#include "Image.h"
+#include "image.h"
 #include "integer.h"
-#include "Render.h"
+#include "render.h"
 
 
-void DrawPush()
+void drawpush()
 {
 	glPushClientAttrib(GL_CLIENT_ALL_ATTRIB_BITS);
 	glPushAttrib(GL_ALL_ATTRIB_BITS);
@@ -24,7 +24,7 @@ void DrawPush()
 	glPushMatrix();
 }
 
-void DrawStateReset()
+void drawstatereset()
 {
 
 	glDisable(GL_CULL_FACE);
@@ -42,7 +42,7 @@ void DrawStateReset()
 
 }
 
-void SetDrawView(int x, int y, int swidth, int sheight)
+void setdrawview(int x, int y, int swidth, int sheight)
 {
 	//Tell OpenGL how to convert from coordinates to pixel values
 	glViewport( x, y, swidth, sheight );
@@ -56,15 +56,15 @@ void SetDrawView(int x, int y, int swidth, int sheight)
 }
 
 //sets the screen, GLFW , and the Screen Title
-void InitScreen(int swidth, int sheight, int mode)
+void initscreen(int swidth, int sheight, int mode)
 {
 	// Initialize GLFW
 	if( !glfwInit() )
-		RenderError(GLFWINIT_ERROR);
+		rendererror(GLFWINIT_ERROR);
 
 	// Finally we can Open an OpenGL window
 	if(!glfwOpenWindow ( swidth, sheight, 0,0,0,0,0,0, mode ))
-		RenderError(GLFWWIN_ERROR);
+		rendererror(GLFWWIN_ERROR);
 
 	glfwSetWindowTitle( TITLE );//Sets the Windows Name
 	screen.Height = sheight;
@@ -72,14 +72,14 @@ void InitScreen(int swidth, int sheight, int mode)
 
 }
 
-void ClearScreen(int red, int blue, int green, int alpha)
+void clearscreen(int red, int blue, int green, int alpha)
 {
 	glClearColor(red / 255.f, green / 255.f, blue / 255.f, alpha / 255.f);
 	glClear(GL_COLOR_BUFFER_BIT);
 }
 
 //Called when the window is resized
-void GLFWCALL handleResize(int width,int height)
+void GLFWCALL handleresize(int width,int height)
 {
 	//Tell OpenGL how to convert from coordinates to pixel values
 	glViewport( 0, 0, width, height );
@@ -96,23 +96,23 @@ void GLFWCALL handleResize(int width,int height)
 
 }
 
-void initimage(Image* img)
+void initimage(image* img)
 {
-	img->BytesPerPixel = 0;
-	img->Format = GL_RGBA;
-	img->Height = 0;
-	img ->Width = 0;
-	img ->texID = NULL;
+	img->bpp = 0;
+	img->format = GL_RGBA;
+	img->height = 0;
+	img ->width = 0;
+	img ->texid = NULL;
 	img->reload = true;
 }
 
-void reloadimage(Image* img)
+void reloadimage(image* img)
 {
 	img->reload = true;
-	img ->texID = NULL;
+	img ->texid = NULL;
 }
 
-void LoadImage(char *name, Image* img)
+void loadimage(char *name, image* img)
 {
 
 	if(img->reload == true)//check if its a new image or the first load.
@@ -123,11 +123,11 @@ void LoadImage(char *name, Image* img)
 		load_png( name, img);
 		
 
-		glGenTextures( 1, &img ->texID );
-		glBindTexture( GL_TEXTURE_2D, img ->texID );
+		glGenTextures( 1, &img ->texid );
+		glBindTexture( GL_TEXTURE_2D, img ->texid );
 		glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
-		glTexImage2D( GL_TEXTURE_2D, 0, img ->Format,
-			img ->Width, img ->Height, 0, img ->Format,
+		glTexImage2D( GL_TEXTURE_2D, 0, img ->format,
+			img ->width, img ->height, 0, img ->format,
 			GL_UNSIGNED_BYTE, (void*) img->pixels );
 
 
@@ -138,15 +138,15 @@ void LoadImage(char *name, Image* img)
 
 }
 
-void Draw(Image* img, Vector2i vecpos, Vector2f imgpos,int width, int height)
+void draw(image* img, vector2i vecpos, vector2f imgpos,int width, int height)
 {
-	float X2,X1;
-	float Y2,Y1;
+	float x2,x1;
+	float y2,y1;
 
-	X1 = imgpos.x / img->Width;
-	X2 = (imgpos.x + width) / img->Width;
-	Y1 = imgpos.y / img->Height;
-	Y2 = (imgpos.y +height) / img->Height;
+	x1 = imgpos.x / img->width;
+	x2 = (imgpos.x + width) / img->width;
+	y1 = imgpos.y / img->height;
+	y2 = (imgpos.y +height) / img->height;
 
 	glMatrixMode (GL_MODELVIEW);
 	glLoadIdentity ();
@@ -154,22 +154,22 @@ void Draw(Image* img, Vector2i vecpos, Vector2f imgpos,int width, int height)
 	glTranslatef(0.375, 0.375, 0);
 
 	glEnable (GL_TEXTURE_2D);
-	glBindTexture(GL_TEXTURE_2D, img ->texID);
+	glBindTexture(GL_TEXTURE_2D, img ->texid);
 	glColor4f(1, 1, 1, 1);// set the image color properties, 1 being highest 0.0000 being lowest
 
 	glBegin (GL_QUADS);
 
 
-	glTexCoord2f (X1, Y2); 
+	glTexCoord2f (x1, y2); 
 	glVertex2i (vecpos.x, vecpos.y);
 
-	glTexCoord2f (X2, Y2); 
+	glTexCoord2f (x2, y2); 
 	glVertex2i (vecpos.x + width, vecpos.y);
 
-	glTexCoord2f (X2, Y1); 
+	glTexCoord2f (x2, y1); 
 	glVertex2i (vecpos.x + width, vecpos.y +height);
 
-	glTexCoord2f (X1, Y1); 
+	glTexCoord2f (x1, y1); 
 	glVertex2i (vecpos.x, vecpos.y +height);
 
 	glEnd ();

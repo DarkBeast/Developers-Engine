@@ -8,75 +8,69 @@
 #include <glfw.h>
 #include "integer.h"
 
-typedef struct Screen
-{
-	int Width;
-	int Height;
-}Screen;
-
-typedef struct Color
+typedef struct color
 {
 	unsigned int r;
 	unsigned int g;
 	unsigned int b;
 	unsigned int a;
-}Color;
+}color;
 
-typedef struct Vector2i // the coords for placing on screen
+typedef struct vector2i // the coords for placing on screen
 {
 	int x;
 	int y;
-}Vector2i;
+}vector2i;
 
-typedef struct Vector2ui // the coords for placing on screen
+typedef struct vector2ui // the coords for placing on screen
 {
 	unsigned int x;
 	unsigned int y;
-}Vector2ui;
+}vector2ui;
 
-typedef struct Vector2f
+typedef struct vector2f
 {
 	float x;
 	float y;
-}Vector2f;
+}vector2f;
 
-typedef struct Vector3i //for actule tile coords
+typedef struct vector3i //for actule tile coords
 {
 	int y;
 	int x;
 	int z;
-}Vector3i;
+}vector3i;
 
-typedef struct Vector3ui //for actule tile coords
+typedef struct vector3ui //for actule tile coords
 {
 	unsigned int y;
 	unsigned int x;
 	unsigned int z;
-}Vector3ui;
+}vector3ui;
 
-typedef struct Vector3f // for pixels
+typedef struct vector3f // for pixels
 {
 	float y;
 	float x;
 	float z;
-}Vector3f;
+}vector3f;
 
-typedef struct Vertex  
+typedef struct vertex  
 {
-	Vector2i position;
-	Vector2f texpos;
-	Color color;
-}Vertex;
+	vector2i position;
+	vector2f texpos;
+	color color;
+}vertex;
 
-typedef struct Image
+typedef struct image
 {
-	int Width; // le Width
-	int Height; //le height
-	int Format; // the format of the image.
-	int BytesPerPixel; //how many bytes per pixel are in the image
+	int width; // le Width
+	int height; //le height
+	int format; // the format of the image.
+	int bpp; //how many bytes per pixel are in the image
 	unsigned char *pixels; //actule pixel data of image
 	char reload;
-	GLuint texID; //image ID in opengl
-}Image;
+	GLuint texid; //image ID in opengl
+}image;
 
 #endif

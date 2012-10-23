@@ -44,6 +44,7 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LibraryPath>$(VCInstallDir)lib;$(VCInstallDir)atlmfc\lib;$(WindowsSDK_LibraryPath_x86);$(solutionDir)\lib;</LibraryPath>
     <ExcludePath />
+    <CodeAnalysisRuleSet>NativeRecommendedRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LibraryPath>$(VCInstallDir)lib;$(VCInstallDir)atlmfc\lib;$(WindowsSDK_LibraryPath_x86);$(solutionDir)\lib;</LibraryPath>
@@ -56,7 +57,7 @@
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <MinimalRebuild>false</MinimalRebuild>
-      <CompileAs>CompileAsC</CompileAs>
+      <CompileAs>Default</CompileAs>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -79,31 +80,31 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="buffer.h" />
-    <ClInclude Include="Error.h" />
+    <ClInclude Include="error.h" />
     <ClInclude Include="function.h" />
     <ClInclude Include="globals.h" />
-    <ClInclude Include="Image.h" />
-    <ClInclude Include="Keys.h" />
-    <ClInclude Include="Render.h" />
+    <ClInclude Include="image.h" />
+    <ClInclude Include="input.h" />
+    <ClInclude Include="render.h" />
     <ClInclude Include="integer.h" />
     <ClInclude Include="program_path.h" />
-    <ClInclude Include="String.h" />
-    <ClInclude Include="Types.h" />
-    <ClInclude Include="UI.h" />
-    <ClInclude Include="UIControls.h" />
+    <ClInclude Include="cstring.h" />
+    <ClInclude Include="types.h" />
+    <ClInclude Include="widget.h" />
+    <ClInclude Include="controls.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="buffer.c" />
-    <ClCompile Include="Error.c" />
+    <ClCompile Include="error.c" />
     <ClCompile Include="function.c" />
-    <ClCompile Include="Image.c" />
-    <ClCompile Include="Keys.c" />
-    <ClCompile Include="Render.c" />
+    <ClCompile Include="image.c" />
+    <ClCompile Include="input.c" />
+    <ClCompile Include="render.c" />
     <ClCompile Include="main.c" />
     <ClCompile Include="program_path.c" />
-    <ClCompile Include="UIControls.c" />
-    <ClCompile Include="UI.c" />
-    <ClCompile Include="String.c" />
+    <ClCompile Include="controls.c" />
+    <ClCompile Include="widget.c" />
+    <ClCompile Include="cstring.c" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

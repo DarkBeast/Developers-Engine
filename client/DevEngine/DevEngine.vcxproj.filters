@@ -12,40 +12,40 @@
     <ClInclude Include="buffer.h">
       <Filter>Core</Filter>
     </ClInclude>
-    <ClInclude Include="Error.h">
-      <Filter>Core</Filter>
-    </ClInclude>
     <ClInclude Include="globals.h">
       <Filter>Core</Filter>
     </ClInclude>
     <ClInclude Include="program_path.h">
       <Filter>Core</Filter>
     </ClInclude>
-    <ClInclude Include="String.h">
-      <Filter>Core</Filter>
-    </ClInclude>
     <ClInclude Include="integer.h">
       <Filter>Core</Filter>
     </ClInclude>
-    <ClInclude Include="Image.h">
-      <Filter>Graphics</Filter>
-    </ClInclude>
-    <ClInclude Include="Render.h">
-      <Filter>Graphics</Filter>
-    </ClInclude>
-    <ClInclude Include="Types.h">
-      <Filter>Core</Filter>
-    </ClInclude>
-    <ClInclude Include="UI.h">
-      <Filter>Graphics</Filter>
-    </ClInclude>
-    <ClInclude Include="UIControls.h">
-      <Filter>Graphics</Filter>
-    </ClInclude>
-    <ClInclude Include="Keys.h">
-      <Filter>Core</Filter>
-    </ClInclude>
     <ClInclude Include="function.h">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="widget.h">
+      <Filter>Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="controls.h">
+      <Filter>Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="render.h">
+      <Filter>Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="image.h">
+      <Filter>Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="types.h">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="input.h">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="error.h">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="cstring.h">
       <Filter>Core</Filter>
     </ClInclude>
   </ItemGroup>
@@ -53,32 +53,32 @@
     <ClCompile Include="buffer.c">
       <Filter>Core</Filter>
     </ClCompile>
-    <ClCompile Include="Error.c">
-      <Filter>Core</Filter>
-    </ClCompile>
     <ClCompile Include="program_path.c">
       <Filter>Core</Filter>
     </ClCompile>
-    <ClCompile Include="String.c">
-      <Filter>Core</Filter>
-    </ClCompile>
-    <ClCompile Include="Image.c">
-      <Filter>Graphics</Filter>
-    </ClCompile>
-    <ClCompile Include="Render.c">
-      <Filter>Graphics</Filter>
-    </ClCompile>
     <ClCompile Include="main.c" />
-    <ClCompile Include="UIControls.c">
-      <Filter>Graphics</Filter>
-    </ClCompile>
-    <ClCompile Include="UI.c">
-      <Filter>Graphics</Filter>
-    </ClCompile>
-    <ClCompile Include="Keys.c">
+    <ClCompile Include="function.c">
       <Filter>Core</Filter>
     </ClCompile>
-    <ClCompile Include="function.c">
+    <ClCompile Include="widget.c">
+      <Filter>Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="render.c">
+      <Filter>Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="controls.c">
+      <Filter>Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="image.c">
+      <Filter>Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="input.c">
+      <Filter>Core</Filter>
+    </ClCompile>
+    <ClCompile Include="error.c">
+      <Filter>Core</Filter>
+    </ClCompile>
+    <ClCompile Include="cstring.c">
       <Filter>Core</Filter>
     </ClCompile>
   </ItemGroup>

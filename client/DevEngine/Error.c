@@ -6,11 +6,12 @@
 #include <glfw.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include "Error.h"
+#include "error.h"
+#include "globals.h"
 
 //TODO: Add Error File Save
 
-void FatalError(int error_flag)
+void fatalerror(int error_flag)
 {
 	switch(error_flag)
 	{
@@ -43,10 +44,10 @@ void FatalError(int error_flag)
 	}
 	fputs("The Application will now close.", stderr);
 	getch();
-	ShutDown();
+	shutdown();
 }
 
-void RenderError(int error_flag)
+void rendererror(int error_flag)
 {
 	switch(error_flag)
 	{
@@ -85,12 +86,12 @@ void RenderError(int error_flag)
 	}
 	fputs("The Application will now close.", stderr);
 	getch();
-	ShutDown();
+	shutdown();
 }
 
-void ShutDown()
+void shutdown()
 {
 	//TODO: Clean up memory, shut down sockets, etc....?
 	glfwTerminate();
-	exit( EXIT_FAILURE );
+	exit( false );
 }

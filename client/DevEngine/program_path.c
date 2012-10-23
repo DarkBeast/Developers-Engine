@@ -11,39 +11,39 @@
 #include "program_path.h"
 
 
-Uint32 iPath   = 0;
-Uint32 iSize   = 1024;
-char* Path;
+uint32 ipath   = 0;
+uint32 isize   = 1024;
+char* path;
 
-char* GetPath(char* target)
+char* getpath(char* target)
 {
 	//TODO: Set Cache for string sizes
-	if(strlen(Program_Path)  + strlen(target) >= strlen(Path))
-		Path = (char *)realloc(Path, next_power_of_two(strlen(Program_Path)  + strlen(target)));
+	if(strlen(program_path)  + strlen(target) >= strlen(path))
+		path = (char *)realloc(path, next_power_of_two(strlen(program_path)  + strlen(target)));
 
-	strcpy(Path ,Program_Path);
-	strcat(Path ,target);
+	strcpy(path ,program_path);
+	strcat(path ,target);
 
-	return Path;
+	return path;
 }
 
-int CDLGetCurrentDirectory() 
+int gpd() //get program directory
 { 
 
-	char  *sPath   = NULL;
-	char  *sResult = NULL;
+	char  *spath   = NULL;
+	char  *sresult = NULL;
 
-	Path = NULL;
-	Path = (char *)malloc(1024);
-	Program_Path = (char *)malloc(iSize  + 1);
-	sPath = (char *)malloc(iSize);
+	path = NULL;
+	path = (char *)malloc(1024);
+	program_path = (char *)malloc(isize  + 1);
+	spath = (char *)malloc(isize);
 
-	if (Program_Path == NULL)
+	if (program_path == NULL)
 	{
 		return false;
 	}
 
-	if (sPath == NULL)
+	if (spath == NULL)
 
 	{
 
@@ -52,19 +52,19 @@ int CDLGetCurrentDirectory()
 	}
 
 
-	sResult = getcwd(sPath, iSize);
+	sresult = getcwd(spath, isize);
 
-	while (sResult == NULL)
+	while (sresult == NULL)
 
 	{
 
-		iSize *= 2;
+		isize *= 2;
 
 
-		sPath = (char *)realloc(sPath, iSize);
+		spath = (char *)realloc(spath, isize);
 
 
-		if (sPath == NULL)
+		if (spath == NULL)
 
 		{
 
@@ -73,26 +73,26 @@ int CDLGetCurrentDirectory()
 		}
 
 
-		sResult = getcwd(sPath, iSize);
+		sresult = getcwd(spath, isize);
 
 	}
 
 
-	iPath = strlen(sPath) + 1;
+	ipath = strlen(spath) + 1;
 
 
-	if (Program_Path != NULL && iSize  >= iPath)
+	if (program_path != NULL && isize  >= ipath)
 
 	{
 
-		memcpy(Program_Path, sPath, iPath);
+		memcpy(program_path, spath, ipath);
 
 	}
 
 
-	free(sPath);
-	strcat(Program_Path ,"\\");
-	if (Program_Path == NULL || iSize  < iPath)
+	free(spath);
+	strcat(program_path ,"\\");
+	if (program_path == NULL || isize  < ipath)
 	{
 
 		return false;
@@ -107,9 +107,9 @@ int CDLGetCurrentDirectory()
 
 void pathdestroy(void)
 {
-	Program_Path =(char *) malloc (sizeof(Program_Path+1024));
+	program_path =(char *) malloc (sizeof(program_path+1024));
 
-	free(Program_Path);
+	free(program_path);
 	return;
 }
 
