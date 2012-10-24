@@ -8,6 +8,13 @@
 #include <glfw.h>
 #include "integer.h"
 
+typedef struct 
+{
+	void **data;
+	size_t size;
+	size_t count;
+}voidarray;
+
 typedef struct color
 {
 	unsigned int r;
