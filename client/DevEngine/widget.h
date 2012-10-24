@@ -8,41 +8,47 @@
 #include "types.h"
 #include "controls.h"
 
-
-typedef struct widget
+typedef struct 
 {
+	void *type;
 	void(*draw)(void *);
 	void(*mousepress)(void *,int,int);
 	void(*mouserelease)(void *,int,int);
 	void(*mousewheel)(void *,int);
 	void(*keypressed)(void *,int,int);
-	void **widgets;
-	size_t size;
-	size_t count;
+	voidarray widgets;
+	voidarray hidden;
 	vector2i pos;
-	vector2f imgpos;
+	vector2f imgpos; 
 	char visisble;
     char canuse;
     char draggable;
 } widget;
 
 
-typedef struct screen
+typedef struct 
 {
 	vector2i mouseclick;
 	vector2i mousepos;
 	uint16 focusedcontrol; //can hold any control # up to 65,535 
-	uint16 maxcontrols;
-	widget *canvas; //first invisible control;
-}screen;
+}canvas;
+
+
+typedef struct 
+{
+	widget **data;
+	size_t size;
+	size_t count;
+}widgetarray;
 
 void initwidget(void  *wgt);
 void AddtoWidget(void  *wgt,void *sub);
 void switchwidget(void  *wgt, int a, int b);
-void initmousepress(void *wgt, int button, int pressed);
+
+void initmousepress(void *wgt, int button, int pressed);//starter types, leave blank to prevent error on widget creation.
 void initmouserelease(void *wgt, int button, int pressed);
 void initmousewheel(void *wgt, int moved);
 void initkeypressed(void *wgt, int key, int pressed);
-void initdraw(void *wgt);
+void initdraw(void *wgt);// end of starter types
 
 #endif
