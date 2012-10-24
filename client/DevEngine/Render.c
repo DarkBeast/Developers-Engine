@@ -67,8 +67,8 @@ void initscreen(int swidth, int sheight, int mode)
 		rendererror(GLFWWIN_ERROR);
 
 	glfwSetWindowTitle( TITLE );//Sets the Windows Name
-	screen.Height = sheight;
-	screen.Width = swidth;
+	thescreen.height = sheight;
+	thescreen.width = swidth;
 
 }
 
@@ -91,8 +91,8 @@ void GLFWCALL handleresize(int width,int height)
 	glOrtho (0, width, height, 0, 0, 1);
 
 	//set the new screen size from the resize
-	screen.Height = height;
-	screen.Width = width;
+	thescreen.height = height;
+	thescreen.width = width;
 
 }
 
@@ -103,25 +103,25 @@ void initimage(image* img)
 	img->height = 0;
 	img ->width = 0;
 	img ->texid = NULL;
-	img->reload = true;
+	img->reload = TRUE;
 }
 
 void reloadimage(image* img)
 {
-	img->reload = true;
+	img->reload = TRUE;
 	img ->texid = NULL;
 }
 
 void loadimage(char *name, image* img)
 {
 
-	if(img->reload == true)//check if its a new image or the first load.
+	if(img->reload == TRUE)//check if its a new image or the first load.
 	{
 		GLuint Texture;
 
 		// Read image from file
 		load_png( name, img);
-		
+
 
 		glGenTextures( 1, &img ->texid );
 		glBindTexture( GL_TEXTURE_2D, img ->texid );
@@ -133,7 +133,7 @@ void loadimage(char *name, image* img)
 
 		glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MIN_FILTER,GL_LINEAR);
 		glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MAG_FILTER,GL_LINEAR);
-		img->reload = false;
+		img->reload = FALSE;
 	}
 
 }
@@ -173,5 +173,10 @@ void draw(image* img, vector2i vecpos, vector2f imgpos,int width, int height)
 	glVertex2i (vecpos.x, vecpos.y +height);
 
 	glEnd ();
+
+}
+
+void drawwidgets(widget* canvas)//draw all the widgets on the canvas.
+{
 
 }

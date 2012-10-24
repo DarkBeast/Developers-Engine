@@ -25,19 +25,24 @@
 #define VERSION_REV   0
 
 /* network defines*/
-#define CLIENT_PORT        8001	/* The port the server will use to connect */
-#define PACKET_SIZE        8192	/* Size of packet buffer (about 8kiB) */
+#define CLIENT_PORT        8001	//The port the server will use to connect 
+#define PACKET_SIZE        8192	// Size of packet buffer (about 8kiB)
 
 /* player defines*/
-#define MAX_PLAYERS        50  /* # of players the server can support */
-#define MAX_USERNAME_SIZE  16  /* Let's have a reasonable size for usernames */
+#define MAX_PLAYERS        50  // # of players the server can support 
+#define MAX_USERNAME_SIZE  16  // Let's have a reasonable size for usernames 
 
 /* map defines*/
-#define TILE_SIZE_X     32	/*magic pixels*/
-#define TILE_SIZE_Y     32	/*magic pixels*/
+#define TILE_SIZE_X     32	//magic pixels
+#define TILE_SIZE_Y     32	//magic pixels
 
-#define true 0
-#define false -1
+/* boolean defines*/
+#define TRUE 0
+#define FALSE -1
+
+/*widget defines*/
+#define WIDGET_MAX        100 //max ammont of widgets per array.
+
 
 /* Always the end nothing past this point. */
 #endif

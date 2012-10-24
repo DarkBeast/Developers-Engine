@@ -40,14 +40,14 @@ int gpd() //get program directory
 
 	if (program_path == NULL)
 	{
-		return false;
+		return FALSE;
 	}
 
 	if (spath == NULL)
 
 	{
 
-		return false;
+		return FALSE;
 
 	}
 
@@ -95,13 +95,13 @@ int gpd() //get program directory
 	if (program_path == NULL || isize  < ipath)
 	{
 
-		return false;
+		return FALSE;
 
 	}
 
 
 
-	return true;
+	return TRUE;
 
 }
 

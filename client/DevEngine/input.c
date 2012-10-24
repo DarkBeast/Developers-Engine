@@ -22,7 +22,7 @@ void GLFWCALL handlekeypress(int key,int press) //The key that was pressed
 		}
 		break;
 	case GLFW_KEY_DOWN: 
-		if (pos.y < screen.Height){
+		if (pos.y < thescreen.height){
 			pos.y = pos.y +1;
 		}
 		break;
@@ -32,7 +32,7 @@ void GLFWCALL handlekeypress(int key,int press) //The key that was pressed
 		}
 		break;
 	case GLFW_KEY_RIGHT: 
-		if (pos.x < screen.Width){
+		if (pos.x < thescreen.width){
 			pos.x = pos.x +1;
 		}
 		break;

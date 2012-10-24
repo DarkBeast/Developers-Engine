@@ -93,5 +93,5 @@ void shutdown()
 {
 	//TODO: Clean up memory, shut down sockets, etc....?
 	glfwTerminate();
-	exit( false );
+	exit( FALSE );
 }

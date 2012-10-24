@@ -6,14 +6,15 @@
 #define _Render_H
 
 #include "types.h"
+#include "widget.h"
 
 typedef struct 
 {
-	int Width;
-	int Height;
+	int width;
+	int height;
 }screensize;
 
-screensize screen;
+screensize thescreen;
 
 void drawPush();
 void drawstatereset();
@@ -25,5 +26,6 @@ void initimage(image* img);
 void GLFWCALL handleresize(int width,int height);
 void clearscreen(int red, int blue, int green, int alpha);
 void initscreen(int swidth, int sheight, int mode);
+void drawwidgets(widget* canvas);
 
 #endif
