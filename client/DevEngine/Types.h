@@ -65,7 +65,7 @@ typedef struct vector3f // for pixels
 typedef struct vertex  
 {
 	vector2i position;
-	vector2f texpos;
+	vector2i texpos;
 	color color;
 }vertex;
 
