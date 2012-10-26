@@ -20,6 +20,9 @@ typedef struct
 	voidarray hidden;
 	vector2i pos;
 	vector2f imgpos; 
+	image image;
+	int width; 
+	int height;
 	char visisble;
     char canuse;
     char draggable;
