@@ -7,7 +7,7 @@
 #include "integer.h"
 #include "globals.h"
 
-void widgetcreate(canvas *screen, widgetarray *parent)
+void widgetinit(canvas *screen, widgetarray *parent)// used to start the UI system up from the array.
 {
 
 	screen->mouseclick.x = 0;
@@ -16,7 +16,7 @@ void widgetcreate(canvas *screen, widgetarray *parent)
 	screen->mousepos.y = 0;
 	screen->focusedcontrol = 0; //can hold any control # up to 65,535 
 
-	parent->data  = (widget **)calloc(WIDGET_MAX, WIDGET_MAX * sizeof(widget)); //set the size of the widget array
+	parent->data  = (widget **)calloc(1, WIDGET_MAX * sizeof (widget*)); //set the size of the widget array
 	parent->count = (parent->count > WIDGET_MAX) ? WIDGET_MAX : parent->count;
 	parent->size = WIDGET_MAX;
 }
@@ -34,16 +34,16 @@ void switchwidget(voidarray *wgt, int a, int b)
 
 }
 
-void hidewidget(widget *parent, widget *child, size_t index)
+void hidewidget(widget *parent, size_t index)// Parent: the holder of the widgets to be moved, Index the widget to be moved.
 {
 	int i;
 
-	if(child == NULL || parent == NULL || index < 0)
+	if( parent == NULL || index < 0 || parent->widgets.data[index] == NULL)
 		return;
 
 	if(parent->hidden.count == 0)
 	{//if we are starting a new array then create the first object.
-		parent->hidden.data[0] = child; 
+		parent->hidden.data[0] = parent->widgets.data[index]; 
 		parent->hidden.count += 1;
 		parent->widgets.data[index] = NULL;
 		return;
@@ -53,7 +53,7 @@ void hidewidget(widget *parent, widget *child, size_t index)
 	{//search through existing count for Nulled data if Null then use.
 		if(parent->hidden.data[i] = NULL)
 		{
-			parent->hidden.data[i] = child; 
+			parent->hidden.data[i] = parent->widgets.data[index]; 
 			parent->widgets.data[index] = NULL;
 			return;
 		}
@@ -61,7 +61,7 @@ void hidewidget(widget *parent, widget *child, size_t index)
 
 	if( parent->hidden.count < parent->hidden.size)
 	{// if none are nulled then check to see if we reach limit if not add to the count.
-		parent->hidden.data[parent->hidden.count] = child;
+		parent->hidden.data[parent->hidden.count] = parent->widgets.data[index];
 		parent->hidden.count += 1;
 		parent->widgets.data[index] = NULL;
 		return;
@@ -70,16 +70,16 @@ void hidewidget(widget *parent, widget *child, size_t index)
 }
 
 
-void showwidget(widget *parent, widget *child, size_t index)
+void showwidget(widget *parent, size_t index) // Parent: the holder of the widgets to be moved, Index the widget to be moved.
 {
 	int i;
 
-	if(child == NULL || parent == NULL || index < 0)
+	if(parent == NULL || index < 0 || parent->hidden.data[index] == NULL)
 		return;
 
 	if(parent->widgets.count == 0)
 	{
-		parent->widgets.data[0] = child; 
+		parent->widgets.data[0] = parent->hidden.data[index]; 
 		parent->widgets.count += 1;
 		parent->hidden.data[index] == NULL;
 		return;
@@ -89,7 +89,7 @@ void showwidget(widget *parent, widget *child, size_t index)
 	{
 		if(parent->widgets.data[i] = NULL)
 		{
-			parent->widgets.data[i] = child;
+			parent->widgets.data[i] = parent->hidden.data[index];
 			parent->hidden.data[index] == NULL;
 			return;
 		}
@@ -97,7 +97,7 @@ void showwidget(widget *parent, widget *child, size_t index)
 
 	if( parent->widgets.count < parent->widgets.size)
 	{
-		parent->widgets.data[parent->widgets.count] = child;
+		parent->widgets.data[parent->widgets.count] = parent->hidden.data[index];
 		parent->widgets.count += 1;
 		parent->hidden.data[index] == NULL;
 		return;
@@ -186,6 +186,8 @@ void initwidget(widget *wgt)//intilizes the widget so we can then use it error f
 	wgt->pos.y = 0;
 	wgt->imgpos.x = 0;
 	wgt->imgpos.y = 0;
+	wgt->width = 0; 
+	wgt->height = 0;
 	wgt->visisble = FALSE;
 	wgt->canuse = FALSE;
 	wgt->draggable = FALSE;
