@@ -9,13 +9,12 @@
 
 typedef struct button
 {
-	image image;
+	
 	uint8 toggle;
 }button;
 
 typedef struct label
 {
-	image image;
 	uint8 toggle;
 }label;
 
