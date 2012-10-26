@@ -138,10 +138,10 @@ void loadimage(char *name, image* img)
 
 }
 
-void draw(image* img, vector2i vecpos, vector2f imgpos,int width, int height)
+void draw(image* img, vector2i vecpos, vector2i imgpos,int width, int height)
 {
-	float x2,x1;
-	float y2,y1;
+	int x2,x1;
+	int y2,y1;
 
 	x1 = imgpos.x / img->width;
 	x2 = (imgpos.x + width) / img->width;
@@ -160,23 +160,56 @@ void draw(image* img, vector2i vecpos, vector2f imgpos,int width, int height)
 	glBegin (GL_QUADS);
 
 
-	glTexCoord2f (x1, y2); 
+	glTexCoord2i (x1, y2); 
 	glVertex2i (vecpos.x, vecpos.y);
 
-	glTexCoord2f (x2, y2); 
+	glTexCoord2i (x2, y2); 
 	glVertex2i (vecpos.x + width, vecpos.y);
 
-	glTexCoord2f (x2, y1); 
+	glTexCoord2i (x2, y1); 
 	glVertex2i (vecpos.x + width, vecpos.y +height);
 
-	glTexCoord2f (x1, y1); 
+	glTexCoord2i (x1, y1); 
 	glVertex2i (vecpos.x, vecpos.y +height);
 
 	glEnd ();
 
 }
 
-void drawwidgets(widget* canvas)//draw all the widgets on the canvas.
+void drawwidget(widget* widget) //draws all the widgets on the canvas.
 {
+	int x2,x1;
+	int y2,y1;
+
+	x1 = widget->imgpos.x / widget->image.width;
+	x2 = (widget->imgpos.x + widget->width) / widget->image.width;
+	y1 = widget->imgpos.y / widget->image.height;
+	y2 = (widget->imgpos.y +widget->height) / widget->image.height;
+
+	glMatrixMode (GL_MODELVIEW);
+	glLoadIdentity ();
+
+	glTranslatef(0.375, 0.375, 0);
+
+	glEnable (GL_TEXTURE_2D);
+	glBindTexture(GL_TEXTURE_2D, widget->image.texid);
+	glColor4f(1, 1, 1, 1);// set the image color properties, 1 being highest 0.0000 being lowest
+
+	glBegin (GL_QUADS);
+
+
+	glTexCoord2i (x1, y2); 
+	glVertex2i (widget->pos.x, widget->pos.y);
+
+	glTexCoord2i (x2, y2); 
+	glVertex2i (widget->pos.x + widget->width, widget->pos.y);
+
+	glTexCoord2i (x2, y1); 
+	glVertex2i (widget->pos.x + widget->width, widget->pos.y + widget->height);
+
+	glTexCoord2i (x1, y1); 
+	glVertex2i (widget->pos.x, widget->pos.y + widget->height);
+
+	glEnd ();
 
 }
