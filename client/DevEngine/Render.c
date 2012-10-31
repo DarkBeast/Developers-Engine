@@ -1,5 +1,5 @@
 /*******************************************************************************
-* Credits:  Andrew Wheeler/Genusis    
+* Credits:  Andrew Wheeler/Genusis
 ******************************************************************************/
 
 #include <glfw.h>
@@ -10,7 +10,6 @@
 #include "image.h"
 #include "integer.h"
 #include "render.h"
-
 
 void drawpush()
 {
@@ -26,7 +25,6 @@ void drawpush()
 
 void drawstatereset()
 {
-
 	glDisable(GL_CULL_FACE);
 	glDisable(GL_LIGHTING);
 	glDisable (GL_DEPTH_TEST);
@@ -35,11 +33,10 @@ void drawstatereset()
 	//glEnable(GL_COLOR_MATERIAL);//sets a vertex color, migth slow down system some.
 	glEnable(GL_BLEND); //Enable alpha blending for better image qulity, turn off for better performace.
 
-	glAlphaFunc ( GL_GREATER, 0.2 );
+	glAlphaFunc ( GL_GREATER, (GLclampf)0.2 );
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);//Set the blend function
 
 	glMatrixMode(GL_MODELVIEW);
-
 }
 
 void setdrawview(int x, int y, int swidth, int sheight)
@@ -52,7 +49,6 @@ void setdrawview(int x, int y, int swidth, int sheight)
 	glLoadIdentity(); //reset the camera
 
 	glOrtho (0, swidth, sheight, 0, 0, 1);
-
 }
 
 //sets the screen, GLFW , and the Screen Title
@@ -69,7 +65,6 @@ void initscreen(int swidth, int sheight, int mode)
 	glfwSetWindowTitle( TITLE );//Sets the Windows Name
 	thescreen.height = sheight;
 	thescreen.width = swidth;
-
 }
 
 void clearscreen(int red, int blue, int green, int alpha)
@@ -93,7 +88,6 @@ void GLFWCALL handleresize(int width,int height)
 	//set the new screen size from the resize
 	thescreen.height = height;
 	thescreen.width = width;
-
 }
 
 void initimage(image* img)
@@ -102,26 +96,24 @@ void initimage(image* img)
 	img->format = GL_RGBA;
 	img->height = 0;
 	img ->width = 0;
-	img ->texid = NULL;
+	img ->texid = 0;
 	img->reload = TRUE;
 }
 
 void reloadimage(image* img)
 {
 	img->reload = TRUE;
-	img ->texid = NULL;
+	img ->texid = 0;
 }
 
 void loadimage(char *name, image* img)
 {
-
 	if(img->reload == TRUE)//check if its a new image or the first load.
 	{
 		GLuint Texture;
 
 		// Read image from file
 		load_png( name, img);
-
 
 		glGenTextures( 1, &img ->texid );
 		glBindTexture( GL_TEXTURE_2D, img ->texid );
@@ -130,12 +122,10 @@ void loadimage(char *name, image* img)
 			img ->width, img ->height, 0, img ->format,
 			GL_UNSIGNED_BYTE, (void*) img->pixels );
 
-
 		glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MIN_FILTER,GL_LINEAR);
 		glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MAG_FILTER,GL_LINEAR);
 		img->reload = FALSE;
 	}
-
 }
 
 void draw(image* img, vector2i vecpos, vector2i imgpos,int width, int height)
@@ -159,21 +149,19 @@ void draw(image* img, vector2i vecpos, vector2i imgpos,int width, int height)
 
 	glBegin (GL_QUADS);
 
-
-	glTexCoord2i (x1, y2); 
+	glTexCoord2i (x1, y2);
 	glVertex2i (vecpos.x, vecpos.y);
 
-	glTexCoord2i (x2, y2); 
+	glTexCoord2i (x2, y2);
 	glVertex2i (vecpos.x + width, vecpos.y);
 
-	glTexCoord2i (x2, y1); 
+	glTexCoord2i (x2, y1);
 	glVertex2i (vecpos.x + width, vecpos.y +height);
 
-	glTexCoord2i (x1, y1); 
+	glTexCoord2i (x1, y1);
 	glVertex2i (vecpos.x, vecpos.y +height);
 
 	glEnd ();
-
 }
 
 void drawwidget(widget* widget) //draws all the widgets on the canvas.
@@ -181,10 +169,10 @@ void drawwidget(widget* widget) //draws all the widgets on the canvas.
 	int x2,x1;
 	int y2,y1;
 
-	x1 = widget->imgpos.x / widget->image.width;
-	x2 = (widget->imgpos.x + widget->width) / widget->image.width;
-	y1 = widget->imgpos.y / widget->image.height;
-	y2 = (widget->imgpos.y +widget->height) / widget->image.height;
+	x1 = widget->imgpos.x / widget->img.width;
+	x2 = (widget->imgpos.x + widget->width) / widget->img.width;
+	y1 = widget->imgpos.y / widget->img.height;
+	y2 = (widget->imgpos.y +widget->height) / widget->img.height;
 
 	glMatrixMode (GL_MODELVIEW);
 	glLoadIdentity ();
@@ -192,24 +180,22 @@ void drawwidget(widget* widget) //draws all the widgets on the canvas.
 	glTranslatef(0.375, 0.375, 0);
 
 	glEnable (GL_TEXTURE_2D);
-	glBindTexture(GL_TEXTURE_2D, widget->image.texid);
+	glBindTexture(GL_TEXTURE_2D, widget->img.texid);
 	glColor4f(1, 1, 1, 1);// set the image color properties, 1 being highest 0.0000 being lowest
 
 	glBegin (GL_QUADS);
 
-
-	glTexCoord2i (x1, y2); 
+	glTexCoord2i (x1, y2);
 	glVertex2i (widget->pos.x, widget->pos.y);
 
-	glTexCoord2i (x2, y2); 
+	glTexCoord2i (x2, y2);
 	glVertex2i (widget->pos.x + widget->width, widget->pos.y);
 
-	glTexCoord2i (x2, y1); 
+	glTexCoord2i (x2, y1);
 	glVertex2i (widget->pos.x + widget->width, widget->pos.y + widget->height);
 
-	glTexCoord2i (x1, y1); 
+	glTexCoord2i (x1, y1);
 	glVertex2i (widget->pos.x, widget->pos.y + widget->height);
 
 	glEnd ();
-
 }

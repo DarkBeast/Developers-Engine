@@ -1,5 +1,5 @@
 /*******************************************************************************
-* Credits:  Stephan  
+* Credits:  Stephan
 *           Anthony Ianozi
 ******************************************************************************/
 #ifndef _INTEGER_H_
@@ -11,7 +11,6 @@
 #define setbit(bitset, index) (bitset |= 1<<index)
 #define clearbit(bitset, index) (bitset &= ~(1<<index))
 #define togglebit(bitset, index) (bitset ^= 1<<index)
-
 
 #if 0
 
@@ -199,6 +198,5 @@ Uint64: 0 to 18,446,744,073,709,551,615
 #define INT64_C(v)                      ((int64)v ## I64)
 #endif
 #endif /* Int64 */
-
 
 #endif

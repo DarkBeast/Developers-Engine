@@ -1,5 +1,5 @@
 /*******************************************************************************
-* Credits:  Andrew Wheeler/Genusis  
+* Credits:  Andrew Wheeler/Genusis
 *           Stephan
 ******************************************************************************/
 #include <direct.h>
@@ -9,7 +9,6 @@
 #include "globals.h"
 #include "integer.h"
 #include "program_path.h"
-
 
 uint32 ipath   = 0;
 uint32 isize   = 1024;
@@ -28,8 +27,7 @@ char* getpath(char* target)
 }
 
 int gpd() //get program directory
-{ 
-
+{
 	char  *spath   = NULL;
 	char  *sresult = NULL;
 
@@ -46,63 +44,43 @@ int gpd() //get program directory
 	if (spath == NULL)
 
 	{
-
 		return FALSE;
-
 	}
-
 
 	sresult = getcwd(spath, isize);
 
 	while (sresult == NULL)
 
 	{
-
 		isize *= 2;
 
-
 		spath = (char *)realloc(spath, isize);
-
 
 		if (spath == NULL)
 
 		{
-
 			return -1;
-
 		}
 
-
 		sresult = getcwd(spath, isize);
-
 	}
 
-
 	ipath = strlen(spath) + 1;
-
 
 	if (program_path != NULL && isize  >= ipath)
 
 	{
-
 		memcpy(program_path, spath, ipath);
-
 	}
-
 
 	free(spath);
 	strcat(program_path ,"\\");
 	if (program_path == NULL || isize  < ipath)
 	{
-
 		return FALSE;
-
 	}
 
-
-
 	return TRUE;
-
 }
 
 void pathdestroy(void)
@@ -112,5 +90,3 @@ void pathdestroy(void)
 	free(program_path);
 	return;
 }
-
-

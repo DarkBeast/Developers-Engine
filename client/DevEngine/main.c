@@ -1,5 +1,5 @@
 /*******************************************************************************
-* Credits:  Andrew Wheeler/Genusis    
+* Credits:  Andrew Wheeler/Genusis
 ******************************************************************************/
 
 #include <glfw.h>
@@ -13,7 +13,6 @@
 #include "program_path.h"
 #include "render.h"
 #include "types.h"
-
 
 int main( )
 {
@@ -34,7 +33,6 @@ int main( )
 	glfwSetMouseButtonCallback(handlemousepress);//handles mouse button events
 	glfwSetMouseWheelCallback(handlemousewheel);//handles mouse wheel scrolling
 
-	
 	// Main loop
 	while( running )
 	{
@@ -59,11 +57,8 @@ int main( )
 
 		//glfwSleep(.005);
 
-
 		// Check if ESC key was pressed or window was closed
 		running = glfwGetWindowParam( GLFW_OPENED );
-
-		
 	}
 
 	// Close window and terminate GLFW
@@ -72,4 +67,3 @@ int main( )
 	// Exit program
 	exit(TRUE);
 }
-

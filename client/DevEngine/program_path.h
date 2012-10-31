@@ -1,5 +1,5 @@
 /*******************************************************************************
-* Credits:  Andrew Wheeler/Genusis    
+* Credits:  Andrew Wheeler/Genusis
 ******************************************************************************/
 
 #ifndef _PROGRAMPATH_H
@@ -12,4 +12,3 @@ int gpd();//get program directory
 void pathdestroy(void);
 
 #endif
-

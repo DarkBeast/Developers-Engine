@@ -1,5 +1,5 @@
 /*******************************************************************************
-* Credits:  Andrew Wheeler/Genusis    
+* Credits:  Andrew Wheeler/Genusis
 ******************************************************************************/
 
 #ifndef _TYPES_H
@@ -8,7 +8,7 @@
 #include <glfw.h>
 #include "integer.h"
 
-typedef struct 
+typedef struct
 {
 	void **data;
 	size_t size;
@@ -62,7 +62,7 @@ typedef struct vector3f // for pixels
 	float z;
 }vector3f;
 
-typedef struct vertex  
+typedef struct vertex
 {
 	vector2i position;
 	vector2i texpos;

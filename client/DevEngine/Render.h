@@ -1,5 +1,5 @@
 /*******************************************************************************
-* Credits:  Andrew Wheeler/Genusis    
+* Credits:  Andrew Wheeler/Genusis
 ******************************************************************************/
 
 #ifndef _Render_H
@@ -8,7 +8,7 @@
 #include "types.h"
 #include "widget.h"
 
-typedef struct 
+typedef struct
 {
 	int width;
 	int height;

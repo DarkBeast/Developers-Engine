@@ -11,7 +11,7 @@
 cstring* String_Create(uint32 icapacity)
 {
 	cstring* objstring = NULL;
-	objstring = (cstring*)calloc(1, sizeof(cstring) + icapacity * 
+	objstring = (cstring*)calloc(1, sizeof(cstring) + icapacity *
 		sizeof(uint32));
 	if(objstring == NULL)
 	{
@@ -35,7 +35,7 @@ cstring *string_createFromASCIIstring(const char *sstring)
 		++soffset;
 	}
 	icapacity = soffset - sstring;
-	objstring = (cstring*)calloc(1, sizeof(cstring) + icapacity * 
+	objstring = (cstring*)calloc(1, sizeof(cstring) + icapacity *
 		sizeof(uint32));
 	if (objstring == NULL)
 	{
@@ -54,8 +54,7 @@ cstring *string_createFromASCIIstring(const char *sstring)
 		++ioffset;
 	}
 	return objstring;
-} 
-
+}
 
 void string_destroy(cstring* objstring)
 {
@@ -69,7 +68,7 @@ cstring* String_Concatenate(cstring* objtarget, cstring* objsource)
 	{
 		return NULL;
 	}
-	memcpy(objtarget->data+objtarget->count, 
+	memcpy(objtarget->data+objtarget->count,
 		objsource->data, objsource->count * sizeof(uint32));
 	objtarget->count += objsource->count;
 	return objtarget;
@@ -156,4 +155,3 @@ cstring* string_copy(cstring* objtarget, cstring* objsource)
 		objsource->count * sizeof(uint32));
 	return objtarget;
 }
-

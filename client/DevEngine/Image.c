@@ -1,9 +1,7 @@
 /*******************************************************************************
-* Credits:  Andrew Wheeler/Genusis    
+* Credits:  Andrew Wheeler/Genusis
 *           LibPng Creators
 ******************************************************************************/
-
-
 
 #include <glfw.h>
 #include <setjmp.h>
@@ -37,30 +35,24 @@ void load_png(const char *name, image *image)
 	if (!png_file)
 		fatalerror(FILE_ERROR);
 
-
 	fread(header, 1, PNG_SIG_BYTES, png_file);
 	if(png_sig_cmp(header, 0, PNG_SIG_BYTES))
 		fatalerror(FILE_ERROR);
-
 
 	png_ptr = png_create_read_struct(PNG_LIBPNG_VER_STRING, NULL, NULL, NULL);
 	if (!png_ptr)
 		fatalerror(MISC_ERROR);
 
-
 	info_ptr = png_create_info_struct(png_ptr);
 	if (!info_ptr)
 		fatalerror(MISC_ERROR);
-
 
 	end_info = png_create_info_struct(png_ptr);
 	if (!end_info)
 		fatalerror(MISC_ERROR);
 
-
 	if(setjmp(png_jmpbuf(png_ptr)))
 		fatalerror(IO_ERROR);
-
 
 	png_init_io(png_ptr, png_file);
 	png_set_sig_bytes(png_ptr, PNG_SIG_BYTES);
@@ -116,6 +108,4 @@ void load_png(const char *name, image *image)
 
 	png_destroy_read_struct(&png_ptr, &info_ptr, &end_info);
 	fclose(png_file);
-
 }
-
