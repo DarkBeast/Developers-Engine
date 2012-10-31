@@ -1,5 +1,5 @@
 /*******************************************************************************
-* Credits:  Andrew Wheeler/Genusis    
+* Credits:  Andrew Wheeler/Genusis
 ******************************************************************************/
 
 #ifndef _UICONTROLS_H
@@ -9,7 +9,6 @@
 
 typedef struct button
 {
-	
 	uint8 toggle;
 }button;
 
