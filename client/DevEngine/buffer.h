@@ -13,11 +13,11 @@ struct buffer_t
 };
 
 int  addbuffer(struct buffer_t *buffer, const void* source, size_t size);
-void Takebuffer(void* dest, struct buffer_t* buffer, size_t size);
+int  addopcode(struct buffer_t* buffer, uint8_t opcode);
 int  addstring(struct buffer_t* buffer, char* str);
-void Takestring(char* dest, struct buffer_t *buffer);
+int  bufferfull(struct buffer_t* buffer, size_t size);
 int  setrawstring(struct buffer_t *buffer, char* str);
 void clearbuffer(struct buffer_t *buffer);
-int  addopcode(struct buffer_t* buffer, uint8_t opcode);
-int  bufferfull(struct buffer_t* buffer, size_t size);
+void takebuffer(void* dest, struct buffer_t* buffer, size_t size);
+void takestring(char* dest, struct buffer_t *buffer);
 #endif

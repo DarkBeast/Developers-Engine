@@ -23,7 +23,7 @@ void takebuffer(void* dest, struct buffer_t* buffer, size_t size)
 }
 
 int addstring(struct buffer_t* buffer, char* str)
-{ /*[str_len][str]*/
+{
 	uint8 len = strlen(str)+1;
 	if(addbuffer(buffer, &len, sizeof(len))) return 1;
 	if(addbuffer(buffer, str, len)) return 1;
