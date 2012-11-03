@@ -8,7 +8,7 @@
 char* program_path;
 
 char* getpath(const char* target);
-int gpd();//get program directory
+int gpd(void);//get program directory
 void pathdestroy(void);
 
 #endif

@@ -26,8 +26,8 @@ char* getpath(char* target)
 	return path;
 }
 
-int gpd() //get program directory
-{
+int gpd(void)
+{//get program directory
 	char  *spath   = NULL;
 	char  *sresult = NULL;
 
