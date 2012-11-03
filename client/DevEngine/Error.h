@@ -21,5 +21,5 @@
 
 void fatalerror(int error_flag);
 void rendererror(int error_flag);
-void shutdown();
+void shutdown(void);
 #endif
