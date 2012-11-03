@@ -3,6 +3,10 @@
 ******************************************************************************/
 
 #include "function.h"
+#include "types.h"
+#include "globals.h"
+
+uint32 program_time;
 
 size_t next_power_of_two(size_t input) {
 	size_t index;
