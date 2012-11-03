@@ -81,5 +81,8 @@
     <ClCompile Include="cstring.c">
       <Filter>Core</Filter>
     </ClCompile>
+    <ClCompile Include="globals.c">
+      <Filter>Core</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>
