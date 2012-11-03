@@ -7,14 +7,19 @@
 
 #include "types.h"
 
-typedef struct button
-{
-	uint8 toggle;
+//only need types for special widgets.
+typedef struct
+{//TODO:Update to bit Boolean.
+	uint8 click;
 }button;
 
-typedef struct label
+typedef struct
 {
 	uint8 toggle;
 }label;
 
+void drawbuttons(void * wgt);
+
+#define Empty 0;
+#define BUTTON 1;
 #endif
