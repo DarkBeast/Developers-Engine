@@ -14,18 +14,18 @@ typedef struct
 	int height;
 }screensize;
 
-screensize thescreen;
-
-void drawPush();
-void drawstatereset();
-void SetdrawView(int x, int y, int swidth, int sheight);
-void draw(image* img, vector2i vecpos, vector2i imgpos,int width, int height);
-void LoadImage(char *name, image* img);
-void reloadimage(image* img);
-void initimage(image* img);
-void GLFWCALL handleresize(int width,int height);
+screensize getscreensize(void);
 void clearscreen(int red, int blue, int green, int alpha);
-void initscreen(int swidth, int sheight, int mode);
+void draw(image* img, vector2i vecpos, vector2i imgpos,int width, int height);
+void drawpush(void);
+void drawstatereset(void);
 void drawwidget(widget* widget);
-
+void GLFWCALL handleresize(int width,int height);
+void initimage(image* img);
+void initscreen(int swidth, int sheight, int mode);
+void loadimage(char *name, image* img);
+void reloadimage(image* img);
+void SetdrawView(int x, int y, int swidth, int sheight);
+int getscreenheight(void);
+int getscreenwidth(void);
 #endif

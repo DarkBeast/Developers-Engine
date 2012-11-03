@@ -11,7 +11,24 @@
 #include "integer.h"
 #include "render.h"
 
-void drawpush()
+screensize thescreen;
+
+screensize getscreensize(void)
+{
+	return thescreen;
+}
+
+int getscreenheight(void)
+{
+	return thescreen.height;
+}
+
+int getscreenwidth(void)
+{
+	return thescreen.width;
+}
+
+void drawpush(void)
 {
 	glPushClientAttrib(GL_CLIENT_ALL_ATTRIB_BITS);
 	glPushAttrib(GL_ALL_ATTRIB_BITS);
@@ -23,7 +40,7 @@ void drawpush()
 	glPushMatrix();
 }
 
-void drawstatereset()
+void drawstatereset(void)
 {
 	glDisable(GL_CULL_FACE);
 	glDisable(GL_LIGHTING);
