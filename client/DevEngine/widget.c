@@ -8,7 +8,15 @@
 #include "globals.h"
 #include "function.h"
 
-void widgetinit()
+userinterface ui;
+
+void setmousepos(int x , int y)
+{
+	ui.screen.mousepos.x = x;
+	ui.screen.mousepos.y = y;
+}
+
+void widgetinit(void)
 {
 	/*
 	*use only once for initializing a new Root Widget.
@@ -16,39 +24,46 @@ void widgetinit()
 	*a in game widgets. Always unload the root before reusing the root.
 	*/
 
-	screen->mouseclick.x = 0;
-	screen->mouseclick.y = 0;
-	screen->mousepos.x = 0;
-	screen->mousepos.y = 0;
-	screen->focusedcontrol = 0; //can hold any control # up to 65,535
-	screen->clicked = 0;
+	ui.screen.mouseclick.x = 0;
+	ui.screen.mouseclick.y = 0;
+	ui.screen.mousepos.x = 0;
+	ui.screen.mousepos.y = 0;
+	ui.screen.focused = (void *)calloc(1, sizeof (widget*));
+	ui.screen.clicked = 0;
 
-	root->widgets.data  = (void **)calloc(1, WIDGET_MAX * sizeof (widget*)); //set the size of the widget array
-	root->widgets.count = (root->widgets.count > WIDGET_MAX) ? WIDGET_MAX : root->widgets.count;
-	root->widgets.size = WIDGET_MAX;
+	ui.root->widgets.data  = (void **)calloc(1, WIDGET_MAX * sizeof (widget*)); //set the size of the widget array
+	ui.root->widgets.count = (ui.root->widgets.count > WIDGET_MAX) ? WIDGET_MAX : ui.root->widgets.count;
+	ui.root->widgets.size = WIDGET_MAX;
 
-	root->hidden.data  = (void **)calloc(1, WIDGET_MAX * sizeof (widget*)); //set the size of the widget array
-	root->hidden.count = (root->hidden.count > WIDGET_MAX) ? WIDGET_MAX : root->hidden.count;
-	root->hidden.size = WIDGET_MAX;
+	ui.root->hidden.data  = (void **)calloc(1, WIDGET_MAX * sizeof (widget*)); //set the size of the widget array
+	ui.root->hidden.count = (ui.root->hidden.count > WIDGET_MAX) ? WIDGET_MAX : ui.root->hidden.count;
+	ui.root->hidden.size = WIDGET_MAX;
+}
+
+userinterface getui(void)
+{
+	return ui;
 }
 
 void switchwidget(voidarray *wgt, size_t a, size_t b)//switch's widget positions in the arrays. very useful.
 {
 	widget *clone;
 
-	if(wgt == NULL || a < 0 || b < 0 || a >= wgt->size || b >= wgt->size)
+	if(wgt == NULL || a >= wgt->size || b >= wgt->size)
 		return;
 
 	clone = (widget *)wgt->data[a];
 	wgt->data[a] = wgt->data[b];
 	wgt->data[b] = clone;
+	clone = NULL;
+	free(clone);
 }
 
 void hidewidget(widget *parent, size_t index)// Parent: the holder of the widgets to be moved, Index the widget to be moved.
 {
 	size_t i;
 
-	if( parent == NULL || index < 0 || parent->widgets.data[index] == NULL)
+	if( parent == NULL || parent->widgets.data[index] == NULL)
 		return;
 
 	if(parent->hidden.size == 0)
@@ -87,7 +102,7 @@ void showwidget(widget *parent, size_t index) // Parent: the holder of the widge
 {
 	size_t i;
 
-	if(parent == NULL || index < 0 || parent->hidden.data[index] == NULL)
+	if(parent == NULL || parent->hidden.data[index] == NULL)
 		return;
 
 	if(parent->widgets.size == 0)
@@ -195,7 +210,7 @@ void initwidget(widget *wgt)//initializes a widget so we can then use it error f
 	if (wgt == NULL)                                                           \
 		return;
 
-	wgt->type = NULL;
+	wgt->control = NULL;
 	wgt->draw = &initdraw;
 	wgt->mousepress = &initmousepress;
 	wgt->mouserelease = &initmouserelease;
@@ -214,15 +229,14 @@ void initwidget(widget *wgt)//initializes a widget so we can then use it error f
 	wgt->imgpos.y = 0;
 	wgt->width = 0;
 	wgt->height = 0;
-	wgt->visisble = FALSE;
-	wgt->canuse = FALSE;
-	wgt->draggable = FALSE;
+	wgt->focused = FALSE;
+	wgt->mouseover = FALSE;
+	wgt->clicked = FALSE;
+	wgt->type = 0;
 }
 
-void unloadwidget(widget *parent, size_t index)
+void unloadwidget(widget *parent)
 {
-	widget *child;
-
 	if(!clearbothwidgetarrays(parent))
 		return;// add error message
 
@@ -558,9 +572,12 @@ char clearshownarray(widget *parent)
 	return TRUE;
 }
 
-void resizeidarray(size_t *id, size_t size)
+void resizeid(size_t *id, size_t size)
 {
 	size_t *data = NULL;
+
+	if(id == NULL)
+		return;//TODO: add error handler here.
 
 	data = (size_t *)realloc(id, size * sizeof(size_t*));
 
@@ -570,7 +587,7 @@ void resizeidarray(size_t *id, size_t size)
 	id = data;
 }
 
-void widgetmanager()//used to draw the widgets onto the screen.
+void widgetmanager(void)//used to draw the widgets onto the screen.
 {
 	widget *child;
 	size_t *id = NULL;
@@ -582,42 +599,16 @@ void widgetmanager()//used to draw the widgets onto the screen.
 	idsize = 32;
 	idindex = 0;
 
-	for( index = 0; index < root->widgets.count; ++index)
+	for( index = 0; index < ui.root->widgets.count; ++index)
 	{
-		child = (widget *)root->widgets.data[index];
+		child = (widget *)ui.root->widgets.data[index];
 		child->draw(child);//then draw there parent.
 
-		for(id[idindex] = 0; id[idindex] > child->widgets.count; ++id[idindex])
+		if(child->widgets.data != NULL)
 		{
-			if(id[idindex] == child->widgets.count)
+			for(id[idindex] = 0; id[idindex] < child->widgets.count; ++id[idindex])
 			{
-				id[idindex] = 0;
-				if(idindex != 0)
-				{
-					--idindex;
-					child = (widget *)child->parent;
-				}
-			}
-			else
-			{
-				if(child ->widgets.data != NULL)
-				{
-					if (child->widgets.data[id[idindex]] != NULL)
-					{
-						child = (widget *)child->widgets.data[id[idindex]];
-						child->draw(child);//then draw the child.
-
-						++idindex;//we set the z buffer index to know which layer we are in
-
-						if(idindex <= idsize)//make sure there is not too many layers for the id array.
-						{
-							idsize = next_power_of_two(idsize);
-							resizeidarray(id,idsize);
-						}
-						id[idindex] = 0;//set the new ID index to 0
-					}
-				}
-				else
+				if(id[idindex] + 1 == child->widgets.count)
 				{
 					id[idindex] = 0;
 					if(idindex != 0)
@@ -625,6 +616,135 @@ void widgetmanager()//used to draw the widgets onto the screen.
 						--idindex;
 						child = (widget *)child->parent;
 					}
+				}
+				else
+				{
+					if(child ->widgets.data != NULL)
+					{
+						if (child->widgets.data[id[idindex]] != NULL)
+						{
+							child = (widget *)child->widgets.data[id[idindex]];
+							child->draw(child);//then draw the child.
+
+							++idindex;//we set the z buffer index to know which layer we are in
+
+							if(idindex < idsize)//make sure there is not too many layers for the id array.
+							{
+								idsize = next_power_of_two(idsize);
+								resizeid(id,idsize);
+							}
+							id[idindex] = 0;//set the new ID index to 0
+						}
+					}
+					else
+					{
+						id[idindex] = 0;
+						if(idindex != 0)
+						{
+							--idindex;
+							child = (widget *)child->parent;
+						}
+					}
+				}
+			}
+		}
+	}
+}
+
+char widgetrectcontains(widget *control)
+{
+	if(ui.screen.mousepos.x < control->pos.x ){return FALSE;}
+	if(ui.screen.mousepos.x > control->pos.x + control->width){return FALSE;}
+	if(ui.screen.mousepos.y < control->pos.y ) {return FALSE;}
+	if(ui.screen.mousepos.y > control->pos.y + control->height){return FALSE;}
+
+	return TRUE;
+}
+
+void isonwidgetfocused(widget *focused)
+{
+	widget *child;
+	size_t index = 0;
+	size_t index2 = 0;
+
+	if(focused->widgets.data != NULL)
+	{
+		for( index = 0; index < focused->widgets.count; ++index)
+		{
+			child = (widget *)focused->widgets.data[index];
+
+			if(widgetrectcontains(child)== TRUE)
+			{
+				if(child->widgets.data != NULL)
+				{
+					for( index2 = 0; index2 < child->widgets.count; ++index2)
+					{
+						if(widgetrectcontains((widget *)child->widgets.data[index2])== TRUE)
+						{
+							child = (widget *)child->widgets.data[index2];
+
+							if(child->widgets.data == NULL)
+							{
+								ui.screen.focused = child;
+								return;
+							}
+
+							index2 = 0;
+						}
+					}
+
+					ui.screen.focused = child;
+					return;
+				}
+				else
+				{
+					ui.screen.focused = child;
+					return;
+				}
+			}
+		}
+	}
+}
+
+void isonwidget(void)
+{
+	widget *child;
+	size_t index = 0;
+	size_t index2 = 0;
+
+	if(ui.root->widgets.data != NULL)
+	{
+		for( index = 0; index < ui.root->widgets.count; ++index)
+		{
+			child = (widget *)ui.root->widgets.data[index];
+
+			if(widgetrectcontains(child)== TRUE)
+			{
+				if(child->widgets.data != NULL)
+				{
+					for( index2 = 0; index2 < child->widgets.count; ++index2)
+					{
+						if(widgetrectcontains((widget *)child->widgets.data[index2])== TRUE)
+						{
+							child = (widget *)child->widgets.data[index2];
+
+							if(child->widgets.data == NULL)
+							{
+								ui.screen.focused = child;
+								return;
+							}
+
+							index2 = 0;
+						}
+					}
+
+					ui.screen.focused = child;
+					return;
+				}
+				else
+				{
+					ui.screen.focused = child;
+					return;
 				}
 			}
 		}
