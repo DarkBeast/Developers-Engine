@@ -10,7 +10,7 @@
 
 typedef struct
 {
-	void *type;
+	void *control;
 	void(*draw)(void *);
 	void(*mousepress)(void *,int,int);
 	void(*mouserelease)(void *,int,int);
@@ -24,38 +24,49 @@ typedef struct
 	image img;
 	int width;
 	int height;
-	char visisble;
-	char canuse;
-	char draggable;
+	uint8 focused;
+	uint8 mouseover;
+	uint8 clicked;
+	char type;
 } widget;
 
 typedef struct
 {
 	vector2i mouseclick;
 	vector2i mousepos;
-	uint16 focusedcontrol; //can hold any control # up to 65,535
+	void *focused; //can hold any control # up to 65,535
 	uint8 clicked;
 }canvas;
 
-void widgetinit(canvas *screen, widget *parent);//see function for details
-void switchwidget(voidarray *wgt, size_t a, size_t b);
-void hidewidget(widget *parent, size_t index);
-void showwidget(widget *parent, size_t index);
-void addtowidget(widget *parent, widget *child, char hidden);
-void initwidget(widget *wgt);
+typedef struct
+{
+	widget *root;
+	canvas screen;
+}userinterface;
+
 char clearbothwidgetarrays(widget *parent);
 char clearhiddenarray(widget *parent);
 char clearshownarray(widget *parent);
-void initwidgetarray(widget *parent, char opt);
-void widgetarrayresize(widget *parent, char opt, size_t size);//for dynamic widget arrays, the system currently uses static.
-void unloadwidget(widget *parent, size_t index);
-
+char widgetrectcontains(widget *control);
+userinterface getui(void);
+void addtowidget(widget *parent, widget *child, char hidden);
+void hidewidget(widget *parent, size_t index);
+void initdraw(void *wgt);
+void initkeypressed(void *wgt, int key, int pressed);
 void initmousepress(void *wgt, int button, int pressed);
 void initmouserelease(void *wgt, int button, int pressed);
 void initmousewheel(void *wgt, int moved);
-void initkeypressed(void *wgt, int key, int pressed);
-void initdraw(void *wgt);
+void inituserinterface(void);//see function for details
+void initwidget(widget *wgt);
+void initwidgetarray(widget *parent, char opt);
+void isonwidget(void);
+void isonwidgetfocused(widget *focused);
+void resizeid(size_t *id, size_t size);
+void showwidget(widget *parent, size_t index);
+void switchwidget(voidarray *wgt, size_t a, size_t b);
+void unloadwidget(widget *parent);
+void widgetmanager(void);
+void widgetresize(widget *parent, char opt, size_t size);//for dynamic widget arrays, the system currently uses static.
+void setmousepos(int x , int y);
 
-widget *root;
-canvas *screen;
 #endif
