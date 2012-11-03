@@ -10,7 +10,7 @@
 #include "integer.h"
 
 /* Public globals */
-//CBool SYSBOOL;
+//see globals.c it contains public globals types and a example.
 
 /* static globals
 *  can be const Uint8 test = 5; or #defines
@@ -36,12 +36,16 @@
 #define TILE_SIZE_X     32	//magic pixels
 #define TILE_SIZE_Y     32	//magic pixels
 
-/* boolean defines*/
+/* Boolean defines*/
 #define TRUE 0
 #define FALSE -1
 
 /*widget defines*/
-#define WIDGET_MAX        100 //max ammont of widgets per array.
+#define WIDGET_MAX        100 //max amount of widgets per array.
 
+/*to use debug commands set debug to TRUE to turn off set debug to FALSE
+then compile the Program for it to go into Debug mode*/
+#define DEBUG FALSE
+#define MEMORYTEST TRUE
 /* Always the end nothing past this point. */
 #endif
