@@ -42,10 +42,11 @@
 
 /*widget defines*/
 #define WIDGET_MAX        100 //max amount of widgets per array.
-
+#define FONTNAME   "arialuni.ttf" // the font we will use globally. TODO: allow extra fonts at once.
 /*to use debug commands set debug to TRUE to turn off set debug to FALSE
 then compile the Program for it to go into Debug mode*/
 #define DEBUG FALSE
 #define MEMORYTEST TRUE
+
 /* Always the end nothing past this point. */
 #endif
