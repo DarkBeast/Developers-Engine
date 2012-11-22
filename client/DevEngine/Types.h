@@ -17,10 +17,10 @@ typedef struct
 
 typedef struct color
 {
-	unsigned int r;
-	unsigned int g;
-	unsigned int b;
-	unsigned int a;
+	float r;
+	float g;
+	float b;
+	float a;
 }color;
 
 typedef struct vector2i // the coords for placing on screen
@@ -41,14 +41,14 @@ typedef struct vector2f
 	float y;
 }vector2f;
 
-typedef struct vector3i //for actule tile coords
+typedef struct vector3i //for actual tile coords
 {
 	int y;
 	int x;
 	int z;
 }vector3i;
 
-typedef struct vector3ui //for actule tile coords
+typedef struct vector3ui //for actual tile coords
 {
 	unsigned int y;
 	unsigned int x;
@@ -75,7 +75,7 @@ typedef struct image
 	int height; //le height
 	int format; // the format of the image.
 	int bpp; //how many bytes per pixel are in the image
-	unsigned char *pixels; //actule pixel data of image
+	unsigned char *pixels; //actual pixel data of image
 	char reload;
 	GLuint texid; //image ID in opengl
 }image;
