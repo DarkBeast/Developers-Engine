@@ -604,47 +604,42 @@ void widgetmanager(void)//used to draw the widgets onto the screen.
 		child = (widget *)ui.root->widgets.data[index];
 		child->draw(child);//then draw there parent.
 
-		if(child->widgets.data != NULL)
+		for(id[idindex] = 0; id[idindex] < child->widgets.count; ++id[idindex])
 		{
-			for(id[idindex] = 0; id[idindex] < child->widgets.count; ++id[idindex])
+			if(child ->widgets.data != NULL)
 			{
-				if(id[idindex] + 1 == child->widgets.count)
+				if(id[idindex] + 1 >= child->widgets.count && idindex != 0)
 				{
 					id[idindex] = 0;
-					if(idindex != 0)
-					{
-						--idindex;
-						child = (widget *)child->parent;
-					}
+
+					--idindex;
+					child = (widget *)child->parent;
 				}
 				else
 				{
-					if(child ->widgets.data != NULL)
+					if (child->widgets.data[id[idindex]] != NULL)
 					{
-						if (child->widgets.data[id[idindex]] != NULL)
-						{
-							child = (widget *)child->widgets.data[id[idindex]];
-							child->draw(child);//then draw the child.
+						child = (widget *)child->widgets.data[id[idindex]];
+						child->draw(child);//then draw the child.
 
-							++idindex;//we set the z buffer index to know which layer we are in
+						++idindex;//we set the z buffer index to know which layer we are in
 
-							if(idindex < idsize)//make sure there is not too many layers for the id array.
-							{
-								idsize = next_power_of_two(idsize);
-								resizeid(id,idsize);
-							}
-							id[idindex] = 0;//set the new ID index to 0
-						}
-					}
-					else
-					{
-						id[idindex] = 0;
-						if(idindex != 0)
+						if(idindex < idsize)//make sure there is not too many layers for the id array.
 						{
-							--idindex;
-							child = (widget *)child->parent;
+							idsize = next_power_of_two(idsize);
+							resizeid(id,idsize);
 						}
+						id[idindex] = 0;//set the new ID index to 0
 					}
+				}
+			}
+			else
+			{
+				if(idindex != 0)
+				{
+					id[idindex] = 0;
+					--idindex;
+					child = (widget *)child->parent;
 				}
 			}
 		}
