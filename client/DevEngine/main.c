@@ -1,4 +1,4 @@
-/*******************************************************************************
+﻿/*******************************************************************************
 * Credits:  Andrew Wheeler/Genusis
 ******************************************************************************/
 
@@ -13,8 +13,11 @@
 #include "program_path.h"
 #include "render.h"
 #include "types.h"
+#include "text.h"
 
-int main( )
+text *word;
+
+int main(void)
 {
 	int running = GL_TRUE;
 
@@ -23,6 +26,7 @@ int main( )
 	uint32 lps = 0;
 
 	gpd();
+	initfont("");
 	initscreen(800,600,GLFW_WINDOW);
 	glfwEnable(GLFW_KEY_REPEAT);
 
@@ -32,6 +36,18 @@ int main( )
 	glfwSetMouseButtonCallback(handlemousepress);//handles mouse button events
 	glfwSetMouseWheelCallback(handlemousewheel);//handles mouse wheel scrolling
 
+	word =(text *)calloc(1, sizeof(text));
+	word->col.a = 1;
+	word->col.r = 1;
+	word->col.b = 1;
+	word->col.g = 1;
+	word->hw.x = 1;
+	word->hw.y = 1;
+	word->xy.x = 10;
+	word->xy.y = 20;
+	word->size = 3;
+	word->text = "The Quick Brown Fox Jumps Over The Lazy Dog 菝";
+
 	// Main loop
 	while( running )
 	{
@@ -40,7 +56,6 @@ int main( )
 		clearscreen(255,255,0,0);
 
 		drawstatereset();
-
 		//Clear information from last draw
 		glFlush();
 		glfwSwapBuffers();
