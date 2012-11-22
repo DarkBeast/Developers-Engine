@@ -10,3 +10,5 @@ client/DevEnginevs11.opensdf
 *.lnk
 *.idb
 *.pdb
+
+*.lastbuildstate
