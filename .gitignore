@@ -12,3 +12,4 @@ client/DevEnginevs11.opensdf
 *.pdb
 
 *.lastbuildstate
+*.ipch
