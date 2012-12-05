@@ -32,10 +32,10 @@ typedef struct
 
 typedef struct
 {
+	uint8 clicked;
 	vector2i mouseclick;
 	vector2i mousepos;
 	void *focused; //can hold any control # up to 65,535
-	uint8 clicked;
 }canvas;
 
 typedef struct

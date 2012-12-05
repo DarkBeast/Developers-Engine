@@ -20,13 +20,13 @@ text *word;
 int main(void)
 {
 	int running = GL_TRUE;
-
 	uint32 time;
 	uint32 lpstimer = 0;
 	uint32 lps = 0;
 
 	gpd();
 	initfont("");
+
 	initscreen(800,600,GLFW_WINDOW);
 	glfwEnable(GLFW_KEY_REPEAT);
 
@@ -41,22 +41,23 @@ int main(void)
 	word->col.r = 1;
 	word->col.b = 1;
 	word->col.g = 1;
-	word->hw.x = 1;
-	word->hw.y = 1;
+	word->hw.x = 32;
+	word->hw.y = 32;
 	word->xy.x = 10;
 	word->xy.y = 20;
 	word->size = 3;
-	word->text = "The Quick Brown Fox Jumps Over The Lazy Dog 菝";
+	word->data = "The Quick Brown Fox Jumps Over The Lazy Dog ";
 
 	// Main loop
 	while( running )
 	{
 		time = (uint32)glfwGetTime();
 
-		clearscreen(255,255,0,0);
+		clearscreen(0,0,0,0);
 
 		drawstatereset();
 		//Clear information from last draw
+		rendertext(word);
 		glFlush();
 		glfwSwapBuffers();
 

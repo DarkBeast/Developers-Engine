@@ -46,7 +46,6 @@
 /*to use debug commands set debug to TRUE to turn off set debug to FALSE
 then compile the Program for it to go into Debug mode*/
 #define DEBUG FALSE
-#define MEMORYTEST TRUE
 
 /* Always the end nothing past this point. */
 #endif

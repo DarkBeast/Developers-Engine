@@ -17,10 +17,10 @@ typedef struct
 
 typedef struct color
 {
-	float r;
-	float g;
-	float b;
-	float a;
+	float r; // Red
+	float g; // Green
+	float b; // Blue
+	float a; // Alpha transparency
 }color;
 
 typedef struct vector2i // the coords for placing on screen
@@ -71,13 +71,13 @@ typedef struct vertex
 
 typedef struct image
 {
+	GLuint texid; //image ID in opengl
 	int width; // le Width
 	int height; //le height
 	int format; // the format of the image.
 	int bpp; //how many bytes per pixel are in the image
 	unsigned char *pixels; //actual pixel data of image
 	char reload;
-	GLuint texid; //image ID in opengl
 }image;
 
 #endif

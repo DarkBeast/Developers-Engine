@@ -127,8 +127,6 @@ void loadimage(char *name, image* img)
 {
 	if(img->reload == TRUE)//check if its a new image or the first load.
 	{
-		GLuint Texture;
-
 		// Read image from file
 		load_png( name, img);
 

@@ -7,10 +7,10 @@
 /*examples of a global variable*/
 int playersonline;
 
-void setplayersonline(int players){playersonline = players;}
+void setplayersonline(int players){ playersonline = players; }
 
-void increaseplayersonline(void){playersonline += 1;}
+void increaseplayersonline(void){ playersonline += 1; }
 
-void decreaseplayersonline(void){playersonline -= 1;}
+void decreaseplayersonline(void){ playersonline -= 1; }
 
-int getplayersonline(void){return playersonline;}
+int getplayersonline(void){ return playersonline; }
