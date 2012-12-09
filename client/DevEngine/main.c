@@ -15,7 +15,7 @@
 #include "types.h"
 #include "text.h"
 
-text *word;
+text word;
 
 int main(void)
 {
@@ -25,7 +25,6 @@ int main(void)
 	uint32 lps = 0;
 
 	gpd();
-	initfont("");
 
 	initscreen(800,600,GLFW_WINDOW);
 	glfwEnable(GLFW_KEY_REPEAT);
@@ -36,28 +35,20 @@ int main(void)
 	glfwSetMouseButtonCallback(handlemousepress);//handles mouse button events
 	glfwSetMouseWheelCallback(handlemousewheel);//handles mouse wheel scrolling
 
-	word =(text *)calloc(1, sizeof(text));
-	word->col.a = 1;
-	word->col.r = 1;
-	word->col.b = 1;
-	word->col.g = 1;
-	word->hw.x = 32;
-	word->hw.y = 32;
-	word->xy.x = 10;
-	word->xy.y = 20;
-	word->size = 3;
-	word->data = "The Quick Brown Fox Jumps Over The Lazy Dog ";
+	initfont("");
+	//word =(text *)calloc(1, sizeof(text));
+	settext(&word,0,100,16,1,1,1,1,"The Brown Fox Jumps Over The Fence");
 
 	// Main loop
 	while( running )
 	{
 		time = (uint32)glfwGetTime();
 
-		clearscreen(0,0,0,0);
+		clearscreen(1,1,1,1);
 
 		drawstatereset();
 		//Clear information from last draw
-		rendertext(word);
+		rendertext(&word);
 		glFlush();
 		glfwSwapBuffers();
 
