@@ -1,11 +1,14 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <Filter Include="Core">
-      <UniqueIdentifier>{5d397eba-2ba8-420a-91d4-4b6946cd7c2a}</UniqueIdentifier>
+    <Filter Include="GUI">
+      <UniqueIdentifier>{6dfec0eb-d2ab-42ba-a1bf-da51d7876afd}</UniqueIdentifier>
     </Filter>
     <Filter Include="Graphics">
       <UniqueIdentifier>{b9413f54-f7a6-4237-98f4-888e0875bda8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Core">
+      <UniqueIdentifier>{5d397eba-2ba8-420a-91d4-4b6946cd7c2a}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -25,9 +28,6 @@
       <Filter>Core</Filter>
     </ClInclude>
     <ClInclude Include="widget.h">
-      <Filter>Graphics</Filter>
-    </ClInclude>
-    <ClInclude Include="controls.h">
       <Filter>Graphics</Filter>
     </ClInclude>
     <ClInclude Include="render.h">
@@ -51,6 +51,12 @@
     <ClInclude Include="text.h">
       <Filter>Graphics</Filter>
     </ClInclude>
+    <ClInclude Include="controls.h">
+      <Filter>Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="mainmenu.h">
+      <Filter>GUI</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="buffer.c">
@@ -67,9 +73,6 @@
       <Filter>Graphics</Filter>
     </ClCompile>
     <ClCompile Include="render.c">
-      <Filter>Graphics</Filter>
-    </ClCompile>
-    <ClCompile Include="controls.c">
       <Filter>Graphics</Filter>
     </ClCompile>
     <ClCompile Include="image.c">
@@ -89,6 +92,12 @@
     </ClCompile>
     <ClCompile Include="text.c">
       <Filter>Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="controls.c">
+      <Filter>Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="mainmenu.c">
+      <Filter>GUI</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>
