@@ -8,25 +8,25 @@
 #include "function.h"
 #include "integer.h"
 
-text* String_Create(uint32 icapacity)
+cstring* String_Create(uint32 icapacity)
 {
-	text* objstring = NULL;
-	objstring = (text*)calloc(1, sizeof(text) + icapacity *
+	cstring* objstring = NULL;
+	objstring = (cstring*)calloc(1, sizeof(cstring) + icapacity *
 		sizeof(uint8));
 	if(objstring == NULL)
 	{
 		return NULL;
 	}
-	objstring->data = (char*)(objstring + sizeof(text));
+	objstring->data = (char*)(objstring + sizeof(cstring));
 	objstring->size = icapacity;
 	objstring->count = 0;
 
 	return objstring;
 }
 
-text *string_createFromASCIIstring(const char *sstring)
+cstring *string_createFromASCIIstring(const char *sstring)
 {
-	text *objstring = NULL;
+	cstring *objstring = NULL;
 	uint32     *ioffset   = NULL;
 	char       *soffset   = (char*)sstring;
 	uint32      icapacity = 0;
@@ -36,7 +36,7 @@ text *string_createFromASCIIstring(const char *sstring)
 		++soffset;
 	}
 	icapacity = soffset - sstring;
-	objstring = (text*)calloc(1, sizeof(text) + icapacity *
+	objstring = (cstring*)calloc(1, sizeof(cstring) + icapacity *
 		sizeof(uint8));
 	if (objstring == NULL)
 	{
@@ -57,12 +57,12 @@ text *string_createFromASCIIstring(const char *sstring)
 	return objstring;
 }
 
-void string_destroy(text* objstring)
+void string_destroy(cstring* objstring)
 {
 	free(objstring);
 }
 
-text* String_Concatenate(text* objtarget, text* objsource)
+cstring* String_Concatenate(cstring* objtarget, cstring* objsource)
 {
 	if(objsource->count > objtarget->size -
 		objtarget->count)
@@ -74,7 +74,7 @@ text* String_Concatenate(text* objtarget, text* objsource)
 	objtarget->count += objsource->count;
 	return objtarget;
 }
-extern text* string_concatenatefromASCIIstring(text* objtarget, const char* ssource)
+extern cstring* string_concatenatefromASCIIstring(cstring* objtarget, const char* ssource)
 {
 	uint32     *ioffset   = NULL;
 	char       *soffset   = (char*)ssource;
@@ -97,7 +97,7 @@ extern text* string_concatenatefromASCIIstring(text* objtarget, const char* ssou
 	}
 	return objtarget;
 }
-uint32 string_length(text* objstring)
+uint32 string_length(cstring* objstring)
 {
 	if(objstring == NULL)
 	{
@@ -117,7 +117,7 @@ uint32 GetASCIIstringlength(const char* sstring)
 	return sstring - sstart;
 }
 
-text* string_copyfromASCIIstring(text* objtarget, const char* ssource)
+cstring* string_copyfromASCIIstring(cstring* objtarget, const char* ssource)
 {
 	uint32     *ioffset   = NULL;
 	char       *soffset   = (char*)ssource;
@@ -145,7 +145,7 @@ text* string_copyfromASCIIstring(text* objtarget, const char* ssource)
 	return objtarget;
 }
 
-text* string_copy(text* objtarget, text* objsource)
+cstring* string_copy(cstring* objtarget, cstring* objsource)
 {
 	if(objsource->count > objtarget->size)
 	{
