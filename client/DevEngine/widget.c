@@ -10,6 +10,11 @@
 
 userinterface ui;
 
+userinterface getui(void)
+{
+	return ui;
+}
+
 void setmousepos(int x , int y)
 {
 	ui.screen.mousepos.x = x;
@@ -31,18 +36,15 @@ void widgetinit(void)
 	ui.screen.focused = (void *)calloc(1, sizeof (widget*));
 	ui.screen.clicked = 0;
 
-	ui.root->widgets.data  = (void **)calloc(1, WIDGET_MAX * sizeof (widget*)); //set the size of the widget array
+	ui.root = (widget *)calloc(1, sizeof (widget));
+	initwidget(ui.root);
+	ui.root->widgets.data  = (void **)calloc(1, WIDGET_MAX * sizeof (widget)); //set the size of the widget array
 	ui.root->widgets.count = (ui.root->widgets.count > WIDGET_MAX) ? WIDGET_MAX : ui.root->widgets.count;
 	ui.root->widgets.size = WIDGET_MAX;
 
-	ui.root->hidden.data  = (void **)calloc(1, WIDGET_MAX * sizeof (widget*)); //set the size of the widget array
+	ui.root->hidden.data  = (void **)calloc(1, WIDGET_MAX * sizeof (widget)); //set the size of the widget array
 	ui.root->hidden.count = (ui.root->hidden.count > WIDGET_MAX) ? WIDGET_MAX : ui.root->hidden.count;
 	ui.root->hidden.size = WIDGET_MAX;
-}
-
-userinterface getui(void)
-{
-	return ui;
 }
 
 void switchwidget(voidarray *wgt, size_t a, size_t b)//switch's widget positions in the arrays. very useful.
@@ -141,8 +143,13 @@ void addtowidget(widget *parent, widget *child, char hidden)
 {
 	size_t i;
 
-	if(child == NULL || parent == NULL)
+	if(child == NULL)
 		return;
+
+	if(parent == NULL)
+	{
+		parent = ui.root;
+	}
 
 	if(hidden)
 	{
@@ -207,7 +214,7 @@ void addtowidget(widget *parent, widget *child, char hidden)
 
 void initwidget(widget *wgt)//initializes a widget so we can then use it error free.
 {
-	if (wgt == NULL)                                                           \
+	if(wgt == NULL)
 		return;
 
 	wgt->control = NULL;
@@ -216,10 +223,10 @@ void initwidget(widget *wgt)//initializes a widget so we can then use it error f
 	wgt->mouserelease = &initmouserelease;
 	wgt->mousewheel = &initmousewheel;
 	wgt->keypressed = &initkeypressed;
-	wgt->widgets.data = NULL;
+	wgt->widgets.data  = NULL; //set the size of the widget array
 	wgt->widgets.count = 0;
 	wgt->widgets.size = 0;
-	wgt->hidden.data = NULL;
+	wgt->hidden.data  = NULL;
 	wgt->hidden.count = 0;
 	wgt->hidden.size = 0;
 	wgt->parent = NULL;
@@ -644,6 +651,8 @@ void widgetmanager(void)//used to draw the widgets onto the screen.
 			}
 		}
 	}
+
+	free(id);
 }
 
 char widgetrectcontains(widget *control)
