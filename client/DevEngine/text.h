@@ -11,6 +11,7 @@
 #include FT_FREETYPE_H
 #include <freetype/ftglyph.h>
 #include "types.h"
+#include "integer.h"
 
 typedef struct
 {
@@ -23,22 +24,23 @@ typedef struct
 	FT_Glyph glyph;
 	FT_BitmapGlyph  glyph_bitmap;
 	GLuint tex;
-	int advancex;
-	int advancey;
+	int16 advancex;
+	int16 advancey;
 } symbol;		// character information
 
 typedef struct
 {
 	char *data;
-	size_t  count;
-	size_t  size;
 	color col; //color of text
-	vector2i xy; // X location and Y location on screen
-	int resize;
+	vector2ui xy; // X location and Y location on screen
+	uint16 resize;
 }text;
 
 void initfont(char *fontname);
-void initatlas();
-void rendertext(text *str);
-void settext(text *data, int x, int y, int size, int red, int blue, int green, int alpha, char* string);
+void initatlas(void);
+void drawtext(text *str);
+void settext(text *data, uint16 x, uint16 y, uint16 size, uint8 red,uint8 blue,uint8 green,uint8 alpha, char *string);
+vector2ui getmaxstringhw(char *string, uint16 resize);
+symbol* getcharacterarray(void);
+
 #endif
