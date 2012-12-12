@@ -1,27 +1,35 @@
 /*******************************************************************************
 * Credits:  Andrew Wheeler/Genusis
 ******************************************************************************/
-#include "widget.h"
+
 #include "render.h"
 #include "program_path.h"
-#include "globals.h"
+#include "controls.h"
+#include <stdlib.h>
 
-void createbutton(widget *button, uint32 x, uint32 y, uint32 height, uint32 width, char* image)
+//Buttons
+void createbutton(widget *data, uint16 x, uint16 y, uint16 height, uint16 width, char *image)
 {
-	initwidget(button);
-	button->pos.x = x;
-	button->pos.y = y;
-	button->height = height;
-	button->width = width;
-	button->imgpos.x = 0;
-	button->imgpos.y = 0;
-	button->type = BUTTON;
-	button->draw = &drawbuttons;
+	button box;
 
-	loadimage(getpath(image), &button->img);
+	data = (widget *)calloc(1,sizeof(widget));
+	initwidget(data);
+	data->pos.x = x;
+	data->pos.y = y;
+	data->height = height;
+	data->width = width;
+	data->imgpos.x = 0;
+	data->imgpos.y = 0;
+	data->type = BUTTON;
+	data->draw = &drawbuttons;
+
+	box.click = 0;
+
+	data ->control = &box;
+	loadimage(getpath(image), &data->img);
 }
 
-void drawbuttons(void * wgt)
+void drawbuttons(void *wgt)
 {
 	widget *data;
 	data = (widget *)wgt;
@@ -44,4 +52,38 @@ void drawbuttons(void * wgt)
 		data->imgpos.y = 0;
 		drawwidget(data);
 	}
+}
+
+//labels
+void createlabel(widget *data, uint16 x, uint16 y, uint16 size, uint8 red, uint8 blue, uint8 green, uint8 alpha, char *labeltext)
+{
+	label *inittext;
+	vector2ui hw;
+	char *p;
+
+	initwidget(data);
+	data->pos.x = x;
+	data->pos.y = y;
+	data->imgpos.x = 0;
+	data->imgpos.y = 0;
+	data->type = LABEL;
+	data->draw = &drawlabel;
+	inittext = (label *)calloc(1,sizeof(label));
+	inittext->string = (text *)calloc(1,sizeof(text));
+	settext(inittext->string,x,y,size,red,blue,green,alpha,labeltext);
+	inittext->click = 0;
+	hw = getmaxstringhw(labeltext,size);
+	data->height = hw.y;
+	data->width = hw.x;
+	data->control = inittext;
+}
+
+void drawlabel(void *wgt)
+{
+	widget *data;
+	label *parent;
+
+	data = (widget *)wgt;
+	parent = (label *)data->control;
+	drawtext(parent->string);
 }

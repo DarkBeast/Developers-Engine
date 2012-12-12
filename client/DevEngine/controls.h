@@ -2,12 +2,20 @@
 * Credits:  Andrew Wheeler/Genusis
 ******************************************************************************/
 
-#ifndef _UICONTROLS_H
-#define _UICONTROLS_H
+#ifndef _CONTROLS_H
+#define _CONTROLS_H
 
+#include "widget.h"
 #include "types.h"
+#include "integer.h"
+#include "text.h"
+#include "globals.h"
 
+#define EMPTY 0;
+#define BUTTON 1;
+#define LABEL 2;
 //only need types for special widgets.
+
 typedef struct
 {//TODO:Update to bit Boolean.
 	uint8 click;
@@ -15,11 +23,13 @@ typedef struct
 
 typedef struct
 {
-	uint8 toggle;
+	uint8 click;
+	text *string;
 }label;
 
-void drawbuttons(void * wgt);
+void createbutton(widget *data, uint16 x, uint16 y, uint16 height, uint16 width, char *image);
+void drawbuttons(void *wgt);
 
-#define Empty 0;
-#define BUTTON 1;
+void createlabel(widget *data, uint16 x, uint16 y, uint16 size, uint8 red, uint8 blue, uint8 green, uint8 alpha, char *labeltext);
+void drawlabel(void *wgt);
 #endif
