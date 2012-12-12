@@ -14,16 +14,10 @@
 #include "render.h"
 #include "types.h"
 #include "text.h"
-
-text word;
+#include "mainmenu.h"
 
 int main(void)
 {
-	int running = GL_TRUE;
-	uint32 time;
-	uint32 lpstimer = 0;
-	uint32 lps = 0;
-
 	gpd();
 
 	initscreen(800,600,GLFW_WINDOW);
@@ -36,38 +30,10 @@ int main(void)
 	glfwSetMouseWheelCallback(handlemousewheel);//handles mouse wheel scrolling
 
 	initfont("");
-	//word =(text *)calloc(1, sizeof(text));
-	settext(&word,0,100,16,1,1,1,1,"The Brown Fox Jumps Over The Fence");
 
 	// Main loop
-	while( running )
-	{
-		time = (uint32)glfwGetTime();
-
-		clearscreen(1,1,1,1);
-
-		drawstatereset();
-		//Clear information from last draw
-		rendertext(&word);
-		glFlush();
-		glfwSwapBuffers();
-
-		if(lpstimer < time)
-		{//calculates the loops per second the code does, through everything
-			printf("%i\n",lps);
-			lpstimer = time + 1;
-
-			lps = 0;
-		}
-
-		lps += 1;
-
-		//glfwSleep(.005); //used to save cpu
-
-		// Check if ESC key was pressed or window was closed
-		running = glfwGetWindowParam( GLFW_OPENED );
-	}
-
+	initmainmenu();
+	mainmenu();
 	// Close window and terminate GLFW
 	glfwTerminate();
 
