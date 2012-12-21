@@ -27,7 +27,7 @@ char* getpath(char* target)
 	return path;
 }
 
-int gpd(void)
+int getprogramdirectory(void)
 {//get program directory
 	char  *spath   = NULL;
 	char  *sresult = NULL;
@@ -48,7 +48,7 @@ int gpd(void)
 		return FALSE;
 	}
 
-	sresult = getcwd(spath, isize);
+	sresult = _getcwd(spath, isize);
 
 	while (sresult == NULL)
 
@@ -63,7 +63,7 @@ int gpd(void)
 			return -1;
 		}
 
-		sresult = getcwd(spath, isize);
+		sresult = _getcwd(spath, isize);
 	}
 
 	ipath = strlen(spath) + 1;
