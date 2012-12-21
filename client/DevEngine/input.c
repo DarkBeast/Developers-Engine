@@ -18,7 +18,7 @@ void GLFWCALL handlekeypress(int key,int press) //The key that was pressed
 
 void GLFWCALL handlemousepos(int x,int y)
 {
-	setmousepos(x,y);
+	setmousepos((int16)x,(int16)y);
 
 #if(DEBUG == TRUE)
 	printf(" x = %i\n", x);
@@ -28,6 +28,30 @@ void GLFWCALL handlemousepos(int x,int y)
 
 void GLFWCALL handlemousepress(int button,int pressed)
 {
+	setuiclickevent((int8)button, (int8)pressed);
+
+	if( checkfocused() == TRUE)
+	{
+		if(pressed == 1)
+		{
+			isonwidgetfocused();
+		}
+		else
+		{
+			isonmousereleasefocused();
+		}
+	}
+	else
+	{
+		if(pressed == 1)
+		{
+			isonwidget();
+		}
+		else
+		{
+			isonmousereleasewidget();
+		}
+	}
 }
 
 void GLFWCALL handlemousewheel(int moved)
