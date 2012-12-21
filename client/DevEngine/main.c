@@ -1,7 +1,7 @@
 ﻿/*******************************************************************************
 * Credits:  Andrew Wheeler/Genusis
 ******************************************************************************/
-
+// /ENTRY:"mainCRTStartup"
 #include <glfw.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -14,18 +14,11 @@
 #include "render.h"
 #include "types.h"
 #include "text.h"
-
-text *word;
+#include "mainmenu.h"
 
 int main(void)
 {
-	int running = GL_TRUE;
-	uint32 time;
-	uint32 lpstimer = 0;
-	uint32 lps = 0;
-
-	gpd();
-	initfont("");
+	getprogramdirectory();
 
 	initscreen(800,600,GLFW_WINDOW);
 	glfwEnable(GLFW_KEY_REPEAT);
@@ -36,47 +29,11 @@ int main(void)
 	glfwSetMouseButtonCallback(handlemousepress);//handles mouse button events
 	glfwSetMouseWheelCallback(handlemousewheel);//handles mouse wheel scrolling
 
-	word =(text *)calloc(1, sizeof(text));
-	word->col.a = 1;
-	word->col.r = 1;
-	word->col.b = 1;
-	word->col.g = 1;
-	word->hw.x = 32;
-	word->hw.y = 32;
-	word->xy.x = 10;
-	word->xy.y = 20;
-	word->size = 3;
-	word->data = "The Quick Brown Fox Jumps Over The Lazy Dog ";
+	initfont("");
 
 	// Main loop
-	while( running )
-	{
-		time = (uint32)glfwGetTime();
-
-		clearscreen(0,0,0,0);
-
-		drawstatereset();
-		//Clear information from last draw
-		rendertext(word);
-		glFlush();
-		glfwSwapBuffers();
-
-		if(lpstimer < time)
-		{//calculates the loops per second the code does, through everything
-			printf("%i\n",lps);
-			lpstimer = time + 1;
-
-			lps = 0;
-		}
-
-		lps += 1;
-
-		//glfwSleep(.005); //used to save cpu
-
-		// Check if ESC key was pressed or window was closed
-		running = glfwGetWindowParam( GLFW_OPENED );
-	}
-
+	initmainmenu();
+	mainmenu();
 	// Close window and terminate GLFW
 	glfwTerminate();
 
