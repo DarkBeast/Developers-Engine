@@ -23,16 +23,23 @@ typedef struct color
 	float a; // Alpha transparency
 }color;
 
+typedef struct
+{
+	char *data;
+	size_t  count;
+	size_t  size;
+}cstring;
+
 typedef struct vector2i // the coords for placing on screen
 {
-	int x;
-	int y;
+	int16 x;
+	int16 y;
 }vector2i;
 
 typedef struct vector2ui // the coords for placing on screen
 {
-	unsigned int x;
-	unsigned int y;
+	uint16 x;
+	uint16 y;
 }vector2ui;
 
 typedef struct vector2f
@@ -43,16 +50,16 @@ typedef struct vector2f
 
 typedef struct vector3i //for actual tile coords
 {
-	int y;
-	int x;
-	int z;
+	int16 y;
+	int16 x;
+	int16 z;
 }vector3i;
 
 typedef struct vector3ui //for actual tile coords
 {
-	unsigned int y;
-	unsigned int x;
-	unsigned int z;
+	uint16 y;
+	uint16 x;
+	uint16 z;
 }vector3ui;
 
 typedef struct vector3f // for pixels
@@ -72,12 +79,12 @@ typedef struct vertex
 typedef struct image
 {
 	GLuint texid; //image ID in opengl
-	int width; // le Width
-	int height; //le height
-	int format; // the format of the image.
-	int bpp; //how many bytes per pixel are in the image
+	int32 width; // le Width
+	int32 height; //le height
+	uint16 format; // the format of the image.
+	uint16 bpp; //how many bytes per pixel are in the image
 	unsigned char *pixels; //actual pixel data of image
-	char reload;
+	int8 reload;
 }image;
 
 #endif

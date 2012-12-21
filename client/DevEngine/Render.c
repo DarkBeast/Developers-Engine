@@ -181,13 +181,13 @@ void draw(image* img, vector2i vecpos, vector2i imgpos,int width, int height)
 
 void drawwidget(widget* widget) //draws all the widgets on the canvas.
 {
-	int x2,x1;
-	int y2,y1;
+	float x2,x1;
+	float y2,y1;
 
-	x1 = widget->imgpos.x / widget->img.width;
-	x2 = (widget->imgpos.x + widget->width) / widget->img.width;
-	y1 = widget->imgpos.y / widget->img.height;
-	y2 = (widget->imgpos.y +widget->height) / widget->img.height;
+	x1 =   (float) widget->imgpos.x  / widget->img.width;
+	x2 =   (float) (widget->imgpos.x + widget->width) / widget->img.width;
+	y1 =   (float) widget->imgpos.y / widget->img.height;
+	y2 =   (float)(widget->imgpos.y +widget->height) /widget->img.height;
 
 	glMatrixMode (GL_MODELVIEW);
 	glLoadIdentity ();
@@ -200,16 +200,16 @@ void drawwidget(widget* widget) //draws all the widgets on the canvas.
 
 	glBegin (GL_QUADS);
 
-	glTexCoord2i (x1, y2);
+	glTexCoord2f (x1, y2);
 	glVertex2i (widget->pos.x, widget->pos.y);
 
-	glTexCoord2i (x2, y2);
+	glTexCoord2f (x2, y2);
 	glVertex2i (widget->pos.x + widget->width, widget->pos.y);
 
-	glTexCoord2i (x2, y1);
+	glTexCoord2f (x2, y1);
 	glVertex2i (widget->pos.x + widget->width, widget->pos.y + widget->height);
 
-	glTexCoord2i (x1, y1);
+	glTexCoord2f (x1, y1);
 	glVertex2i (widget->pos.x, widget->pos.y + widget->height);
 
 	glEnd ();

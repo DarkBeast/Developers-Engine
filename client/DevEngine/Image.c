@@ -21,14 +21,12 @@ void load_png(const char *name, image *image)
 	png_structp png_ptr;
 	png_infop info_ptr, end_info;
 	png_uint_32 rowbytes, numbytes;
-	png_uint_32 bit_depth, color_type, interlace_type;
+	png_uint_32 bit_depth, color_type;
 	png_byte* pixelz;
 	png_byte** row_ptrs;
-	int i;
+	uint32 i;
 
 	unsigned char header[PNG_SIG_BYTES];
-
-	int y = sizeof(image->pixels);
 
 	FILE *png_file = fopen(name, "rb");
 
@@ -58,8 +56,8 @@ void load_png(const char *name, image *image)
 	png_set_sig_bytes(png_ptr, PNG_SIG_BYTES);
 	png_read_info(png_ptr, info_ptr);
 
-	image->width = png_get_image_width(png_ptr, info_ptr);
-	image->height = png_get_image_height(png_ptr, info_ptr);
+	image->width = (uint32)png_get_image_width(png_ptr, info_ptr);
+	image->height = (uint32)png_get_image_height(png_ptr, info_ptr);
 
 	bit_depth = png_get_bit_depth(png_ptr, info_ptr);
 	color_type = png_get_color_type(png_ptr, info_ptr);
@@ -94,7 +92,7 @@ void load_png(const char *name, image *image)
 	pixelz = (png_byte*)malloc(numbytes);
 	row_ptrs = (png_byte**)malloc((image->height) * sizeof(png_byte*));
 
-	for (i=0; i<(image->height); i++)
+	for (i=0; i<((uint32)image->height); i++)
 		row_ptrs[i] = pixelz + ((image->height) - 1 - i)*rowbytes;
 
 	png_read_image(png_ptr, row_ptrs);
