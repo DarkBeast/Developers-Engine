@@ -2,8 +2,8 @@
 * Credits:  Andrew Wheeler/Genusis
 ******************************************************************************/
 
-#ifndef _Render_H
-#define _Render_H
+#ifndef _RENDER_H
+#define _RENDER_H
 
 #include "types.h"
 #include "widget.h"
