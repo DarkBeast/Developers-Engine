@@ -9,62 +9,38 @@
 
 #include <ft2build.h>
 #include FT_FREETYPE_H
-
+#include <freetype/ftglyph.h>
 #include "types.h"
+#include "integer.h"
 
 typedef struct
 {
-	FT_Library library;
 	FT_Face face;
 	const char *fontfilename;
-	GLuint tex;
 }fonts;
 
 typedef struct
 {
-	GLuint texture;
-	FT_GlyphSlot g;
-}glyph_array;
-
-typedef struct
-{
-	char* data;
-	size_t  count;
-	size_t  size;
-	color col; //color of text
-	int charactersize;
-	vector2i xy; // X location and Y location on screen
-	vector2i hw; //height width
-}text;
-
-typedef struct  smallbitmap
-{
-	int             rows;
-	int             width;
-	unsigned char*  buffer;
-} smallbitmap;
-
-typedef struct
-{
-	smallbitmap image; //hold the Bitmap details, pixels, width etc.
-	GLuint tex; //holds the character loaded image.
-	int advancex;	// advance.x
-	int advancey;	// advance.y
-	int bitmapleft;	// bitmap_left;
-	int bitmaptop;	// bitmap_top;
-	int offsetx;	// x offset of glyph in texture coordinates
-	int offsety;	// y offset of glyph in texture coordinates
+	FT_Glyph glyph;
+	FT_BitmapGlyph  glyph_bitmap;
+	GLuint tex;
+	int16 advancex;
+	int16 advancey;
 } symbol;		// character information
 
 typedef struct
 {
-	GLuint tex;		// texture object Hold the entire font image.
-	int width;			// width of texture in pixels
-	int height;			// height of texture in pixels
-	symbol character[0x0010FFFF]; //holds individual character bitmap data etc.
-}atlas;
+	char *data;
+	color col; //color of text
+	vector2ui xy; // X location and Y location on screen
+	uint8 resize;
+}text;
 
 void initfont(char *fontname);
-void initatlas(FT_Face face, int height, atlas *cache);
-void rendertext(text *str);
+void initatlas(void);
+void drawtext(text *str);
+void settext(text *data, uint16 x, uint16 y, uint8 size, uint8 red,uint8 blue,uint8 green,uint8 alpha, char *string);
+vector2ui getmaxstringhw(char *string, uint8 resize);
+symbol* getcharacterarray(void);
+
 #endif
