@@ -10,10 +10,36 @@
 
 userinterface ui;
 
-void setmousepos(int x , int y)
+userinterface getui(void)
+{
+	return ui;
+}
+
+void presswidget(widget * control)
+{
+}
+
+char checkfocused(void)
+{
+	if(ui.screen.focused != NULL && widgetrectcontains((widget *)ui.screen.focused) == TRUE)
+	{
+		return TRUE;
+	}
+	return FALSE;
+}
+
+void setmousepos(int16 x , int16 y)
 {
 	ui.screen.mousepos.x = x;
 	ui.screen.mousepos.y = y;
+}
+
+void setuiclickevent(int8 button, int8 clicked)
+{
+	ui.screen.clicked = clicked;
+	ui.screen.mouseclick.x = ui.screen.mousepos.x;
+	ui.screen.mouseclick.y = ui.screen.mousepos.y;
+	ui.screen.button = button;
 }
 
 void widgetinit(void)
@@ -26,26 +52,23 @@ void widgetinit(void)
 
 	ui.screen.mouseclick.x = 0;
 	ui.screen.mouseclick.y = 0;
-	ui.screen.mousepos.x = 0;
-	ui.screen.mousepos.y = 0;
+	ui.screen.mousepos.x = -1;
+	ui.screen.mousepos.y = -1;
 	ui.screen.focused = (void *)calloc(1, sizeof (widget*));
 	ui.screen.clicked = 0;
 
-	ui.root->widgets.data  = (void **)calloc(1, WIDGET_MAX * sizeof (widget*)); //set the size of the widget array
+	ui.root = (widget *)calloc(1, sizeof (widget));
+	initwidget(ui.root);
+	ui.root->widgets.data  = (void **)calloc(1, WIDGET_MAX * sizeof (widget)); //set the size of the widget array
 	ui.root->widgets.count = (ui.root->widgets.count > WIDGET_MAX) ? WIDGET_MAX : ui.root->widgets.count;
 	ui.root->widgets.size = WIDGET_MAX;
 
-	ui.root->hidden.data  = (void **)calloc(1, WIDGET_MAX * sizeof (widget*)); //set the size of the widget array
+	ui.root->hidden.data  = (void **)calloc(1, WIDGET_MAX * sizeof (widget)); //set the size of the widget array
 	ui.root->hidden.count = (ui.root->hidden.count > WIDGET_MAX) ? WIDGET_MAX : ui.root->hidden.count;
 	ui.root->hidden.size = WIDGET_MAX;
 }
 
-userinterface getui(void)
-{
-	return ui;
-}
-
-void switchwidget(voidarray *wgt, size_t a, size_t b)//switch's widget positions in the arrays. very useful.
+void switchwidget(widget_void_array *wgt, uint16 a, uint16 b)//switch's widget positions in the arrays. very useful.
 {
 	widget *clone;
 
@@ -59,9 +82,9 @@ void switchwidget(voidarray *wgt, size_t a, size_t b)//switch's widget positions
 	free(clone);
 }
 
-void hidewidget(widget *parent, size_t index)// Parent: the holder of the widgets to be moved, Index the widget to be moved.
+void hidewidget(widget *parent, uint16 index)// Parent: the holder of the widgets to be moved, Index the widget to be moved.
 {
-	size_t i;
+	uint16 i;
 
 	if( parent == NULL || parent->widgets.data[index] == NULL)
 		return;
@@ -81,7 +104,7 @@ void hidewidget(widget *parent, size_t index)// Parent: the holder of the widget
 
 	for( i = 0; i < parent->hidden.count; ++i)
 	{//search through existing count for Nulled data if Null then use.
-		if(parent->hidden.data[i] = NULL)
+		if(parent->hidden.data[i] == NULL)
 		{
 			parent->hidden.data[i] = parent->widgets.data[index];
 			parent->widgets.data[index] = NULL;
@@ -98,9 +121,9 @@ void hidewidget(widget *parent, size_t index)// Parent: the holder of the widget
 	}
 }
 
-void showwidget(widget *parent, size_t index) // Parent: the holder of the widgets to be moved, Index the widget to be moved.
+void showwidget(widget *parent, uint16 index) // Parent: the holder of the widgets to be moved, Index the widget to be moved.
 {
-	size_t i;
+	uint16 i;
 
 	if(parent == NULL || parent->hidden.data[index] == NULL)
 		return;
@@ -120,7 +143,7 @@ void showwidget(widget *parent, size_t index) // Parent: the holder of the widge
 
 	for( i = 0; i < parent->widgets.count; i++)
 	{
-		if(parent->widgets.data[i] = NULL)
+		if(parent->widgets.data[i] == NULL)
 		{
 			parent->widgets.data[i] = parent->hidden.data[index];
 			parent->hidden.data[index] = NULL;
@@ -139,10 +162,17 @@ void showwidget(widget *parent, size_t index) // Parent: the holder of the widge
 
 void addtowidget(widget *parent, widget *child, char hidden)
 {
-	size_t i;
+	uint16 i;
 
-	if(child == NULL || parent == NULL)
+	if(child == NULL)
 		return;
+
+	if(parent == NULL)
+	{
+		parent = ui.root;
+	}
+
+	child->parent = parent;
 
 	if(hidden)
 	{
@@ -160,7 +190,7 @@ void addtowidget(widget *parent, widget *child, char hidden)
 
 		for( i = 0; i < parent->hidden.count; ++i)
 		{//search through existing count for Nulled data if Null then use.
-			if(parent->hidden.data[i] = NULL)
+			if(parent->hidden.data[i] == NULL)
 			{
 				parent->hidden.data[i] = child;
 				return;
@@ -172,6 +202,10 @@ void addtowidget(widget *parent, widget *child, char hidden)
 			parent->hidden.data[parent->hidden.count] = child;
 			parent->hidden.count += 1;
 			return;
+		}
+		else
+		{
+			//error handler for stupid people.
 		}
 	}else{
 		if(parent->widgets.size == 0)
@@ -188,7 +222,7 @@ void addtowidget(widget *parent, widget *child, char hidden)
 
 		for( i = 0; i < parent->widgets.count; i++)
 		{
-			if(parent->widgets.data[i] = NULL)
+			if(parent->widgets.data[i] == NULL)
 			{
 				parent->widgets.data[i] = child;
 				return;
@@ -207,7 +241,7 @@ void addtowidget(widget *parent, widget *child, char hidden)
 
 void initwidget(widget *wgt)//initializes a widget so we can then use it error free.
 {
-	if (wgt == NULL)                                                           \
+	if(wgt == NULL)
 		return;
 
 	wgt->control = NULL;
@@ -216,10 +250,10 @@ void initwidget(widget *wgt)//initializes a widget so we can then use it error f
 	wgt->mouserelease = &initmouserelease;
 	wgt->mousewheel = &initmousewheel;
 	wgt->keypressed = &initkeypressed;
-	wgt->widgets.data = NULL;
+	wgt->widgets.data  = NULL; //set the size of the widget array
 	wgt->widgets.count = 0;
 	wgt->widgets.size = 0;
-	wgt->hidden.data = NULL;
+	wgt->hidden.data  = NULL;
 	wgt->hidden.count = 0;
 	wgt->hidden.size = 0;
 	wgt->parent = NULL;
@@ -229,9 +263,11 @@ void initwidget(widget *wgt)//initializes a widget so we can then use it error f
 	wgt->imgpos.y = 0;
 	wgt->width = 0;
 	wgt->height = 0;
+	wgt->canfocus = FALSE;
 	wgt->focused = FALSE;
 	wgt->mouseover = FALSE;
 	wgt->clicked = FALSE;
+	wgt->moveable = FALSE;
 	wgt->type = 0;
 }
 
@@ -241,11 +277,6 @@ void unloadwidget(widget *parent)
 		return;// add error message
 
 	free(parent->parent);
-	free(parent->keypressed);
-	free(parent->mousepress);
-	free(parent->mouserelease);
-	free(parent->mousewheel);
-	free(parent->draw);
 	free(parent);
 	parent = NULL;
 }
@@ -266,7 +297,7 @@ void initwidgetarray(widget *parent, char opt)// only use once and if only we wa
 	}
 }
 
-void widgetarrayresize(widget *parent, char opt, size_t size)
+void widgetarrayresize(widget *parent, char opt, uint16 size)
 {
 	void **data;
 	if(opt == 1)
@@ -297,14 +328,14 @@ char clearbothwidgetarrays(widget *parent)
 {
 	//will clear all widgets within the widget and the widgets of widgets. clear them in reverse
 	widget *child;
-	size_t z = 0;
+	uint16 z = 0;
 
 	if (parent == NULL){return FALSE;}
 
 	if (parent->hidden.data != NULL)
 	{
-		size_t index = 0;
-		size_t index2 = 0;
+		uint16 index = 0;
+		uint16 index2 = 0;
 
 		for (index = 0; index < parent->hidden.count; ++index)
 		{
@@ -360,8 +391,8 @@ char clearbothwidgetarrays(widget *parent)
 
 	if (parent->widgets.data != NULL)
 	{
-		size_t index = 0;
-		size_t index2 = 0;
+		uint16 index = 0;
+		uint16 index2 = 0;
 
 		for (index = 0; index < parent->widgets.count; ++index)
 		{
@@ -430,14 +461,14 @@ char clearbothwidgetarrays(widget *parent)
 char clearhiddenarray(widget *parent)
 {
 	widget *child;
-	size_t z = 0;
+	uint16 z = 0;
 
 	if (parent == NULL){return FALSE;}
 
 	if (parent->hidden.data != NULL)
 	{
-		size_t index = 0;
-		size_t index2 = 0;
+		uint16 index = 0;
+		uint16 index2 = 0;
 
 		for (index = 0; index < parent->hidden.count; ++index)
 		{
@@ -503,14 +534,14 @@ char clearhiddenarray(widget *parent)
 char clearshownarray(widget *parent)
 {
 	widget *child;
-	size_t z = 0;
+	uint16 z = 0;
 
 	if (parent == NULL){return FALSE;}
 
 	if (parent->widgets.data != NULL)
 	{
-		size_t index = 0;
-		size_t index2 = 0;
+		uint16 index = 0;
+		uint16 index2 = 0;
 
 		for (index = 0; index < parent->widgets.count; ++index)
 		{
@@ -572,14 +603,14 @@ char clearshownarray(widget *parent)
 	return TRUE;
 }
 
-void resizeid(size_t *id, size_t size)
+void resizeid(uint16 *id, uint16 size)
 {
-	size_t *data = NULL;
+	uint16 *data = NULL;
 
 	if(id == NULL)
 		return;//TODO: add error handler here.
 
-	data = (size_t *)realloc(id, size * sizeof(size_t*));
+	data = (uint16 *)realloc(id, size * sizeof(uint16*));
 
 	if (data == NULL)
 		return;
@@ -590,12 +621,12 @@ void resizeid(size_t *id, size_t size)
 void widgetmanager(void)//used to draw the widgets onto the screen.
 {
 	widget *child;
-	size_t *id = NULL;
-	size_t index = 0;
-	size_t idindex;
-	size_t idsize;
+	uint16 *id = NULL;
+	uint16 index = 0;
+	uint16 idindex;
+	uint16 idsize;
 
-	id = (size_t *)calloc(1, 32);
+	id = (uint16 *)calloc(1, 32);
 	idsize = 32;
 	idindex = 0;
 
@@ -626,7 +657,7 @@ void widgetmanager(void)//used to draw the widgets onto the screen.
 
 						if(idindex < idsize)//make sure there is not too many layers for the id array.
 						{
-							idsize = next_power_of_two(idsize);
+							idsize = (uint16)next_power_of_two(idsize);
 							resizeid(id,idsize);
 						}
 						id[idindex] = 0;//set the new ID index to 0
@@ -644,6 +675,8 @@ void widgetmanager(void)//used to draw the widgets onto the screen.
 			}
 		}
 	}
+
+	free(id);
 }
 
 char widgetrectcontains(widget *control)
@@ -656,94 +689,628 @@ char widgetrectcontains(widget *control)
 	return TRUE;
 }
 
-void isonwidgetfocused(widget *focused)
+char ismouseover(widget *control)
 {
+	widget *parent;
+	int8 i = TRUE;
+	if(ui.screen.mousepos.x < control->pos.x ){return FALSE;}
+	if(ui.screen.mousepos.x > control->pos.x + control->width){return FALSE;}
+	if(ui.screen.mousepos.y < control->pos.y ) {return FALSE;}
+	if(ui.screen.mousepos.y > control->pos.y + control->height){return FALSE;}
+
+	if(control->canfocus == TRUE)
+	{
+		if(control->focused != TRUE)
+		{
+			parent = (widget *)control->parent;
+
+			while(i == TRUE)
+			{
+				if(parent != ui.root)
+				{
+					if(parent->canfocus == TRUE && parent->focused == TRUE)
+					{
+						i = FALSE;
+						return TRUE;
+					}
+					else
+					{
+						parent = (widget *)parent->parent;
+					}
+				}
+				else
+				{
+					i = FALSE;
+					return FALSE;
+				}
+			}
+		}
+		else
+		{
+			return TRUE;
+		}
+	}
+	else
+	{
+		parent = (widget *)control->parent;
+
+		if(parent == ui.root)
+		{
+			return TRUE;
+		}
+
+		while(i == TRUE)
+		{
+			if(parent != ui.root)
+			{
+				if(parent->canfocus == TRUE && parent->focused == TRUE)
+				{
+					i = FALSE;
+					return TRUE;
+				}
+				else
+				{
+					parent = (widget *)parent->parent;
+				}
+			}
+			else
+			{
+				i = FALSE;
+				return FALSE;
+			}
+		}
+	}
+	return FALSE; //if can't find any then false
+}
+
+void focuswidget(widget * control)
+{
+	if(control != ui.root)
+	{
+		widget *parent = (widget *)control->parent;
+		uint16 i = 0;
+		if(control->canfocus == TRUE)
+		{
+			for (i = 0; i < parent->widgets.count; i++)
+			{
+				if(control == parent->widgets.data[i])
+				{
+					if(i != parent->widgets.count -1)
+					{
+						switchwidget(&parent->widgets, i, parent->widgets.count - 1);
+					}
+				}
+			}
+			control->focused = TRUE;
+			ui.screen.focused = control;
+		}
+	}
+}
+
+void setfocusable(widget *control, int8 boolean)
+{
+	control->canfocus = boolean;
+}
+
+void setmoveable(widget *control, int8 boolean)
+{
+	control->moveable = boolean;
+}
+
+void isonwidgetfocused(void)
+{
+	widget *focused = (widget *)ui.screen.focused;
 	widget *child;
-	size_t index = 0;
-	size_t index2 = 0;
+	widget *child2; // used to determine if focusable
+	uint16 index = 0;
+	uint16 index2 = 0;
 
 	if(focused->widgets.data != NULL)
 	{
 		for( index = 0; index < focused->widgets.count; ++index)
 		{
-			child = (widget *)focused->widgets.data[index];
-
-			if(widgetrectcontains(child)== TRUE)
+			child2 = (widget *)focused->widgets.data[index];
+			if(child2->canfocus == TRUE)        //next child if focusable
 			{
+				if(widgetrectcontains(child2)== TRUE)// if focusable check if in range
+				{
+					child = (widget *)focused->widgets.data[index];
+
+					if(child->widgets.data != NULL)
+					{
+						for( index2 = 0; index2 < child->widgets.count; ++index2)
+						{
+							child2 = (widget *)child->widgets.data[index2];
+							if(child2->canfocus == TRUE)        //next child if focusable
+							{
+								if(widgetrectcontains(child2)== TRUE)// if focusable check if in range
+								{
+									child = (widget *)child->widgets.data[index2];
+
+									if(child->widgets.data == NULL) //if in range check if widget array is null or not.
+									{
+										child2 = (widget *)child->parent;
+
+										if(child != child2->widgets.data[child2->widgets.count - 1])
+										{
+											switchwidget(&child2->widgets,index2,child2->widgets.count - 1);
+										}
+										focused->focused = FALSE;
+										child->focused = TRUE;
+										ui.screen.focused = child;
+										child->clicked = TRUE;
+										child->mousepress(child,ui.screen.button, ui.screen.clicked);
+										return;
+									}
+
+									index2 = 0; //if not null repeat with new child index till one is found.
+								}
+							}
+							else
+							{
+								if(widgetrectcontains(child2)== TRUE) //check to see if the non-focusable widget is in range.
+								{
+									child = (widget *)child->widgets.data[index2];
+
+									if(child->widgets.data == NULL)//if in range make sure widget array is null
+									{
+										child->clicked = TRUE;
+										child->mousepress(child,ui.screen.button, ui.screen.clicked);
+										return;
+									}
+
+									index2 = 0; //if not null repeat with new child index till one is found.
+								}
+							}
+						}
+
+						if(child->canfocus == TRUE)
+						{
+							child2 = (widget *)child->parent;
+
+							if(child != child2->widgets.data[child2->widgets.count - 1])
+							{
+								switchwidget(&child2->widgets,index,child2->widgets.count - 1);
+							}
+							focused->focused = FALSE;
+							child->focused = TRUE;
+							ui.screen.focused = child;
+							child->clicked = TRUE;
+							child->mousepress(child,ui.screen.button, ui.screen.clicked);
+							return;
+						}
+						else
+						{
+							child->clicked = TRUE;
+							child->mousepress(child,ui.screen.button, ui.screen.clicked);
+							return;
+						}
+					}
+					else
+					{
+						child2 = (widget *)child->parent;
+
+						if(child != child2->widgets.data[child2->widgets.count - 1])
+						{
+							switchwidget(&child2->widgets,index,child2->widgets.count - 1);
+						}
+						focused->focused = FALSE;
+						child->focused = TRUE;
+						ui.screen.focused = child;
+						child->clicked = TRUE;
+						child->mousepress(child,ui.screen.button, ui.screen.clicked);
+						return;
+					}
+				}
+			}
+			else
+			{
+				if(widgetrectcontains(child2)== TRUE)
+				{
+					child = (widget *)focused->widgets.data[index];
+
+					if(child->widgets.data != NULL)
+					{
+						for( index2 = 0; index2 < child->widgets.count; ++index2)
+						{
+							child2 = (widget *)child->widgets.data[index2];
+							if(child2->canfocus == TRUE)        //next child if focusable
+							{
+								if(widgetrectcontains(child2)== TRUE)// if focusable check if in range
+								{
+									child = (widget *)child->widgets.data[index2];
+
+									if(child->widgets.data == NULL) //if in range check if widget array is null or not.
+									{
+										child2 = (widget *)child->parent;
+
+										if(child != child2->widgets.data[child2->widgets.count - 1])
+										{
+											switchwidget(&child2->widgets,index2,child2->widgets.count - 1);
+										}
+										focused->focused = FALSE;
+										child->focused = TRUE;
+										ui.screen.focused = child;
+										child->clicked = TRUE;
+										child->mousepress(child,ui.screen.button, ui.screen.clicked);
+										return;
+									}
+
+									index2 = 0; //if not null repeat with new child index till one is found.
+								}
+							}
+							else
+							{
+								if(widgetrectcontains(child2)== TRUE) //check to see if the non-focusable widget is in range.
+								{
+									child = (widget *)child->widgets.data[index2];
+
+									if(child->widgets.data == NULL)//if in range make sure widget array is null
+									{
+										child->clicked = TRUE;
+										child->mousepress(child,ui.screen.button, ui.screen.clicked);
+										return;
+									}
+
+									index2 = 0; //if not null repeat with new child index till one is found.
+								}
+							}
+						}
+
+						if(child->canfocus == TRUE)
+						{
+							child2 = (widget *)child->parent;
+
+							if(child != child2->widgets.data[child2->widgets.count - 1])
+							{
+								switchwidget(&child2->widgets,index,child2->widgets.count - 1);
+							}
+							focused->focused = FALSE;
+							child->focused = TRUE;
+							ui.screen.focused = child;
+							child->clicked = TRUE;
+							child->mousepress(child,ui.screen.button, ui.screen.clicked);
+							return;
+						}
+						else
+						{
+							child->clicked = TRUE;
+							child->mousepress(child,ui.screen.button, ui.screen.clicked);
+							return;
+						}
+					}
+					else
+					{
+						child->clicked = TRUE;
+						child->mousepress(child,ui.screen.button, ui.screen.clicked);
+						return;
+					}
+				}
+			}
+		}
+		focused->clicked = TRUE;
+	focused->mousepress(focused,ui.screen.button, ui.screen.clicked);
+	return;
+	}
+	
+}
+
+void isonmousereleasefocused(void)
+{
+	widget *focused = (widget *)ui.screen.focused;
+	widget *child;
+	widget *child2; // used to determine if focusable
+	uint16 index = 0;
+	uint16 index2 = 0;
+
+	if(focused->widgets.data != NULL)
+	{
+		for( index = 0; index < focused->widgets.count; ++index)
+		{
+			if(widgetrectcontains((widget *)focused->widgets.data[index])== TRUE)// if focusable check if in range
+			{
+				child = (widget *)focused->widgets.data[index];
+
 				if(child->widgets.data != NULL)
 				{
 					for( index2 = 0; index2 < child->widgets.count; ++index2)
 					{
-						if(widgetrectcontains((widget *)child->widgets.data[index2])== TRUE)
+						child2 = (widget *)child->widgets.data[index2];
+
+						if(widgetrectcontains(child2)== TRUE)// if focusable check if in range
 						{
 							child = (widget *)child->widgets.data[index2];
 
-							if(child->widgets.data == NULL)
+							if(child->widgets.data == NULL) //if in range check if widget array is null or not.
 							{
-								ui.screen.focused = child;
+								child->clicked = FALSE;
+								child->mouserelease(child,ui.screen.button, ui.screen.clicked);
 								return;
 							}
 
-							index2 = 0;
+							index2 = 0; //if not null repeat with new child index till one is found.
 						}
 					}
-
-					ui.screen.focused = child;
+					child->clicked = FALSE;
+					child->mouserelease(child,ui.screen.button, ui.screen.clicked);
 					return;
 				}
 				else
 				{
-					ui.screen.focused = child;
+					child->clicked = FALSE;
+					child->mouserelease(child,ui.screen.button, ui.screen.clicked);
 					return;
 				}
 			}
 		}
 	}
+	focused->clicked = FALSE;
+	focused->mouserelease(focused,ui.screen.button, ui.screen.clicked);
+	return;
 }
 
-void isonwidget(void)
+void isonmousereleasewidget(void)
 {
 	widget *child;
-	size_t index = 0;
-	size_t index2 = 0;
+	widget *child2; // used to determine if focusable
+	uint16 index = 0;
+	uint16 index2 = 0;
 
 	if(ui.root->widgets.data != NULL)
 	{
 		for( index = 0; index < ui.root->widgets.count; ++index)
 		{
-			child = (widget *)ui.root->widgets.data[index];
-
-			if(widgetrectcontains(child)== TRUE)
+			if(widgetrectcontains((widget *)ui.root->widgets.data[index])== TRUE)// if focusable check if in range
 			{
+				child = (widget *)ui.root->widgets.data[index];
+
 				if(child->widgets.data != NULL)
 				{
 					for( index2 = 0; index2 < child->widgets.count; ++index2)
 					{
-						if(widgetrectcontains((widget *)child->widgets.data[index2])== TRUE)
+						child2 = (widget *)child->widgets.data[index2];
+
+						if(widgetrectcontains(child2)== TRUE)// if focusable check if in range
 						{
 							child = (widget *)child->widgets.data[index2];
 
-							if(child->widgets.data == NULL)
+							if(child->widgets.data == NULL) //if in range check if widget array is null or not.
 							{
-								ui.screen.focused = child;
+								child->clicked = FALSE;
+								child->mouserelease(child,ui.screen.button, ui.screen.clicked);
 								return;
 							}
 
-							index2 = 0;
+							index2 = 0; //if not null repeat with new child index till one is found.
 						}
 					}
-
-					ui.screen.focused = child;
+					child->clicked = FALSE;
+					child->mouserelease(child,ui.screen.button, ui.screen.clicked);
 					return;
 				}
 				else
 				{
-					ui.screen.focused = child;
+					child->clicked = FALSE;
+					child->mouserelease(child,ui.screen.button, ui.screen.clicked);
 					return;
 				}
 			}
 		}
 	}
+	ui.root->clicked = FALSE;
+	ui.root->mouserelease(ui.root,ui.screen.button, ui.screen.clicked);
+	return;
+}
+
+void isonwidget(void)
+{
+	widget *child;
+	widget *child2; // used to determine if focusable
+	uint16 index = 0;
+	uint16 index2 = 0;
+	widget *focused = (widget *)ui.screen.focused; //used to set focus to false for the old focus before switch.
+
+	if(ui.root->widgets.data != NULL)
+	{
+		for( index = 0; index < ui.root->widgets.count; ++index)
+		{
+			child2 = (widget *)ui.root->widgets.data[index];
+			if(child2->canfocus == TRUE)        //next child if focusable
+			{
+				if(widgetrectcontains(child2)== TRUE)// if focusable check if in range
+				{
+					child = (widget *)ui.root->widgets.data[index];
+
+					if(child->widgets.data != NULL)
+					{
+						for( index2 = 0; index2 < child->widgets.count; ++index2)
+						{
+							child2 = (widget *)child->widgets.data[index2];
+							if(child2->canfocus == TRUE)        //next child if focusable
+							{
+								if(widgetrectcontains(child2)== TRUE)// if focusable check if in range
+								{
+									child = (widget *)child->widgets.data[index2];
+
+									if(child->widgets.data == NULL) //if in range check if widget array is null or not.
+									{
+										child2 = (widget *)child->parent;
+
+										if(child != child2->widgets.data[child2->widgets.count - 1])
+										{
+											switchwidget(&child2->widgets,index2,child2->widgets.count - 1);
+										}
+										if(focused != NULL)
+										{
+											focused->focused = FALSE;
+										}
+										child->focused = TRUE;
+										ui.screen.focused = child;
+										child->clicked = TRUE;
+										child->mousepress(child,ui.screen.button, ui.screen.clicked);
+										return;
+									}
+
+									index2 = 0; //if not null repeat with new child index till one is found.
+								}
+							}
+							else
+							{
+								if(widgetrectcontains(child2)== TRUE) //check to see if the non-focusable widget is in range.
+								{
+									child = (widget *)child->widgets.data[index2];
+
+									if(child->widgets.data == NULL)//if in range make sure widget array is null
+									{
+										child->clicked = TRUE;
+										child->mousepress(child,ui.screen.button, ui.screen.clicked);
+										return;
+									}
+
+									index2 = 0; //if not null repeat with new child index till one is found.
+								}
+							}
+						}
+
+						if(child->canfocus == TRUE)
+						{
+							child2 = (widget *)child->parent;
+
+							if(child != child2->widgets.data[child2->widgets.count - 1])
+							{
+								switchwidget(&child2->widgets,index,child2->widgets.count - 1);
+							}
+							if(focused != NULL)
+							{
+								focused->focused = FALSE;
+							}
+							child->focused = TRUE;
+							ui.screen.focused = child;
+							child->clicked = TRUE;
+							child->mousepress(child,ui.screen.button, ui.screen.clicked);
+							return;
+						}
+						else
+						{
+							child->clicked = TRUE;
+							child->mousepress(child,ui.screen.button, ui.screen.clicked);
+							return;
+						}
+					}
+					else
+					{
+						child2 = (widget *)child->parent;
+
+						if(child != child2->widgets.data[child2->widgets.count - 1])
+						{
+							switchwidget(&child2->widgets,index,child2->widgets.count - 1);
+						}
+						if(focused != NULL)
+						{
+							focused->focused = FALSE;
+						}
+						child->focused = TRUE;
+						ui.screen.focused = child;
+						child->clicked = TRUE;
+						child->mousepress(child,ui.screen.button, ui.screen.clicked);
+						return;
+					}
+				}
+			}
+			else
+			{
+				if(widgetrectcontains(child2)== TRUE)
+				{
+					child = (widget *)ui.root->widgets.data[index];
+					if(child->widgets.data != NULL)
+					{
+						for( index2 = 0; index2 < child->widgets.count; ++index2)
+						{
+							child2 = (widget *)child->widgets.data[index2];
+							if(child2->canfocus == TRUE)        //next child if focusable
+							{
+								if(widgetrectcontains(child2)== TRUE)// if focusable check if in range
+								{
+									child = (widget *)child->widgets.data[index2];
+
+									if(child->widgets.data == NULL) //if in range check if widget array is null or not.
+									{
+										child2 = (widget *)child->parent;
+
+										if(child != child2->widgets.data[child2->widgets.count - 1])
+										{
+											switchwidget(&child2->widgets,index2,child2->widgets.count - 1);
+										}
+										if(focused != NULL)
+										{
+											focused->focused = FALSE;
+										}
+										child->focused = TRUE;
+										ui.screen.focused = child;
+										child->clicked = TRUE;
+										child->mousepress(child,ui.screen.button, ui.screen.clicked);
+										return;
+									}
+
+									index2 = 0; //if not null repeat with new child index till one is found.
+								}
+							}
+							else
+							{
+								if(widgetrectcontains(child2)== TRUE) //check to see if the non-focusable widget is in range.
+								{
+									child = (widget *)child->widgets.data[index2];
+
+									if(child->widgets.data == NULL)//if in range make sure widget array is null
+									{
+										child->clicked = TRUE;
+										child->mousepress(child,ui.screen.button, ui.screen.clicked);
+										return;
+									}
+
+									index2 = 0; //if not null repeat with new child index till one is found.
+								}
+							}
+						}
+
+						if(child->canfocus == TRUE)
+						{
+							child2 = (widget *)child->parent;
+
+							if(child != child2->widgets.data[child2->widgets.count - 1])
+							{
+								switchwidget(&child2->widgets,index,child2->widgets.count - 1);
+							}
+							if(focused != NULL)
+							{
+								focused->focused = FALSE;
+							}
+							child->focused = TRUE;
+							ui.screen.focused = child;
+							child->clicked = TRUE;
+							child->mousepress(child,ui.screen.button, ui.screen.clicked);
+							return;
+						}
+						else
+						{
+							child->clicked = TRUE;
+							child->mousepress(child,ui.screen.button, ui.screen.clicked);
+							return;
+						}
+					}
+					else
+					{
+						child->clicked = TRUE;
+						child->mousepress(child,ui.screen.button, ui.screen.clicked);
+						return;
+					}
+				}
+			}
+		}
+	}
+	ui.root->clicked = TRUE;
+	ui.root->mousepress(ui.root,ui.screen.button, ui.screen.clicked);
+	return;
 }
 
 void initmousepress(void *wgt, int button, int pressed){}
