@@ -209,7 +209,6 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="buffer.h" />
-    <ClInclude Include="controls.h" />
     <ClInclude Include="error.h" />
     <ClInclude Include="function.h" />
     <ClInclude Include="globals.h" />
@@ -223,10 +222,10 @@
     <ClInclude Include="text.h" />
     <ClInclude Include="types.h" />
     <ClInclude Include="widget.h" />
+    <ClInclude Include="controls.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="buffer.c" />
-    <ClCompile Include="controls.c" />
     <ClCompile Include="error.c" />
     <ClCompile Include="function.c" />
     <ClCompile Include="globals.c" />
@@ -236,6 +235,7 @@
     <ClCompile Include="render.c" />
     <ClCompile Include="main.c" />
     <ClCompile Include="program_path.c" />
+    <ClCompile Include="controls.c" />
     <ClCompile Include="text.c" />
     <ClCompile Include="widget.c" />
     <ClCompile Include="cstring.c" />

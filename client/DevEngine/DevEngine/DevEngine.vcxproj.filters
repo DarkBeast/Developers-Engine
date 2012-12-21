@@ -1,0 +1,103 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Core">
+      <UniqueIdentifier>{5d397eba-2ba8-420a-91d4-4b6946cd7c2a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Graphics">
+      <UniqueIdentifier>{b9413f54-f7a6-4237-98f4-888e0875bda8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="UI">
+      <UniqueIdentifier>{8f4c7b3e-7bf6-4d0e-a723-0c2295c1b9c8}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="buffer.h">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="globals.h">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="program_path.h">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="integer.h">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="function.h">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="controls.h">
+      <Filter>Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="render.h">
+      <Filter>Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="image.h">
+      <Filter>Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="types.h">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="input.h">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="error.h">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="cstring.h">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="text.h">
+      <Filter>Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="widget.h">
+      <Filter>Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="mainmenu.h">
+      <Filter>UI</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="buffer.c">
+      <Filter>Core</Filter>
+    </ClCompile>
+    <ClCompile Include="program_path.c">
+      <Filter>Core</Filter>
+    </ClCompile>
+    <ClCompile Include="main.c" />
+    <ClCompile Include="function.c">
+      <Filter>Core</Filter>
+    </ClCompile>
+    <ClCompile Include="widget.c">
+      <Filter>Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="render.c">
+      <Filter>Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="controls.c">
+      <Filter>Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="image.c">
+      <Filter>Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="input.c">
+      <Filter>Core</Filter>
+    </ClCompile>
+    <ClCompile Include="error.c">
+      <Filter>Core</Filter>
+    </ClCompile>
+    <ClCompile Include="cstring.c">
+      <Filter>Core</Filter>
+    </ClCompile>
+    <ClCompile Include="globals.c">
+      <Filter>Core</Filter>
+    </ClCompile>
+    <ClCompile Include="text.c">
+      <Filter>Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="mainmenu.c">
+      <Filter>UI</Filter>
+    </ClCompile>
+  </ItemGroup>
+</Project>
