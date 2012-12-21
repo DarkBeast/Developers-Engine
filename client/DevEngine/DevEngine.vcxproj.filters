@@ -7,6 +7,9 @@
     <Filter Include="Graphics">
       <UniqueIdentifier>{b9413f54-f7a6-4237-98f4-888e0875bda8}</UniqueIdentifier>
     </Filter>
+    <Filter Include="UI">
+      <UniqueIdentifier>{8f4c7b3e-7bf6-4d0e-a723-0c2295c1b9c8}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="buffer.h">
@@ -23,9 +26,6 @@
     </ClInclude>
     <ClInclude Include="function.h">
       <Filter>Core</Filter>
-    </ClInclude>
-    <ClInclude Include="widget.h">
-      <Filter>Graphics</Filter>
     </ClInclude>
     <ClInclude Include="controls.h">
       <Filter>Graphics</Filter>
@@ -50,6 +50,12 @@
     </ClInclude>
     <ClInclude Include="text.h">
       <Filter>Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="widget.h">
+      <Filter>Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="mainmenu.h">
+      <Filter>UI</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -89,6 +95,9 @@
     </ClCompile>
     <ClCompile Include="text.c">
       <Filter>Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="mainmenu.c">
+      <Filter>UI</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>
