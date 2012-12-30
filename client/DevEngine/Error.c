@@ -4,7 +4,7 @@
 
 #include <conio.h>
 #include <glfw.h>
-#include <stdio.h>
+#include <stdio.h> //For file reading/writing and other functions. open document for more info.
 #include <stdlib.h>
 #include "error.h"
 #include "globals.h"
