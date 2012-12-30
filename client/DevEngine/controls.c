@@ -81,7 +81,7 @@ void createlabel(widget *data, uint16 x, uint16 y, uint8 size, uint8 red, uint8 
 
 void drawlabel(void *wgt)
 {
-	widget *data = (widget *)wgt;
-	label *parent = (label *)data->control;
-	drawtext(parent->string);
+	widget *control = (widget *)wgt;
+	label *data = (label *)control->control;
+	drawtext(data->string, (widget *)control->parent);
 }

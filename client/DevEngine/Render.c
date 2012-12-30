@@ -179,15 +179,16 @@ void draw(image* img, vector2i vecpos, vector2i imgpos,int width, int height)
 	glEnd ();
 }
 
-void drawwidget(widget* widget) //draws all the widgets on the canvas.
+void drawwidget(widget* control) //draws all the image widgets on the canvas.
 {
 	float x2,x1;
 	float y2,y1;
+	widget *parent = (widget *)control->parent;
 
-	x1 =   (float) widget->imgpos.x  / widget->img.width;
-	x2 =   (float) (widget->imgpos.x + widget->width) / widget->img.width;
-	y1 =   (float) widget->imgpos.y / widget->img.height;
-	y2 =   (float)(widget->imgpos.y +widget->height) /widget->img.height;
+	x1 =   (float) control->imgpos.x  / control->img.width;
+	x2 =   (float) (control->imgpos.x + control->width) / control->img.width;
+	y1 =   (float) control->imgpos.y / control->img.height;
+	y2 =   (float)(control->imgpos.y +control->height) /control->img.height;
 
 	glMatrixMode (GL_MODELVIEW);
 	glLoadIdentity ();
@@ -195,22 +196,22 @@ void drawwidget(widget* widget) //draws all the widgets on the canvas.
 	glTranslatef(0.375, 0.375, 0);
 
 	glEnable (GL_TEXTURE_2D);
-	glBindTexture(GL_TEXTURE_2D, widget->img.texid);
+	glBindTexture(GL_TEXTURE_2D, control->img.texid);
 	glColor4f(1, 1, 1, 1);// set the image color properties, 1 being highest 0.0000 being lowest
 
 	glBegin (GL_QUADS);
 
 	glTexCoord2f (x1, y2);
-	glVertex2i (widget->pos.x, widget->pos.y);
+	glVertex2i (control->pos.x + parent->pos.x, control->pos.y + parent->pos.y);
 
 	glTexCoord2f (x2, y2);
-	glVertex2i (widget->pos.x + widget->width, widget->pos.y);
+	glVertex2i (control->pos.x +  parent->pos.x + control->width, control->pos.y + parent->pos.y);
 
 	glTexCoord2f (x2, y1);
-	glVertex2i (widget->pos.x + widget->width, widget->pos.y + widget->height);
+	glVertex2i (control->pos.x +  parent->pos.x + control->width, control->pos.y + parent->pos.y + control->height);
 
 	glTexCoord2f (x1, y1);
-	glVertex2i (widget->pos.x, widget->pos.y + widget->height);
+	glVertex2i (control->pos.x + parent->pos.x, control->pos.y + parent->pos.y + control->height);
 
 	glEnd ();
 }

@@ -48,10 +48,10 @@ void initmainmenu(void)
 	widgetinit();
 	label1 = (widget *)calloc(1,sizeof(widget));
 	button1 = (widget *)calloc(1,sizeof(widget));
-	createlabel(label1,120,120,0,255,255,255,255,FALSE,"click me!");
+	createlabel(label1,10,10,0,255,255,255,255,FALSE,"click me!");
 	createbutton(button1,100,100,60,100,"image\\buttons.png");
 	addtowidget(NULL,button1,0);
-	addtowidget(NULL,label1,0);
+	addtowidget(button1,label1,0);
 
 	button1->mousepress = button1press;
 }

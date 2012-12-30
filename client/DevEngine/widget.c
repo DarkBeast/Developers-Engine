@@ -10,30 +10,35 @@
 
 userinterface ui;
 
+//default get Main ui, probabaly never needed but there if someone needs everything.
 userinterface getui(void)
 {
 	return ui;
 }
 
-void presswidget(widget * control)
-{
-}
-
+//Prechecked if we are on a focused object to decide if we should check inside it or not.
 char checkfocused(void)
 {
-	if(ui.screen.focused != NULL && widgetrectcontains((widget *)ui.screen.focused) == TRUE)
+	widget *control = (widget *)ui.screen.focused;
+
+	if(control != NULL)
 	{
-		return TRUE;
+		if(widgetrectcontains(control, (widget *)control->parent) == TRUE)
+		{
+			return TRUE;
+		}
 	}
 	return FALSE;
 }
 
+//sets the mouses position form screen movement.
 void setmousepos(int16 x , int16 y)
 {
 	ui.screen.mousepos.x = x;
 	ui.screen.mousepos.y = y;
 }
 
+//sets the UI.events in case of fall back.
 void setuiclickevent(int8 button, int8 clicked)
 {
 	ui.screen.clicked = clicked;
@@ -42,6 +47,7 @@ void setuiclickevent(int8 button, int8 clicked)
 	ui.screen.button = button;
 }
 
+//initilizes the widget system.
 void widgetinit(void)
 {
 	/*
@@ -50,24 +56,35 @@ void widgetinit(void)
 	*a in game widgets. Always unload the root before reusing the root.
 	*/
 
+	// sets the ui.mouseclick to 0 to deture erroring.
 	ui.screen.mouseclick.x = 0;
 	ui.screen.mouseclick.y = 0;
+
+	//sets to -1 to stop a mouse bug from accuring if something is in the top corner.
 	ui.screen.mousepos.x = -1;
 	ui.screen.mousepos.y = -1;
-	ui.screen.focused = (void *)calloc(1, sizeof (widget*));
+
+	//creates the focused items to contain widgets that are focused.
+	ui.screen.focused = (void **)calloc(1, sizeof (widget));
+	ui.screen.focused = NULL;
 	ui.screen.clicked = 0;
 
+	//create an initilize the ROOT which is the main screens hidden widget control.
 	ui.root = (widget *)calloc(1, sizeof (widget));
 	initwidget(ui.root);
+
+	//sets the show widget array
 	ui.root->widgets.data  = (void **)calloc(1, WIDGET_MAX * sizeof (widget)); //set the size of the widget array
 	ui.root->widgets.count = (ui.root->widgets.count > WIDGET_MAX) ? WIDGET_MAX : ui.root->widgets.count;
 	ui.root->widgets.size = WIDGET_MAX;
 
+	//sets the hidden widget array
 	ui.root->hidden.data  = (void **)calloc(1, WIDGET_MAX * sizeof (widget)); //set the size of the widget array
 	ui.root->hidden.count = (ui.root->hidden.count > WIDGET_MAX) ? WIDGET_MAX : ui.root->hidden.count;
 	ui.root->hidden.size = WIDGET_MAX;
 }
 
+//switchs widgets around in an array.
 void switchwidget(widget_void_array *wgt, uint16 a, uint16 b)//switch's widget positions in the arrays. very useful.
 {
 	widget *clone;
@@ -82,6 +99,7 @@ void switchwidget(widget_void_array *wgt, uint16 a, uint16 b)//switch's widget p
 	free(clone);
 }
 
+//takes a shown widget and hides it.
 void hidewidget(widget *parent, uint16 index)// Parent: the holder of the widgets to be moved, Index the widget to be moved.
 {
 	uint16 i;
@@ -121,6 +139,7 @@ void hidewidget(widget *parent, uint16 index)// Parent: the holder of the widget
 	}
 }
 
+//takes a hidden widget and shows it
 void showwidget(widget *parent, uint16 index) // Parent: the holder of the widgets to be moved, Index the widget to be moved.
 {
 	uint16 i;
@@ -160,16 +179,21 @@ void showwidget(widget *parent, uint16 index) // Parent: the holder of the widge
 	}
 }
 
-void addtowidget(widget *parent, widget *child, char hidden)
+//adds a widget to another widgets array either Roots or another widget.
+void addtowidget(widget *container, widget *child, char hidden)
 {
 	uint16 i;
-
+	widget * parent;
 	if(child == NULL)
 		return;
 
-	if(parent == NULL)
+	if(container == NULL)
 	{
 		parent = ui.root;
+	}
+	else
+	{
+		parent = container;
 	}
 
 	child->parent = parent;
@@ -239,6 +263,7 @@ void addtowidget(widget *parent, widget *child, char hidden)
 	return; //TODO: add error handler for overloaded array.
 }
 
+//used to initilize the array so when the program runs no UI Errors will happen becuase of invalid data.
 void initwidget(widget *wgt)//initializes a widget so we can then use it error free.
 {
 	if(wgt == NULL)
@@ -268,19 +293,21 @@ void initwidget(widget *wgt)//initializes a widget so we can then use it error f
 	wgt->mouseover = FALSE;
 	wgt->clicked = FALSE;
 	wgt->moveable = FALSE;
+	wgt->canclickbehind = FALSE;
 	wgt->type = 0;
 }
 
+//unloads a widget from memory
 void unloadwidget(widget *parent)
 {
 	if(!clearbothwidgetarrays(parent))
 		return;// add error message
 
-	free(parent->parent);
 	free(parent);
 	parent = NULL;
 }
 
+//initilizes a widgets dormant arrays, we set them to dormant to save ram.
 void initwidgetarray(widget *parent, char opt)// only use once and if only we wanted to add a widget to a Array with no size.
 {
 	if(opt == 1)
@@ -297,6 +324,7 @@ void initwidgetarray(widget *parent, char opt)// only use once and if only we wa
 	}
 }
 
+//resizes the ammont of widgets the show, or hidden array can hold, use if you need more than defualt.
 void widgetarrayresize(widget *parent, char opt, uint16 size)
 {
 	void **data;
@@ -324,6 +352,7 @@ void widgetarrayresize(widget *parent, char opt, uint16 size)
 	}
 }
 
+//Frees all the widgets in the widget arrays shown/hidden so we can free the parent.
 char clearbothwidgetarrays(widget *parent)
 {
 	//will clear all widgets within the widget and the widgets of widgets. clear them in reverse
@@ -458,6 +487,7 @@ char clearbothwidgetarrays(widget *parent)
 	return TRUE;
 }
 
+//clears just the hidden array.
 char clearhiddenarray(widget *parent)
 {
 	widget *child;
@@ -531,6 +561,7 @@ char clearhiddenarray(widget *parent)
 	return TRUE;
 }
 
+//clears jsut the shown array.
 char clearshownarray(widget *parent)
 {
 	widget *child;
@@ -603,6 +634,7 @@ char clearshownarray(widget *parent)
 	return TRUE;
 }
 
+//resizes the ID for the widget manager when handling deep UI systems, defualt Z is 32.
 void resizeid(uint16 *id, uint16 size)
 {
 	uint16 *data = NULL;
@@ -618,6 +650,7 @@ void resizeid(uint16 *id, uint16 size)
 	id = data;
 }
 
+//This is the Main widget That displays All the widgets in the Widget array aka shown. it Displays them via Tree branch style.
 void widgetmanager(void)//used to draw the widgets onto the screen.
 {
 	widget *child;
@@ -655,7 +688,7 @@ void widgetmanager(void)//used to draw the widgets onto the screen.
 
 						++idindex;//we set the z buffer index to know which layer we are in
 
-						if(idindex < idsize)//make sure there is not too many layers for the id array.
+						if(idindex + 1 >= idsize)//make sure there is not too many layers for the id array.
 						{
 							idsize = (uint16)next_power_of_two(idsize);
 							resizeid(id,idsize);
@@ -679,31 +712,31 @@ void widgetmanager(void)//used to draw the widgets onto the screen.
 	free(id);
 }
 
-char widgetrectcontains(widget *control)
+//checks if the widget is in the area the mouse clicked.
+char widgetrectcontains(widget *control, widget *parent)
 {
-	if(ui.screen.mousepos.x < control->pos.x ){return FALSE;}
-	if(ui.screen.mousepos.x > control->pos.x + control->width){return FALSE;}
-	if(ui.screen.mousepos.y < control->pos.y ) {return FALSE;}
-	if(ui.screen.mousepos.y > control->pos.y + control->height){return FALSE;}
+	if(ui.screen.mousepos.x < control->pos.x + parent->pos.x){return FALSE;}
+	if(ui.screen.mousepos.x > control->pos.x + parent->pos.x + control->width){return FALSE;}
+	if(ui.screen.mousepos.y < control->pos.y + parent->pos.y) {return FALSE;}
+	if(ui.screen.mousepos.y > control->pos.y + parent->pos.y + control->height){return FALSE;}
 
 	return TRUE;
 }
 
+//checks if the mouse is in the area the mouse moved onto.
 char ismouseover(widget *control)
 {
-	widget *parent;
+	widget *parent = (widget *)control->parent;
 	int8 i = TRUE;
-	if(ui.screen.mousepos.x < control->pos.x ){return FALSE;}
-	if(ui.screen.mousepos.x > control->pos.x + control->width){return FALSE;}
-	if(ui.screen.mousepos.y < control->pos.y ) {return FALSE;}
-	if(ui.screen.mousepos.y > control->pos.y + control->height){return FALSE;}
+	if(ui.screen.mousepos.x < control->pos.x  + parent->pos.x){return FALSE;}
+	if(ui.screen.mousepos.x > control->pos.x  + parent->pos.x + control->width){return FALSE;}
+	if(ui.screen.mousepos.y < control->pos.y  + parent->pos.y) {return FALSE;}
+	if(ui.screen.mousepos.y > control->pos.y  + parent->pos.y + control->height){return FALSE;}
 
 	if(control->canfocus == TRUE)
 	{
 		if(control->focused != TRUE)
 		{
-			parent = (widget *)control->parent;
-
 			while(i == TRUE)
 			{
 				if(parent != ui.root)
@@ -763,6 +796,7 @@ char ismouseover(widget *control)
 	return FALSE; //if can't find any then false
 }
 
+//Manually sets a widget to Focus
 void focuswidget(widget * control)
 {
 	if(control != ui.root)
@@ -787,16 +821,19 @@ void focuswidget(widget * control)
 	}
 }
 
+//function to allow change of fucusability not needed but helpful to some. Default is FALSE.
 void setfocusable(widget *control, int8 boolean)
 {
 	control->canfocus = boolean;
 }
 
+//allows you to set the widget to draggable stat or to not drag, Default is FALSE.
 void setmoveable(widget *control, int8 boolean)
 {
 	control->moveable = boolean;
 }
 
+//checks if the Click was on a widget inside of the focused widget.
 void isonwidgetfocused(void)
 {
 	widget *focused = (widget *)ui.screen.focused;
@@ -812,7 +849,7 @@ void isonwidgetfocused(void)
 			child2 = (widget *)focused->widgets.data[index];
 			if(child2->canfocus == TRUE)        //next child if focusable
 			{
-				if(widgetrectcontains(child2)== TRUE)// if focusable check if in range
+				if(widgetrectcontains(child2, (widget *)child2->parent)== TRUE)// if focusable check if in range
 				{
 					child = (widget *)focused->widgets.data[index];
 
@@ -823,7 +860,7 @@ void isonwidgetfocused(void)
 							child2 = (widget *)child->widgets.data[index2];
 							if(child2->canfocus == TRUE)        //next child if focusable
 							{
-								if(widgetrectcontains(child2)== TRUE)// if focusable check if in range
+								if(widgetrectcontains(child2, (widget *)child2->parent)== TRUE)// if focusable check if in range
 								{
 									child = (widget *)child->widgets.data[index2];
 
@@ -848,7 +885,7 @@ void isonwidgetfocused(void)
 							}
 							else
 							{
-								if(widgetrectcontains(child2)== TRUE) //check to see if the non-focusable widget is in range.
+								if(widgetrectcontains(child2, (widget *)child2->parent)== TRUE) //check to see if the non-focusable widget is in range.
 								{
 									child = (widget *)child->widgets.data[index2];
 
@@ -905,7 +942,7 @@ void isonwidgetfocused(void)
 			}
 			else
 			{
-				if(widgetrectcontains(child2)== TRUE)
+				if(widgetrectcontains(child2, (widget *)child2->parent)== TRUE)
 				{
 					child = (widget *)focused->widgets.data[index];
 
@@ -916,7 +953,7 @@ void isonwidgetfocused(void)
 							child2 = (widget *)child->widgets.data[index2];
 							if(child2->canfocus == TRUE)        //next child if focusable
 							{
-								if(widgetrectcontains(child2)== TRUE)// if focusable check if in range
+								if(widgetrectcontains(child2, (widget *)child2->parent)== TRUE)// if focusable check if in range
 								{
 									child = (widget *)child->widgets.data[index2];
 
@@ -941,7 +978,7 @@ void isonwidgetfocused(void)
 							}
 							else
 							{
-								if(widgetrectcontains(child2)== TRUE) //check to see if the non-focusable widget is in range.
+								if(widgetrectcontains(child2, (widget *)child2->parent)== TRUE) //check to see if the non-focusable widget is in range.
 								{
 									child = (widget *)child->widgets.data[index2];
 
@@ -989,12 +1026,12 @@ void isonwidgetfocused(void)
 			}
 		}
 		focused->clicked = TRUE;
-	focused->mousepress(focused,ui.screen.button, ui.screen.clicked);
-	return;
+		focused->mousepress(focused,ui.screen.button, ui.screen.clicked);
+		return;
 	}
-	
 }
 
+//checkls to see if the focused widget was unclicked.
 void isonmousereleasefocused(void)
 {
 	widget *focused = (widget *)ui.screen.focused;
@@ -1007,7 +1044,7 @@ void isonmousereleasefocused(void)
 	{
 		for( index = 0; index < focused->widgets.count; ++index)
 		{
-			if(widgetrectcontains((widget *)focused->widgets.data[index])== TRUE)// if focusable check if in range
+			if(widgetrectcontains((widget *)focused->widgets.data[index],(widget *)focused)== TRUE)// if focusable check if in range
 			{
 				child = (widget *)focused->widgets.data[index];
 
@@ -1017,7 +1054,7 @@ void isonmousereleasefocused(void)
 					{
 						child2 = (widget *)child->widgets.data[index2];
 
-						if(widgetrectcontains(child2)== TRUE)// if focusable check if in range
+						if(widgetrectcontains(child2, (widget *)child2->parent)== TRUE)// if focusable check if in range
 						{
 							child = (widget *)child->widgets.data[index2];
 
@@ -1049,6 +1086,7 @@ void isonmousereleasefocused(void)
 	return;
 }
 
+//checks if a widget was unclicked Default check, looks through any widget shown.if unclicked then do event.
 void isonmousereleasewidget(void)
 {
 	widget *child;
@@ -1060,7 +1098,7 @@ void isonmousereleasewidget(void)
 	{
 		for( index = 0; index < ui.root->widgets.count; ++index)
 		{
-			if(widgetrectcontains((widget *)ui.root->widgets.data[index])== TRUE)// if focusable check if in range
+			if(widgetrectcontains((widget *)ui.root->widgets.data[index], (widget *)ui.root)== TRUE)// if focusable check if in range
 			{
 				child = (widget *)ui.root->widgets.data[index];
 
@@ -1070,7 +1108,7 @@ void isonmousereleasewidget(void)
 					{
 						child2 = (widget *)child->widgets.data[index2];
 
-						if(widgetrectcontains(child2)== TRUE)// if focusable check if in range
+						if(widgetrectcontains(child2, (widget *)child2->parent)== TRUE)// if focusable check if in range
 						{
 							child = (widget *)child->widgets.data[index2];
 
@@ -1102,6 +1140,7 @@ void isonmousereleasewidget(void)
 	return;
 }
 
+//checks if the widget was clicked Default, if clicked set as focused if focusable or set parent if clickable then do event.
 void isonwidget(void)
 {
 	widget *child;
@@ -1117,7 +1156,7 @@ void isonwidget(void)
 			child2 = (widget *)ui.root->widgets.data[index];
 			if(child2->canfocus == TRUE)        //next child if focusable
 			{
-				if(widgetrectcontains(child2)== TRUE)// if focusable check if in range
+				if(widgetrectcontains(child2, (widget *)child2->parent)== TRUE)// if focusable check if in range
 				{
 					child = (widget *)ui.root->widgets.data[index];
 
@@ -1128,7 +1167,7 @@ void isonwidget(void)
 							child2 = (widget *)child->widgets.data[index2];
 							if(child2->canfocus == TRUE)        //next child if focusable
 							{
-								if(widgetrectcontains(child2)== TRUE)// if focusable check if in range
+								if(widgetrectcontains(child2, (widget *)child2->parent)== TRUE)// if focusable check if in range
 								{
 									child = (widget *)child->widgets.data[index2];
 
@@ -1156,7 +1195,7 @@ void isonwidget(void)
 							}
 							else
 							{
-								if(widgetrectcontains(child2)== TRUE) //check to see if the non-focusable widget is in range.
+								if(widgetrectcontains(child2, (widget *)child2->parent)== TRUE) //check to see if the non-focusable widget is in range.
 								{
 									child = (widget *)child->widgets.data[index2];
 
@@ -1219,7 +1258,7 @@ void isonwidget(void)
 			}
 			else
 			{
-				if(widgetrectcontains(child2)== TRUE)
+				if(widgetrectcontains(child2, (widget *)child2->parent)== TRUE)
 				{
 					child = (widget *)ui.root->widgets.data[index];
 					if(child->widgets.data != NULL)
@@ -1229,7 +1268,7 @@ void isonwidget(void)
 							child2 = (widget *)child->widgets.data[index2];
 							if(child2->canfocus == TRUE)        //next child if focusable
 							{
-								if(widgetrectcontains(child2)== TRUE)// if focusable check if in range
+								if(widgetrectcontains(child2, (widget *)child2->parent)== TRUE)// if focusable check if in range
 								{
 									child = (widget *)child->widgets.data[index2];
 
@@ -1257,7 +1296,7 @@ void isonwidget(void)
 							}
 							else
 							{
-								if(widgetrectcontains(child2)== TRUE) //check to see if the non-focusable widget is in range.
+								if(widgetrectcontains(child2, (widget *)child2->parent)== TRUE) //check to see if the non-focusable widget is in range.
 								{
 									child = (widget *)child->widgets.data[index2];
 
@@ -1313,7 +1352,23 @@ void isonwidget(void)
 	return;
 }
 
-void initmousepress(void *wgt, int button, int pressed){}
+//only used to initiate a empty call to avoid Errors when there events are not setup.
+//initpress and release have background clickable events to parent objects if turned on.
+void initmousepress(void *wgt, int button, int pressed)
+{
+	widget *control = (widget *)wgt;
+	if(control->canclickbehind == TRUE)
+	{
+		widget *parent = (widget *)control->parent;
+
+		if(parent != NULL && parent != ui.root)
+		{
+			//TODO: finish widget background button press
+			parent->mousepress(parent,button,pressed);
+		}
+	}
+}
+
 void initmouserelease(void *wgt, int button, int pressed){}
 void initmousewheel(void *wgt, int moved){}
 void initkeypressed(void *wgt, int key, int pressed){}
