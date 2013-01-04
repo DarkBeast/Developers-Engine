@@ -2,8 +2,9 @@
 * Credits:  Anthony Ianozi
 ******************************************************************************/
 
-#ifndef _BUFFER_H
-#define _BUFFER_H
+#ifndef DE_BUFFER_H
+#define DE_BUFFER_H
+
 #define PACKET_SIZE    8192   // Size of packet buffer
 
 typedef struct buffer_t
