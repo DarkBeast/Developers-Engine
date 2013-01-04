@@ -3,16 +3,20 @@
 #include "controls.h"
 #include "render.h"
 #include <glfw.h>
+#include "bool.h"
 
 widget *label1;
 widget *button1;
 int i = 0;
+
 void mainmenu(void)
 {
-	int running = GL_TRUE;
+	sbool running = TRUE;
 	uint32 time;
 	uint32 lpstimer = 0;
 	uint32 lps = 0;
+
+	drawstatereset();
 
 	while( running )
 	{
@@ -20,8 +24,8 @@ void mainmenu(void)
 
 		clearscreen(1,1,1,1);
 
-		drawstatereset();
 		widgetmanager();
+
 		//Clear information from last draw
 		glFlush();
 		glfwSwapBuffers();
@@ -50,8 +54,8 @@ void initmainmenu(void)
 	button1 = (widget *)calloc(1,sizeof(widget));
 	createlabel(label1,10,10,0,255,255,255,255,FALSE,"click me!");
 	createbutton(button1,100,100,60,100,"image\\buttons.png");
-	addtowidget(NULL,button1,0);
-	addtowidget(button1,label1,0);
+	addtowidget(NULL,button1,FALSE);
+	addtowidget(button1,label1,FALSE);
 
 	button1->mousepress = button1press;
 }
