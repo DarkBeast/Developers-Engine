@@ -2,11 +2,12 @@
 * Credits:  Andrew Wheeler/Genusis
 ******************************************************************************/
 
-#ifndef _WIDGET_H
-#define _WIDGET_H
+#ifndef DE_WIDGET_H
+#define DE_WIDGET_H
 
 #include "types.h"
 #include "integer.h"
+#include "bool.h"
 
 //the Void array to store widgets via pointer
 typedef struct
@@ -15,6 +16,18 @@ typedef struct
 	uint16 size;
 	uint16 count;
 }widget_void_array;
+
+//toggles for the sbool action.
+typedef enum
+{
+	isfocused = (1 << 0),
+	canfocus = (1 << 1),
+	mouseover = (1 << 2),
+	clicked = (1 << 3),
+	moveable = (1 << 4),
+	moving = (1 << 5),
+	canclickbehind = (1 << 6)
+}act;
 
 //A UI control structure.
 typedef struct widget
@@ -42,23 +55,17 @@ typedef struct widget
 	uint16 width;
 	uint16 height;
 	uint8 type;
-	int8 focused;
-	int8 canfocus;
-	int8 mouseover;
-	int8 clicked;
-	int8 moveable;
-	int8 moving;
-	int8 canclickbehind;
+	sbool action;//focused,canfocus,mouseover,clicked,moveable,moving,canclickbehind
 } widget;
 
 //The main screens Settings
 typedef struct
 {
-	int8 clicked;
-	int8 button;
+	sbool clicked;
+	sbool button;
 	vector2ui mouseclick;
 	vector2i mousepos;
-	void *focused; //can hold any control # up to 65,535
+	void *focused; //can hold any widget
 }canvas;
 
 //the UI system Struture.
@@ -72,7 +79,7 @@ typedef struct
 userinterface getui(void);
 
 //checks focused object to see if we need to check inside of it or not.
-char checkfocused(void);
+sbool checkfocused(void);
 
 //sets the mouses XY position during mouse move via event system.
 void setmousepos(int16 x , int16 y);
@@ -108,13 +115,13 @@ void initwidgetarray(widget *parent, char opt);
 void widgetresize(widget *parent, char opt, uint16 size);//for dynamic widget arrays up to 65,535, the system currently uses static.
 
 // clears the widgets arrays
-char clearbothwidgetarrays(widget *parent);
+sbool clearbothwidgetarrays(widget *parent);
 
 //clears the hidden array
-char clearhiddenarray(widget *parent);
+sbool clearhiddenarray(widget *parent);
 
 //clears the shown array
-char clearshownarray(widget *parent);
+sbool clearshownarray(widget *parent);
 
 //resizes the ID for more Z depth of Deep ui systems for widget manager.
 void resizeid(uint16 *id, uint16 size);
@@ -123,10 +130,10 @@ void resizeid(uint16 *id, uint16 size);
 void widgetmanager(void);
 
 //checks if widget is in the mouses location when click event happens
-char widgetrectcontains(widget *control, widget *parent);
+sbool widgetrectcontains(widget *control, widget *parent);
 
 //checks if the mouse is over a widget if so do event
-char ismouseover(widget *control);
+sbool ismouseover(widget *control);
 
 //focuses a widget manually
 void focuswidget(widget * control);
