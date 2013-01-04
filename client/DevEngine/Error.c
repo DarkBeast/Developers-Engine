@@ -7,9 +7,9 @@
 #include <stdio.h> //For file reading/writing and other functions. open document for more info.
 #include <stdlib.h>
 #include "error.h"
-#include "globals.h"
+#include "bool.h"
 
-//TODO: Add Error File Save
+//TODO: Add Error File Save and More Error Functions/FLAGS as well as safe Error types that just display an error but continue operation.
 
 void fatalerror(int error_flag)
 {

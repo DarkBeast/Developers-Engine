@@ -2,8 +2,8 @@
 * Credits:  Andrew Wheeler/Genusis
 ******************************************************************************/
 
-#ifndef _ERROR_H
-#define _ERROR_H
+#ifndef DE_ERROR_H
+#define DE_ERROR_H
 
 // Fatal Error Flags
 #define MISC_ERROR        -1
