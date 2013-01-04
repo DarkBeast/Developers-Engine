@@ -7,11 +7,10 @@
 #include "controls.h"
 #include <stdlib.h>
 #include "widget.h"
+
 //Buttons
 void createbutton(widget *data, uint16 x, uint16 y, uint16 height, uint16 width, char *image)
 {
-	button *box;
-
 	initwidget(data);
 	data->pos.x = x;
 	data->pos.y = y;
@@ -21,11 +20,8 @@ void createbutton(widget *data, uint16 x, uint16 y, uint16 height, uint16 width,
 	data->imgpos.y = 0;
 	data->type = BUTTON;
 	data->draw = &drawbuttons;
+	data ->control = NULL;
 
-	box = (button *)calloc(1,sizeof(button));
-	box->click = 0;
-
-	data ->control = box;
 	loadimage(getpath(image), &data->img);
 }
 
@@ -35,7 +31,7 @@ void drawbuttons(void *wgt)
 
 	if (ismouseover(data) == TRUE)
 	{
-		if (data->clicked != FALSE)
+		if (bitget(data->action,clicked) != FALSE)
 		{
 			data->imgpos.x = data->width;
 			data->imgpos.y = 0;
@@ -56,7 +52,7 @@ void drawbuttons(void *wgt)
 }
 
 //labels
-void createlabel(widget *data, uint16 x, uint16 y, uint8 size, uint8 red, uint8 blue, uint8 green, uint8 alpha, int8 canusemouse, char *labeltext)
+void createlabel(widget *data, uint16 x, uint16 y, uint8 size, uint8 red, uint8 blue, uint8 green, uint8 alpha, sbool canusemouse, char *labeltext)
 {
 	label *inittext;
 	vector2ui hw;
@@ -71,8 +67,7 @@ void createlabel(widget *data, uint16 x, uint16 y, uint8 size, uint8 red, uint8 
 	inittext = (label *)calloc(1,sizeof(label));
 	inittext->string = (text *)calloc(1,sizeof(text));
 	settext(inittext->string,x,y,size,red,blue,green,alpha,labeltext);
-	inittext->click = 0;
-	inittext->canusemouse = canusemouse;
+	inittext->canuseevent = canusemouse;
 	hw = getmaxstringhw(labeltext,size);
 	data->height = hw.y;
 	data->width = hw.x;

@@ -2,14 +2,12 @@
 * Credits:  Andrew Wheeler/Genusis
 ******************************************************************************/
 
-#ifndef _CONTROLS_H
-#define _CONTROLS_H
+#ifndef DE_CONTROLS_H
+#define DE_CONTROLS_H
 
 #include "widget.h"
-#include "types.h"
 #include "integer.h"
 #include "text.h"
-#include "globals.h"
 
 #define EMPTY 0;
 #define BUTTON 1;
@@ -17,14 +15,8 @@
 //only need types for special widgets.
 
 typedef struct
-{//TODO:Update to bit Boolean.
-	int8 click;
-}button;
-
-typedef struct
 {
-	int8 canusemouse;
-	int8 click;
+	sbool canuseevent;
 	text *string;
 }label;
 
