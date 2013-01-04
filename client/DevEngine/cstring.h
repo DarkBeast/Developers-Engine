@@ -1,8 +1,8 @@
 /*******************************************************************************
 * Credits:  Anthony  Ianozi                                                         *
 ******************************************************************************/
-#ifndef _CSTRING_H
-#define _CSTRING_H
+#ifndef DE_CSTRING_H
+#define DE_CSTRING_H
 
 #include"integer.h"
 #include"types.h"

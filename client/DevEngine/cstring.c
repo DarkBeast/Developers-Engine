@@ -5,7 +5,6 @@
 #include <stdlib.h>
 #include <string.h>
 #include "cstring.h"
-#include "function.h"
 #include "integer.h"
 
 cstring* String_Create(uint32 icapacity)
