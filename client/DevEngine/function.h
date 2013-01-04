@@ -2,8 +2,8 @@
 * Credits:  Andrew Wheeler/Genusis
 ******************************************************************************/
 
-#ifndef _FUNCTION_H
-#define _FUNCTION_H
+#ifndef DE_FUNCTION_H
+#define DE_FUNCTION_H
 
 #include <stdlib.h>
 

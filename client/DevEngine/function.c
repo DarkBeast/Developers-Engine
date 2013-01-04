@@ -3,8 +3,7 @@
 ******************************************************************************/
 
 #include "function.h"
-#include "types.h"
-#include "globals.h"
+#include "integer.h"
 
 uint32 program_time;
 
