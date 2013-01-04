@@ -4,8 +4,8 @@
 * Credits:  Andrew Wheeler/Genusis
 *           Freetype library 2
 ******************************************************************************/
-#ifndef _TEXT_H
-#define _TEXT_H
+#ifndef DE_TEXT_H
+#define DE_TEXT_H
 
 #include <ft2build.h>
 #include FT_FREETYPE_H
