@@ -4,10 +4,11 @@
 ******************************************************************************/
 
 /* Static Variables defines and Public Variables*/
-#ifndef _GLOBALS_H
-#define _GLOBALS_H
+#ifndef DE_GLOBALS_H
+#define DE_GLOBALS_H
 
 #include "integer.h"
+#include "bool.h"
 
 /* Public globals */
 //see globals.c it contains public globals types and a example.
@@ -35,10 +36,6 @@
 /* map defines*/
 #define TILE_SIZE_X     32	//magic pixels
 #define TILE_SIZE_Y     32	//magic pixels
-
-/* Boolean defines*/
-#define TRUE 0
-#define FALSE -1
 
 /*widget defines*/
 #define WIDGET_MAX        100 //max amount of widgets per array.
