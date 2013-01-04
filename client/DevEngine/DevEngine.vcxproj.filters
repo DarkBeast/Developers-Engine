@@ -88,6 +88,9 @@
     <ClInclude Include="mainmenu.h">
       <Filter>ui</Filter>
     </ClInclude>
+    <ClInclude Include="bool.h">
+      <Filter>core</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="ui">
