@@ -2,8 +2,8 @@
 * Credits:  Andrew Wheeler/Genusis
 ******************************************************************************/
 
-#ifndef _TYPES_H
-#define _TYPES_H
+#ifndef DE_TYPES_H
+#define DE_TYPES_H
 
 #include <glfw.h>
 #include "integer.h"
@@ -84,7 +84,6 @@ typedef struct image
 	uint16 format; // the format of the image.
 	uint16 bpp; //how many bytes per pixel are in the image
 	unsigned char *pixels; //actual pixel data of image
-	int8 reload;
 }image;
 
 #endif
