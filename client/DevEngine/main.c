@@ -3,18 +3,12 @@
 ******************************************************************************/
 // /ENTRY:"mainCRTStartup"
 #include <glfw.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include "error.h"
-#include "globals.h"
 #include "input.h"
-#include "image.h"
 #include "program_path.h"
 #include "render.h"
-#include "types.h"
 #include "text.h"
 #include "mainmenu.h"
+#include "bool.h"
 
 int main(void)
 {
