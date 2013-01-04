@@ -6,11 +6,12 @@
 #include <stdlib.h>
 #include <string.h>
 #include "function.h"
-#include "globals.h"
 #include "integer.h"
 #include "program_path.h"
+#include "bool.h"
 //hex example 0x0010FFFF = 1,114,111
 //example 0x00000000 = 0
+
 uint32 ipath   = 0;
 uint32 isize   = 1024;
 char* path;
@@ -60,7 +61,7 @@ int getprogramdirectory(void)
 		if (spath == NULL)
 
 		{
-			return -1;
+			return FALSE;
 		}
 
 		sresult = _getcwd(spath, isize);

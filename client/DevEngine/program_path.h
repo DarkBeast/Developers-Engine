@@ -2,8 +2,8 @@
 * Credits:  Andrew Wheeler/Genusis
 ******************************************************************************/
 
-#ifndef _PROGRAMPATH_H
-#define _PROGRAMPATH_H
+#ifndef DE_PROGRAMPATH_H
+#define DE_PROGRAMPATH_H
 
 char* program_path;
 
