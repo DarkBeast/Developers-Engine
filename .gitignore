@@ -13,3 +13,7 @@ client/DevEnginevs11.opensdf
 
 *.lastbuildstate
 *.ipch
+*.idb
+*.pdb
+client/DevEngine/Debug/vc110.pdb
+client/DevEngine/Debug/vc110.idb
