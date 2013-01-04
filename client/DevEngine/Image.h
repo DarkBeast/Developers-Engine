@@ -1,8 +1,8 @@
 /*******************************************************************************
 * Credits:  Andrew Wheeler/Genusis
 ******************************************************************************/
-#ifndef _IMAGE_H
-#define _IMAGE_H
+#ifndef DE_IMAGE_H
+#define DE_IMAGE_H
 
 #include "types.h"
 

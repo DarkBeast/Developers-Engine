@@ -3,15 +3,11 @@
 *           LibPng Creators
 ******************************************************************************/
 
-#include <glfw.h>
 #include <setjmp.h>
 #include <stdlib.h>
 #include "error.h"
-#include "function.h"
-#include "globals.h"
 #include "image.h"
 #include "integer.h"
-#include "render.h"
 #include "png.h"
 
 #define PNG_SIG_BYTES 8
