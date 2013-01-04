@@ -3,14 +3,13 @@
 ******************************************************************************/
 
 #include <glfw.h>
-#include <stdio.h>
 #include <stdlib.h>
 #include "error.h"
 #include "globals.h"
 #include "image.h"
 #include "integer.h"
 #include "render.h"
-
+#include "bool.h"
 screensize thescreen;
 
 screensize getscreensize(void)
@@ -49,7 +48,6 @@ void drawstatereset(void)
 	glEnable(GL_TEXTURE_2D);
 	//glEnable(GL_COLOR_MATERIAL);//sets a vertex color, migth slow down system some.
 	glEnable(GL_BLEND); //Enable alpha blending for better image qulity, turn off for better performace.
-
 	glAlphaFunc ( GL_GREATER, (GLclampf)0.2 );
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);//Set the blend function
 
@@ -114,33 +112,29 @@ void initimage(image* img)
 	img->height = 0;
 	img ->width = 0;
 	img ->texid = 0;
-	img->reload = TRUE;
-}
 
-void reloadimage(image* img)
-{
-	img->reload = TRUE;
-	img ->texid = 0;
+	if(img->pixels != NULL)
+	{
+		free(img->pixels);
+		img->pixels = NULL;
+	}
 }
 
 void loadimage(char *name, image* img)
 {
-	if(img->reload == TRUE)//check if its a new image or the first load.
-	{
-		// Read image from file
-		load_png( name, img);
+	// Read image from file
+	initimage(img);
+	load_png( name, img);
 
-		glGenTextures( 1, &img ->texid );
-		glBindTexture( GL_TEXTURE_2D, img ->texid );
-		glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
-		glTexImage2D( GL_TEXTURE_2D, 0, img ->format,
-			img ->width, img ->height, 0, img ->format,
-			GL_UNSIGNED_BYTE, (void*) img->pixels );
+	glGenTextures( 1, &img ->texid );
+	glBindTexture( GL_TEXTURE_2D, img ->texid );
+	glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
+	glTexImage2D( GL_TEXTURE_2D, 0, img ->format,
+		img ->width, img ->height, 0, img ->format,
+		GL_UNSIGNED_BYTE, (void*) img->pixels );
 
-		glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MIN_FILTER,GL_LINEAR);
-		glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MAG_FILTER,GL_LINEAR);
-		img->reload = FALSE;
-	}
+	glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MIN_FILTER,GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MAG_FILTER,GL_LINEAR);
 }
 
 void draw(image* img, vector2i vecpos, vector2i imgpos,int width, int height)
