@@ -2,8 +2,8 @@
 * Credits:  Andrew Wheeler/Genusis
 ******************************************************************************/
 
-#ifndef _INPUT_H
-#define _INPUT_H
+#ifndef DE_INPUT_H
+#define DE_INPUT_H
 
 void GLFWCALL handlekeypress(int key,int press);
 void GLFWCALL handlemousepos(int x,int y);

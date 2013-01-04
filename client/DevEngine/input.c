@@ -4,10 +4,7 @@
 
 #include <glfw.h>
 #include <stdio.h>
-#include <stdlib.h>
 #include "input.h"
-#include "image.h"
-#include "render.h"
 #include "widget.h"
 #include "globals.h"
 
