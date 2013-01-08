@@ -9,10 +9,15 @@
 #include "integer.h"
 #include "text.h"
 
-#define EMPTY 0;
-#define BUTTON 1;
-#define LABEL 2;
-//only need types for special widgets.
+typedef enum
+{
+	EMPTY = 0,
+	BUTTON,
+	LABEL,
+	WINDOW
+}controltypes;
+
+//only need structs for special widgets.
 
 typedef struct
 {
@@ -20,13 +25,17 @@ typedef struct
 	text *string;
 }label;
 
-//typedef struct
-//{
-//}window;
+typedef struct
+{
+	sbool minimized;
+}window;
 
 void createbutton(widget *data, uint16 x, uint16 y, uint16 height, uint16 width, char *image);
 void drawbuttons(void *wgt);
 
 void createlabel(widget *data, uint16 x, uint16 y, uint8 size, uint8 red, uint8 blue, uint8 green, uint8 alpha, int8 canusemouse, char *labeltext);
 void drawlabel(void *wgt);
+
+void createwindow(widget *data, uint16 x, uint16 y, uint16 height, uint16 width, char *image);
+void drawwindows(void *wgt);
 #endif
