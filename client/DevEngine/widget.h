@@ -17,6 +17,11 @@ typedef struct
 	uint16 count;
 }widget_void_array;
 
+typedef struct
+{
+	uint16 num;
+}widgetmanagerarray;
+
 //toggles for the sbool action.
 typedef enum
 {
@@ -50,6 +55,7 @@ typedef struct widget
 	widget_void_array hidden;
 
 	vector2ui pos;
+	vector2ui actualpos;
 	vector2i imgpos;
 	image img;
 	uint16 width;
@@ -62,7 +68,7 @@ typedef struct widget
 typedef struct
 {
 	sbool clicked;
-	sbool button;
+	uint8 button;
 	vector2ui mouseclick;
 	vector2i mousepos;
 	void *focused; //can hold any widget
