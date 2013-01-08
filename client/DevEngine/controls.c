@@ -6,7 +6,6 @@
 #include "program_path.h"
 #include "controls.h"
 #include <stdlib.h>
-#include "widget.h"
 
 //Buttons
 void createbutton(widget *data, uint16 x, uint16 y, uint16 height, uint16 width, char *image)
@@ -79,4 +78,36 @@ void drawlabel(void *wgt)
 	widget *control = (widget *)wgt;
 	label *data = (label *)control->control;
 	drawtext(data->string, (widget *)control->parent);
+}
+
+void changelabel(label data)
+{
+}
+
+void createwindow(widget *data, uint16 x, uint16 y, uint16 height, uint16 width, char *image)
+{
+	window *initwindow;
+
+	initwidget(data);
+	data->pos.x = x;
+	data->pos.y = y;
+	data->height = height;
+	data->width = width;
+	data->imgpos.x = 0;
+	data->imgpos.y = 0;
+	data->type = BUTTON;
+	data->draw = &drawwindows;
+
+	initwindow = (window *)calloc(1,sizeof(window));
+	initwindow->minimized = FALSE;
+	data ->control = initwindow;
+
+	loadimage(getpath(image), &data->img);
+}
+
+void drawwindows(void *wgt)
+{
+	widget *data = (widget *)wgt;
+
+	drawwidget(data);
 }
