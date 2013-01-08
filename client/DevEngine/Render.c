@@ -179,6 +179,9 @@ void drawwidget(widget* control) //draws all the image widgets on the canvas.
 	float y2,y1;
 	widget *parent = (widget *)control->parent;
 
+	control->actualpos.x = control->pos.x + parent->pos.x;
+	control->actualpos.y = control->pos.y + parent->pos.y;
+
 	x1 =   (float) control->imgpos.x  / control->img.width;
 	x2 =   (float) (control->imgpos.x + control->width) / control->img.width;
 	y1 =   (float) control->imgpos.y / control->img.height;
@@ -196,16 +199,16 @@ void drawwidget(widget* control) //draws all the image widgets on the canvas.
 	glBegin (GL_QUADS);
 
 	glTexCoord2f (x1, y2);
-	glVertex2i (control->pos.x + parent->pos.x, control->pos.y + parent->pos.y);
+	glVertex2i (control->actualpos.x, control->actualpos.y);
 
 	glTexCoord2f (x2, y2);
-	glVertex2i (control->pos.x +  parent->pos.x + control->width, control->pos.y + parent->pos.y);
+	glVertex2i (control->actualpos.x + control->width, control->actualpos.y);
 
 	glTexCoord2f (x2, y1);
-	glVertex2i (control->pos.x +  parent->pos.x + control->width, control->pos.y + parent->pos.y + control->height);
+	glVertex2i (control->actualpos.x + control->width, control->actualpos.y + control->height);
 
 	glTexCoord2f (x1, y1);
-	glVertex2i (control->pos.x + parent->pos.x, control->pos.y + parent->pos.y + control->height);
+	glVertex2i (control->actualpos.x, control->actualpos.y + control->height);
 
 	glEnd ();
 }
