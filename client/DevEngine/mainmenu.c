@@ -7,6 +7,7 @@
 
 widget *label1;
 widget *button1;
+widget *window1;
 int i = 0;
 
 void mainmenu(void)
@@ -50,11 +51,20 @@ void mainmenu(void)
 void initmainmenu(void)
 {
 	widgetinit();
+
 	label1 = (widget *)calloc(1,sizeof(widget));
 	button1 = (widget *)calloc(1,sizeof(widget));
+	window1 = (widget *)calloc(1,sizeof(widget));
+
 	createlabel(label1,10,10,0,255,255,255,255,FALSE,"click me!");
-	createbutton(button1,100,100,60,100,"image\\buttons.png");
-	addtowidget(NULL,button1,FALSE);
+	createbutton(button1,3,5,60,100,"image\\buttons.png");
+	createwindow(window1,100,100,150,150,"image\\window.png");
+
+	bitset(label1->action,canclickbehind);
+	bitset(window1->action,moveable);
+
+	addtowidget(NULL,window1,FALSE);
+	addtowidget(window1,button1,FALSE);
 	addtowidget(button1,label1,FALSE);
 
 	button1->mousepress = button1press;
