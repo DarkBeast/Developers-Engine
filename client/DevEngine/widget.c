@@ -288,6 +288,8 @@ void initwidget(widget *wgt)//initializes a widget so we can then use it error f
 	wgt->parent = NULL;
 	wgt->pos.x = 0;
 	wgt->pos.y = 0;
+	wgt->actualpos.x = 0;
+	wgt->actualpos.y = 0;
 	wgt->imgpos.x = 0;
 	wgt->imgpos.y = 0;
 	wgt->width = 0;
@@ -641,7 +643,7 @@ void resizeid(uint16 *id, uint16 size)
 	if(id == NULL)
 		return;//TODO: add error handler here.
 
-	data = (uint16 *)realloc(id, size * sizeof(uint16*));
+	data = (uint16 *)realloc(id, size * sizeof(uint16));
 
 	if (data == NULL)
 		return;
@@ -653,25 +655,26 @@ void resizeid(uint16 *id, uint16 size)
 void widgetmanager(void)//used to draw the widgets onto the screen.
 {
 	widget *child;
-	uint16 *id = NULL;
+	uint16 *id;
 	uint16 index = 0;
 	uint16 idindex;
 	uint16 idsize;
 
-	id = (uint16 *)calloc(1, 32);
+	id = (uint16 *)calloc(1, 32 * sizeof(uint16));
 	idsize = 32;
 	idindex = 0;
+	id[idindex] = 0;
 
 	for( index = 0; index < ui.root->widgets.count; ++index)
 	{
 		child = (widget *)ui.root->widgets.data[index];
 		child->draw(child);//then draw there parent.
 
-		for(id[idindex] = 0; id[idindex] < child->widgets.count; ++id[idindex])
+		while(id[idindex] <= child->widgets.count)
 		{
 			if(child ->widgets.data != NULL)
 			{
-				if(id[idindex] + 1 >= child->widgets.count && idindex != 0)
+				if(id[idindex]  >= child->widgets.count && idindex != 0)
 				{
 					id[idindex] = 0;
 
@@ -680,19 +683,26 @@ void widgetmanager(void)//used to draw the widgets onto the screen.
 				}
 				else
 				{
-					if (child->widgets.data[id[idindex]] != NULL)
+					if(!id[idindex] >= child->widgets.count)
 					{
-						child = (widget *)child->widgets.data[id[idindex]];
-						child->draw(child);//then draw the child.
-
-						++idindex;//we set the z buffer index to know which layer we are in
-
-						if(idindex + 1 >= idsize)//make sure there is not too many layers for the id array.
+						if (child->widgets.data[id[idindex]] != NULL)
 						{
-							idsize = (uint16)next_power_of_two(idsize);
-							resizeid(id,idsize);
+							child = (widget *)child->widgets.data[id[idindex]];
+							child->draw(child);//then draw the child.
+							++id[idindex];
+							++idindex;//we set the z buffer index to know which layer we are in
+
+							if(idindex + 1 >= idsize)//make sure there is not too many layers for the id array.
+							{
+								idsize = (uint16)next_power_of_two(idsize);
+								resizeid(id,idsize);
+							}
+							id[idindex] = 0;//set the new ID index to 0
 						}
-						id[idindex] = 0;//set the new ID index to 0
+					}
+					else
+					{
+						++id[idindex];
 					}
 				}
 			}
