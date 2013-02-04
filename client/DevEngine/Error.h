@@ -6,20 +6,25 @@
 #define DE_ERROR_H
 
 // Fatal Error Flags
-#define MISC_ERROR        -1
-#define NULL_ERROR         0
-#define POINTER_IN_USE     1
-#define UNDEFINED_POINTER  2
-#define OUT_OF_MEMORY      3
-#define IO_ERROR           4
-#define FILE_ERROR         5
-#define OVERFLOW_ERROR     6
-#define SOCKET_ADDR_ERROR  7
-#define GLFWINIT_ERROR     8
-#define GLFWWIN_ERROR	   9
-#define IMAGELOADER_ERROR  10
+typedef enum error_flags_t error_flags_t;
 
-void fatalerror(int error_flag);
-void rendererror(int error_flag);
-void shutdown(void);
+enum error_flags_t
+{
+	ERROR_MISC_ERROR = -1,
+	ERROR_NULL_ERROR = 0,
+	ERROR_POINTER_IN_USE  = 1,
+	ERROR_UNDEFINED_POINTER = 2,
+	ERROR_OUT_OF_MEMORY = 3,
+	ERROR_IO_ERROR = 4,
+	ERROR_FILE_ERROR = 5,
+	ERROR_OVERFLOW_ERROR = 6,
+	ERROR_SOCKET_ADDR_ERROR = 7,
+	ERROR_GLFWINIT_ERROR = 8,
+	ERROR_GLFWWIN_ERROR = 9,
+	ERROR_IMAGELOADER_ERROR = 10,
+};
+
+void fatal_error(int error_flag);
+void render_error(int error_flag);
+void shut_down(void);
 #endif

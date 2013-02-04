@@ -5,12 +5,12 @@
 #include "globals.h"
 
 /*examples of a global variable*/
-int playersonline;
+int players_online;
 
-void setplayersonline(int players){ playersonline = players; }
+void set_players_online(int players){ players_online = players; }
 
-void increaseplayersonline(void){ playersonline += 1; }
+void increase_players_online(void){ players_online += 1; }
 
-void decreaseplayersonline(void){ playersonline -= 1; }
+void decrease_players_online(void){ players_online -= 1; }
 
-int getplayersonline(void){ return playersonline; }
+int get_players_online(void){ return players_online; }

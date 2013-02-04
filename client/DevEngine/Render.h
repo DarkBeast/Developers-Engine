@@ -8,24 +8,25 @@
 #include "types.h"
 #include "widget.h"
 
-typedef struct
+typedef struct screen_size screen_size;
+
+struct screen_size
 {
 	int width;
 	int height;
-}screensize;
+};
 
-screensize getscreensize(void);
-void clearscreen(int red, int blue, int green, int alpha);
+screen_size get_screen_size(void);
+void clear_screen(int red, int blue, int green, int alpha);
 void draw(image* img, vector2i vecpos, vector2i imgpos,int width, int height);
-void drawpush(void);
-void drawstatereset(void);
-void drawwidget(widget* widget);
-void GLFWCALL handleresize(int width,int height);
-void initimage(image* img);
-void initscreen(int swidth, int sheight, int mode);
-void loadimage(char *name, image* img);
-void reloadimage(image* img);
-void SetdrawView(int x, int y, int swidth, int sheight);
-int getscreenheight(void);
-int getscreenwidth(void);
+void draw_push(void);
+void draw_state_reset(void);
+void draw_widget(widget* widget);
+void GLFWCALL handle_resize(int width,int height);
+void init_image(image* img);
+void init_screen(int swidth, int sheight, int mode);
+void load_image(char *name, image* img);
+void set_draw_view(int x, int y, int swidth, int sheight);
+int get_screen_height(void);
+int get_screen_width(void);
 #endif

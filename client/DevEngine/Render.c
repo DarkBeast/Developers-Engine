@@ -10,24 +10,24 @@
 #include "integer.h"
 #include "render.h"
 #include "bool.h"
-screensize thescreen;
+screen_size the_screen;
 
-screensize getscreensize(void)
+screen_size get_screen_size(void)
 {
-	return thescreen;
+	return the_screen;
 }
 
-int getscreenheight(void)
+int get_screen_height(void)
 {
-	return thescreen.height;
+	return the_screen.height;
 }
 
-int getscreenwidth(void)
+int get_screen_width(void)
 {
-	return thescreen.width;
+	return the_screen.width;
 }
 
-void drawpush(void)
+void draw_push(void)
 {
 	glPushClientAttrib(GL_CLIENT_ALL_ATTRIB_BITS);
 	glPushAttrib(GL_ALL_ATTRIB_BITS);
@@ -39,7 +39,7 @@ void drawpush(void)
 	glPushMatrix();
 }
 
-void drawstatereset(void)
+void draw_state_reset(void)
 {
 	glDisable(GL_CULL_FACE);
 	glDisable(GL_LIGHTING);
@@ -48,18 +48,18 @@ void drawstatereset(void)
 	glEnable(GL_TEXTURE_2D);
 	//glEnable(GL_COLOR_MATERIAL);//sets a vertex color, migth slow down system some.
 	glEnable(GL_BLEND); //Enable alpha blending for better image qulity, turn off for better performace.
-	glAlphaFunc ( GL_GREATER, (GLclampf)0.2 );
+	glAlphaFunc ( GL_GREATER, (GLclampf)0.2);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);//Set the blend function
 
 	glMatrixMode(GL_MODELVIEW);
 }
 
-void setdrawview(int x, int y, int swidth, int sheight)
+void set_draw_view(int x, int y, int swidth, int sheight)
 {
 	//Tell OpenGL how to convert from coordinates to pixel values
-	glViewport( x, y, swidth, sheight );
+	glViewport( x, y, swidth, sheight);
 
-	glMatrixMode( GL_PROJECTION ); //Switch to setting the camera perspective
+	glMatrixMode( GL_PROJECTION); //Switch to setting the camera perspective
 	//Set the camera perspective
 	glLoadIdentity(); //reset the camera
 
@@ -67,45 +67,45 @@ void setdrawview(int x, int y, int swidth, int sheight)
 }
 
 //sets the screen, GLFW , and the Screen Title
-void initscreen(int swidth, int sheight, int mode)
+void init_screen(int swidth, int sheight, int mode)
 {
 	// Initialize GLFW
-	if( !glfwInit() )
-		rendererror(GLFWINIT_ERROR);
+	if( !glfwInit())
+		render_error(ERROR_GLFWINIT_ERROR);
 
 	// Finally we can Open an OpenGL window
-	if(!glfwOpenWindow ( swidth, sheight, 0,0,0,0,0,0, mode ))
-		rendererror(GLFWWIN_ERROR);
+	if(!glfwOpenWindow ( swidth, sheight, 0,0,0,0,0,0, mode))
+		render_error(ERROR_GLFWWIN_ERROR);
 
-	glfwSetWindowTitle( TITLE );//Sets the Windows Name
-	thescreen.height = sheight;
-	thescreen.width = swidth;
+	glfwSetWindowTitle( TITLE);//Sets the Windows Name
+	the_screen.height = sheight;
+	the_screen.width = swidth;
 }
 
-void clearscreen(int red, int blue, int green, int alpha)
+void clear_screen(int red, int blue, int green, int alpha)
 {
 	glClearColor(red / 255.f, green / 255.f, blue / 255.f, alpha / 255.f);
 	glClear(GL_COLOR_BUFFER_BIT);
 }
 
 //Called when the window is resized
-void GLFWCALL handleresize(int width,int height)
+void GLFWCALL handle_resize(int width,int height)
 {
 	//Tell OpenGL how to convert from coordinates to pixel values
-	glViewport( 0, 0, width, height );
+	glViewport( 0, 0, width, height);
 
-	glMatrixMode( GL_PROJECTION ); //Switch to setting the camera perspective
+	glMatrixMode( GL_PROJECTION); //Switch to setting the camera perspective
 	//Set the camera perspective
 	glLoadIdentity(); //reset the camera
 
 	glOrtho (0, width, height, 0, 0, 1);
 
 	//set the new screen size from the resize
-	thescreen.height = height;
-	thescreen.width = width;
+	the_screen.height = height;
+	the_screen.width = width;
 }
 
-void initimage(image* img)
+void init_image(image* img)
 {
 	img->bpp = 0;
 	img->format = GL_RGBA;
@@ -113,25 +113,24 @@ void initimage(image* img)
 	img ->width = 0;
 	img ->texid = 0;
 
-	if(img->pixels != NULL)
-	{
+	if(img->pixels != NULL){
 		free(img->pixels);
 		img->pixels = NULL;
 	}
 }
 
-void loadimage(char *name, image* img)
+void load_image(char *name, image* img)
 {
 	// Read image from file
-	initimage(img);
+	init_image(img);
 	load_png( name, img);
 
-	glGenTextures( 1, &img ->texid );
-	glBindTexture( GL_TEXTURE_2D, img ->texid );
+	glGenTextures( 1, &img ->texid);
+	glBindTexture( GL_TEXTURE_2D, img ->texid);
 	glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
 	glTexImage2D( GL_TEXTURE_2D, 0, img ->format,
 		img ->width, img ->height, 0, img ->format,
-		GL_UNSIGNED_BYTE, (void*) img->pixels );
+		GL_UNSIGNED_BYTE, (void*) img->pixels);
 
 	glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MIN_FILTER,GL_LINEAR);
 	glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MAG_FILTER,GL_LINEAR);
@@ -173,7 +172,7 @@ void draw(image* img, vector2i vecpos, vector2i imgpos,int width, int height)
 	glEnd ();
 }
 
-void drawwidget(widget* control) //draws all the image widgets on the canvas.
+void draw_widget(widget* control) //draws all the image widgets on the canvas.
 {
 	float x2,x1;
 	float y2,y1;

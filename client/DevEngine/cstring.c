@@ -12,8 +12,7 @@ cstring* String_Create(uint32 icapacity)
 	cstring* objstring = NULL;
 	objstring = (cstring*)calloc(1, sizeof(cstring) + icapacity *
 		sizeof(uint8));
-	if(objstring == NULL)
-	{
+	if(objstring == NULL){
 		return NULL;
 	}
 	objstring->data = (char*)(objstring + sizeof(cstring));
@@ -30,15 +29,13 @@ cstring *string_createFromASCIIstring(const char *sstring)
 	char       *soffset   = (char*)sstring;
 	uint32      icapacity = 0;
 	/* Get length of string */
-	while (*soffset > 0)
-	{
+	while (*soffset > 0){
 		++soffset;
 	}
 	icapacity = soffset - sstring;
 	objstring = (cstring*)calloc(1, sizeof(cstring) + icapacity *
 		sizeof(uint8));
-	if (objstring == NULL)
-	{
+	if (objstring == NULL){
 		return NULL;
 	}
 	/* Copy ascii string to new String */
@@ -47,8 +44,7 @@ cstring *string_createFromASCIIstring(const char *sstring)
 	objstring->size = icapacity;
 	soffset = (char *)sstring;
 	ioffset = (uint32 *)objstring->data;
-	while (*soffset > 0)
-	{
+	while (*soffset > 0){
 		*ioffset = *soffset;
 		++soffset;
 		++ioffset;
@@ -63,9 +59,7 @@ void string_destroy(cstring* objstring)
 
 cstring* String_Concatenate(cstring* objtarget, cstring* objsource)
 {
-	if(objsource->count > objtarget->size -
-		objtarget->count)
-	{
+	if(objsource->count > objtarget->size - objtarget->count){
 		return NULL;
 	}
 	memcpy(objtarget->data+objtarget->count,
@@ -79,8 +73,7 @@ extern cstring* string_concatenatefromASCIIstring(cstring* objtarget, const char
 	char       *soffset   = (char*)ssource;
 	uint32      isize = 0;
 	/* Get the length of the source string */
-	while (*soffset > 0)
-	{
+	while (*soffset > 0){
 		++soffset;
 	}
 	isize = soffset - ssource;
@@ -88,8 +81,7 @@ extern cstring* string_concatenatefromASCIIstring(cstring* objtarget, const char
 	soffset = (char *)ssource;
 	ioffset = (uint32 *)(objtarget->data+objtarget->count);
 	objtarget->count += isize;
-	while (*soffset > 0)
-	{
+	while (*soffset > 0){
 		*ioffset = *soffset;
 		++soffset;
 		++ioffset;
@@ -99,9 +91,8 @@ extern cstring* string_concatenatefromASCIIstring(cstring* objtarget, const char
 uint32 string_length(cstring* objstring)
 {
 	if(objstring == NULL)
-	{
 		return 0;
-	}
+
 	return objstring->count;
 }
 
@@ -109,8 +100,7 @@ uint32 GetASCIIstringlength(const char* sstring)
 {
 	/* There _must_ be a faster way than this! */
 	const char* sstart = (char*)sstring;
-	while(*sstring)
-	{
+	while(*sstring){
 		++sstring;
 	}
 	return sstring - sstart;
@@ -122,21 +112,18 @@ cstring* string_copyfromASCIIstring(cstring* objtarget, const char* ssource)
 	char       *soffset   = (char*)ssource;
 	uint32      isize = 0;
 	/* Get the length of the source string */
-	while (*soffset > 0)
-	{
+	while (*soffset > 0){
 		++soffset;
 	}
 	isize = soffset - ssource;
-	if(isize > objtarget->size - objtarget->count)
-	{
+	if(isize > objtarget->size - objtarget->count){
 		return NULL;
 	}
 	/* Copy ascii string to new String */
 	objtarget->count = isize;
 	soffset = (char *)ssource;
 	ioffset = (uint32 *)objtarget->data;
-	while (*soffset > 0)
-	{
+	while (*soffset > 0){
 		*ioffset = *soffset;
 		++soffset;
 		++ioffset;
@@ -146,8 +133,7 @@ cstring* string_copyfromASCIIstring(cstring* objtarget, const char* ssource)
 
 cstring* string_copy(cstring* objtarget, cstring* objsource)
 {
-	if(objsource->count > objtarget->size)
-	{
+	if(objsource->count > objtarget->size){
 		return NULL;
 	}
 	memcpy(objtarget->data, objsource->data,

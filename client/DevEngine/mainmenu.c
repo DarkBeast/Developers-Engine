@@ -5,34 +5,32 @@
 #include <glfw.h>
 #include "bool.h"
 
-widget *label1;
-widget *button1;
-widget *window1;
+widget label1;
+widget button1;
+widget window1;
 int i = 0;
 
-void mainmenu(void)
+void main_menu(void)
 {
 	sbool running = TRUE;
 	uint32 time;
 	uint32 lpstimer = 0;
 	uint32 lps = 0;
 
-	drawstatereset();
+	draw_state_reset();
 
-	while( running )
-	{
+	while( running){
 		time = (uint32)glfwGetTime();
 
-		clearscreen(1,1,1,1);
+		clear_screen(1,1,1,1);
 
-		widgetmanager();
+		widget_manager();
 
 		//Clear information from last draw
 		glFlush();
 		glfwSwapBuffers();
 
-		if(lpstimer < time)
-		{//calculates the loops per second the code does, through everything
+		if(lpstimer < time){//calculates the loops per second the code does, through everything
 			printf("%i\n",lps);
 			lpstimer = time + 1;
 
@@ -44,37 +42,31 @@ void mainmenu(void)
 		//glfwSleep(.005); //used to save cpu
 
 		// Check if ESC key was pressed or window was closed
-		running = glfwGetWindowParam( GLFW_OPENED );
+		running = glfwGetWindowParam( GLFW_OPENED);
 	}
 }
 
-void initmainmenu(void)
+void init_main_menu(void)
 {
-	widgetinit();
+	create_label(&label1,10,10,0,255,255,255,255,FALSE,"click me!");
+	create_button(&button1,3,5,60,100,"image\\buttons.png");
+	create_window(&window1,100,100,150,150,"image\\window.png");
 
-	label1 = (widget *)calloc(1,sizeof(widget));
-	button1 = (widget *)calloc(1,sizeof(widget));
-	window1 = (widget *)calloc(1,sizeof(widget));
+	label1.action |= WIDGET_CAN_CLICK_BEHIND;
+	window1.action |= WIDGET_MOVEABLE;
+	window1.action |= WIDGET_CAN_FOCUS;
 
-	createlabel(label1,10,10,0,255,255,255,255,FALSE,"click me!");
-	createbutton(button1,3,5,60,100,"image\\buttons.png");
-	createwindow(window1,100,100,150,150,"image\\window.png");
+	widget_add(NULL,&window1,FALSE);
+	widget_add(&window1,&button1,FALSE);
+	widget_add(&button1,&label1,FALSE);
 
-	bitset(label1->action,canclickbehind);
-	bitset(window1->action,moveable);
-
-	addtowidget(NULL,window1,FALSE);
-	addtowidget(window1,button1,FALSE);
-	addtowidget(button1,label1,FALSE);
-
-	button1->mousepress = button1press;
+	button1.mousepress = button1_press;
 }
 
-void button1press(void *wgt, int button, int pressed)
+void button1_press(void *wgt, int button, int pressed)
 {
-	label *z = (label *)label1->control;
-	switch(i)
-	{
+	label *z = (label *)label1.control;
+	switch(i){
 	case 0:
 
 		z->string->data = "fuck you!";

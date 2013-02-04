@@ -6,19 +6,19 @@
 #define DE_BUFFER_H
 
 #define PACKET_SIZE    8192   // Size of packet buffer
-
-typedef struct buffer_t
+typedef struct buffer_t buffer_t;
+struct buffer_t
 {
 	char buff[PACKET_SIZE];
 	int offset;
-}buffer_t;
+};
 
-int  addbuffer(buffer_t *buffer, const void* source, size_t size);
-int  addopcode(buffer_t* buffer, uint8_t opcode);
-int  addstring(buffer_t* buffer, char* str);
-int  bufferfull(buffer_t* buffer, size_t size);
-int  setrawstring(buffer_t *buffer, char* str);
-void clearbuffer(buffer_t *buffer);
-void takebuffer(void* dest, buffer_t* buffer, size_t size);
-void takestring(char* dest, buffer_t *buffer);
+int  add_buffer(buffer_t *buffer, const void* source, size_t size);
+int  add_opcode(buffer_t* buffer, uint8_t opcode);
+int  add_string(buffer_t* buffer, char* str);
+int  buffer_full(buffer_t* buffer, size_t size);
+int  set_raw_string(buffer_t *buffer, char* str);
+void clear_buffer(buffer_t *buffer);
+void take_buffer(void* dest, buffer_t* buffer, size_t size);
+void take_string(char* dest, buffer_t *buffer);
 #endif

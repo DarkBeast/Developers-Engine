@@ -12,22 +12,24 @@
 
 int main(void)
 {
-	getprogramdirectory();
+	get_program_directory();
 
-	initscreen(800,600,GLFW_WINDOW);
+	init_screen(800,600,GLFW_WINDOW);
 	glfwEnable(GLFW_KEY_REPEAT);
 
-	glfwSetWindowSizeCallback(handleresize); //handles Window resize calls
-	glfwSetKeyCallback(handlekeypress); //handles Key presses
-	glfwSetMousePosCallback(handlemousepos);//handles mouse move events
-	glfwSetMouseButtonCallback(handlemousepress);//handles mouse button events
-	glfwSetMouseWheelCallback(handlemousewheel);//handles mouse wheel scrolling
+	glfwSetWindowSizeCallback(handle_resize);//handles Window resize calls
+	glfwSetKeyCallback(handle_key_press);//handles Key presses
+	glfwSetMousePosCallback(handle_mouse_pos);//handles mouse move events
+	glfwSetMouseButtonCallback(handle_mouse_press);//handles mouse button events
+	glfwSetMouseWheelCallback(handle_mouse_wheel);//handles mouse wheel scrolling
 
-	initfont("");
+	init_font("");
+	widget_init_system();
+	init_main_menu();
 
 	// Main loop
-	initmainmenu();
-	mainmenu();
+	main_menu();
+
 	// Close window and terminate GLFW
 	glfwTerminate();
 

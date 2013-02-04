@@ -11,32 +11,31 @@
 
 //TODO: Add Error File Save and More Error Functions/FLAGS as well as safe Error types that just display an error but continue operation.
 
-void fatalerror(int error_flag)
+void fatal_error(int error_flag)
 {
-	switch(error_flag)
-	{
-	case MISC_ERROR:
+	switch(error_flag){
+	case ERROR_MISC_ERROR:
 		fputs("An error has occurred!\n", stderr);
 		break;
-	case POINTER_IN_USE:
+	case ERROR_POINTER_IN_USE:
 		fputs("An error has occurred: Pointer in use!\n", stderr);
 		break;
-	case UNDEFINED_POINTER:
+	case ERROR_UNDEFINED_POINTER:
 		fputs("An error has occurred: Undefined Pointer!\n", stderr);
 		break;
-	case OUT_OF_MEMORY:
+	case ERROR_OUT_OF_MEMORY:
 		fputs("An error has occurred: Server Out Of Memory!\n", stderr);
 		break;
-	case IO_ERROR:
+	case ERROR_IO_ERROR:
 		fputs("An error has occurred: I/O Error!\n", stderr);
 		break;
-	case FILE_ERROR:
+	case ERROR_FILE_ERROR:
 		fputs("An error has occurred: File Error!\n", stderr);
 		break;
-	case OVERFLOW_ERROR:
+	case ERROR_OVERFLOW_ERROR:
 		fputs("An error has occurred: Overflow!\n", stderr);
 		break;
-	case SOCKET_ADDR_ERROR:
+	case ERROR_SOCKET_ADDR_ERROR:
 		fputs("Could not establish server address!\n", stderr);
 		break;
 	default:
@@ -44,41 +43,40 @@ void fatalerror(int error_flag)
 	}
 	fputs("The Application will now close.", stderr);
 	_getch();
-	shutdown();
+	shut_down();
 }
 
-void rendererror(int error_flag)
+void render_error(int error_flag)
 {
-	switch(error_flag)
-	{
-	case MISC_ERROR:
+	switch(error_flag){
+	case ERROR_MISC_ERROR:
 		fputs("An error has occurred!\n", stderr);
 		break;
-	case POINTER_IN_USE:
+	case ERROR_POINTER_IN_USE:
 		fputs("An error has occurred: Pointer in use!\n", stderr);
 		break;
-	case UNDEFINED_POINTER:
+	case ERROR_UNDEFINED_POINTER:
 		fputs("An error has occurred: Undefined Pointer!\n", stderr);
 		break;
-	case OUT_OF_MEMORY:
+	case ERROR_OUT_OF_MEMORY:
 		fputs("An error has occurred: Server Out Of Memory!\n", stderr);
 		break;
-	case IO_ERROR:
+	case ERROR_IO_ERROR:
 		fputs("An error has occurred: I/O Error!\n", stderr);
 		break;
-	case FILE_ERROR:
+	case ERROR_FILE_ERROR:
 		fputs("An error has occurred: File Error!\n", stderr);
 		break;
-	case OVERFLOW_ERROR:
+	case ERROR_OVERFLOW_ERROR:
 		fputs("An error has occurred: Overflow!\n", stderr);
 		break;
-	case GLFWINIT_ERROR:
+	case ERROR_GLFWINIT_ERROR:
 		fputs("An error has occurred: GLFW Did Not Intalize!\n", stderr);
 		break;
-	case GLFWWIN_ERROR:
+	case ERROR_GLFWWIN_ERROR:
 		fputs("An error has occurred: GLFW Did Not Open Window!\n", stderr);
 		break;
-	case IMAGELOADER_ERROR:
+	case ERROR_IMAGELOADER_ERROR:
 		fputs("An error has occurred: Image Did Not Load!\n", stderr);
 		break;
 	default:
@@ -86,12 +84,12 @@ void rendererror(int error_flag)
 	}
 	fputs("The Application will now close.", stderr);
 	_getch();
-	shutdown();
+	shut_down();
 }
 
-void shutdown(void)
+void shut_down(void)
 {
 	//TODO: Clean up memory, shut down sockets, etc....?
 	glfwTerminate();
-	exit( FALSE );
+	exit( FALSE);
 }

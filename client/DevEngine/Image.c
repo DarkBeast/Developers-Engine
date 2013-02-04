@@ -27,26 +27,26 @@ void load_png(const char *name, image *image)
 	FILE *png_file = fopen(name, "rb");
 
 	if (!png_file)
-		fatalerror(FILE_ERROR);
+		fatal_error(ERROR_FILE_ERROR);
 
 	fread(header, 1, PNG_SIG_BYTES, png_file);
 	if(png_sig_cmp(header, 0, PNG_SIG_BYTES))
-		fatalerror(FILE_ERROR);
+		fatal_error(ERROR_FILE_ERROR);
 
 	png_ptr = png_create_read_struct(PNG_LIBPNG_VER_STRING, NULL, NULL, NULL);
 	if (!png_ptr)
-		fatalerror(MISC_ERROR);
+		fatal_error(ERROR_MISC_ERROR);
 
 	info_ptr = png_create_info_struct(png_ptr);
 	if (!info_ptr)
-		fatalerror(MISC_ERROR);
+		fatal_error(ERROR_MISC_ERROR);
 
 	end_info = png_create_info_struct(png_ptr);
 	if (!end_info)
-		fatalerror(MISC_ERROR);
+		fatal_error(ERROR_MISC_ERROR);
 
 	if(setjmp(png_jmpbuf(png_ptr)))
-		fatalerror(IO_ERROR);
+		fatal_error(ERROR_IO_ERROR);
 
 	png_init_io(png_ptr, png_file);
 	png_set_sig_bytes(png_ptr, PNG_SIG_BYTES);
@@ -66,16 +66,13 @@ void load_png(const char *name, image *image)
 
 	if(color_type == PNG_COLOR_TYPE_PALETTE)
 		png_set_palette_to_rgb(png_ptr);
-	else if(color_type == PNG_COLOR_TYPE_GRAY ||
-		color_type == PNG_COLOR_TYPE_GRAY_ALPHA)
-	{
+	else if(color_type == PNG_COLOR_TYPE_GRAY || color_type == PNG_COLOR_TYPE_GRAY_ALPHA){
 		png_set_gray_to_rgb(png_ptr);
 	}
 
 	if (png_get_valid(png_ptr, info_ptr, PNG_INFO_tRNS))
 		png_set_tRNS_to_alpha(png_ptr);
-	else if(color_type == PNG_COLOR_TYPE_RGB_ALPHA)
-	{
+	else if(color_type == PNG_COLOR_TYPE_RGB_ALPHA){
 		image->format = GL_RGBA;
 	}
 	else

@@ -14,34 +14,38 @@
 #include "integer.h"
 #include "widget.h"
 
-typedef struct
+typedef struct fonts fonts;
+typedef struct symbol symbol;
+typedef struct text text;
+
+struct fonts
 {
 	FT_Face face;
 	const char *fontfilename;
-}fonts;
+};
 
-typedef struct
+struct symbol
 {
 	FT_Glyph glyph;
 	FT_BitmapGlyph  glyph_bitmap;
 	GLuint tex;
 	int16 advancex;
 	int16 advancey;
-} symbol;		// character information
+};		// character information
 
-typedef struct
+struct text
 {
 	char *data;
 	color col; //color of text
 	vector2ui xy; // X location and Y location on screen
 	uint8 resize;
-}text;
+};
 
-void initfont(char *fontname);
-void initatlas(void);
-void drawtext(text *str, widget *parent);
-void settext(text *data, uint16 x, uint16 y, uint8 size, uint8 red,uint8 blue,uint8 green,uint8 alpha, char *string);
-vector2ui getmaxstringhw(char *string, uint8 resize);
-symbol* getcharacterarray(void);
+void init_font(char *fontname);
+void init_atlas(void);
+void draw_text(text *str, widget *parent);
+void set_text(text *text_data, uint16 x, uint16 y, uint8 size, uint8 red,uint8 blue,uint8 green,uint8 alpha, char *string);
+vector2ui get_max_string_hw(char *string, uint8 resize);
+symbol* get_character_array(void);
 
 #endif

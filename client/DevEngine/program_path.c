@@ -16,7 +16,7 @@ uint32 ipath   = 0;
 uint32 isize   = 1024;
 char* path;
 
-char* getpath(char* target)
+char* get_path(char* target)
 {
 	//TODO: Set Cache for string sizes
 	if(strlen(program_path)  + strlen(target) >= strlen(path))
@@ -28,7 +28,7 @@ char* getpath(char* target)
 	return path;
 }
 
-int getprogramdirectory(void)
+int get_program_directory(void)
 {//get program directory
 	char  *spath   = NULL;
 	char  *sresult = NULL;
@@ -38,29 +38,22 @@ int getprogramdirectory(void)
 	program_path = (char *)malloc(isize  + 1);
 	spath = (char *)malloc(isize);
 
-	if (program_path == NULL)
-	{
+	if (program_path == NULL){
 		return FALSE;
 	}
 
-	if (spath == NULL)
-
-	{
+	if (spath == NULL){
 		return FALSE;
 	}
 
 	sresult = _getcwd(spath, isize);
 
-	while (sresult == NULL)
-
-	{
+	while (sresult == NULL){
 		isize *= 2;
 
 		spath = (char *)realloc(spath, isize);
 
-		if (spath == NULL)
-
-		{
+		if (spath == NULL){
 			return FALSE;
 		}
 
@@ -69,23 +62,20 @@ int getprogramdirectory(void)
 
 	ipath = strlen(spath) + 1;
 
-	if (program_path != NULL && isize  >= ipath)
-
-	{
+	if (program_path != NULL && isize  >= ipath){
 		memcpy(program_path, spath, ipath);
 	}
 
 	free(spath);
 	strcat(program_path ,"\\");
-	if (program_path == NULL || isize  < ipath)
-	{
+	if (program_path == NULL || isize  < ipath){
 		return FALSE;
 	}
 
 	return TRUE;
 }
 
-void pathdestroy(void)
+void path_destroy(void)
 {
 	program_path =(char *) malloc (sizeof(program_path+1024));
 
