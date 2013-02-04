@@ -14,28 +14,42 @@ for both systems.
 *********************************************************************************************************/
 //for people who are not use to bit methods.
 
-//used for definitions or enum with (1<<?) already setup.
-#define bitget(data, flag) (data & (flag))
-#define bitset(data, flag) (data |= flag)
-#define bitclear(data, flag) (data &= ~(flag))
-#define bittoggle(data, flag) (data ^= flag)//on/off switch
+/*
+To use Bits basically use the boolean operators |,& and ~. Examples of how to use bit multiplation is as shown.
 
-//for use with numbers 0 - max
-#define getbit(data, index) (data & (1 << index))
-#define setbit(data, index) (data |= 1 << index)
-#define clearbit(data, index) (data &= ~(1 << index))
-#define togglebit(data, index) (data ^= 1 << index)//on/off switch
+if(Varible & (1 << Mask))
+or
+if(Varible & ENUM_MASK)
 
-typedef unsigned int DE_Large_Boolean;
-typedef unsigned short DE_Medium_Boolean;
-typedef unsigned char DE_Small_Boolean;
+To set a bit you would do this.
+Varible |= (1 << Mask);
+or
+Varible |= ENUM_MASK;
 
-#define sbool DE_Small_Boolean //used for 1- 8 booleans
-#define mbool DE_Medium_Boolean //used for 9 - 16 booleans
-#define lbool  DE_Large_Boolean //used for 17 - 32/64 booleans
+To clear all the bits you would do.
+Varible = 0;
 
-#define FALSE 0
-#define TRUE  1
+To clear just 1 bit out of any bit you would do.
+Varible &= ~(1 << Mask);
+or
+Varible &= ~(ENUM_MASK);
+
+To Toggle the bit on or off based on its last setting you would use.
+Varible ^= (1 << Mask);
+or
+Varible ^= ENUM_MASK;
+*/
+
+typedef unsigned int lbool;
+typedef unsigned short mbool;
+typedef unsigned char sbool;
+typedef enum boolean_flag_t boolean_flag_t;
+
+enum boolean_flag_t
+{
+	FALSE = 0,
+	TRUE = 1
+};
 
 /*
 foo = 0;  clear all bits.
