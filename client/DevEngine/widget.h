@@ -9,33 +9,36 @@
 #include "integer.h"
 #include "bool.h"
 
+typedef enum widget_flags_t widget_flags_t;
+typedef struct widget_void_array widget_void_array;
+typedef struct widget widget;
+typedef struct canvas canvas;
+typedef struct user_interface user_interface;
+
 //the Void array to store widgets via pointer
-typedef struct
+struct widget_void_array
 {
 	void **data;
 	uint16 size;
 	uint16 count;
-}widget_void_array;
-
-typedef struct
-{
-	uint16 num;
-}widgetmanagerarray;
+};
 
 //toggles for the sbool action.
-typedef enum
+
+enum widget_flags_t
 {
-	isfocused = (1 << 0),
-	canfocus = (1 << 1),
-	mouseover = (1 << 2),
-	clicked = (1 << 3),
-	moveable = (1 << 4),
-	moving = (1 << 5),
-	canclickbehind = (1 << 6)
-}act;
+	WIDGET_IS_FOCUSED = (1 << 0),
+	WIDGET_CAN_FOCUS = (1 << 1),
+	WIDGET_MOUSE_OVER = (1 << 2),
+	WIDGET_CLICKED = (1 << 3),
+	WIDGET_MOVEABLE = (1 << 4),
+	WIDGET_MOVING = (1 << 5),
+	WIDGET_CAN_CLICK_BEHIND = (1 << 6),
+	WIDGET_ALWAYS_USEABLE= (1 << 7),
+};
 
 //A UI control structure.
-typedef struct widget
+struct widget
 {
 	//contains control special data
 	void *control;
@@ -56,123 +59,138 @@ typedef struct widget
 
 	vector2ui pos;
 	vector2ui actualpos;
+	vector2ui originalpos;
 	vector2i imgpos;
 	image img;
 	uint16 width;
 	uint16 height;
 	uint8 type;
-	sbool action;//focused,canfocus,mouseover,clicked,moveable,moving,canclickbehind
-} widget;
+	sbool action;//focused,WIDGET_CAN_FOCUS,mouseover,clicked,moveable,moving,canclickbehind
+};
 
 //The main screens Settings
-typedef struct
+struct canvas
 {
 	sbool clicked;
 	uint8 button;
 	vector2ui mouseclick;
 	vector2i mousepos;
 	void *focused; //can hold any widget
-}canvas;
+};
 
 //the UI system Struture.
-typedef struct
+struct user_interface
 {
 	widget *root;
 	canvas screen;
-}userinterface;
+};
 
 //used to Obtain the UI system.
-userinterface getui(void);
+user_interface widget_get_ui(void);
+
+//checks if mouse is in the set move frame.
+sbool widget_frame_contains(widget *control, widget *parent);
+
+//changes the moving widgets position via mouse pos.
+void widget_move(int16 x, int16 y);
+
+//checks if the parent is focused to do click events.
+sbool widget_is_parent_focused(widget *control);
+
+//sets the ison controls to focus and does action.
+void widget_set_focused(widget *control, widget *focused, uint32 index);
+
+//sets the isonrelease control release and does action.
+void widget_set_release(widget *control);
 
 //checks focused object to see if we need to check inside of it or not.
-sbool checkfocused(void);
+sbool widget_check_focus(void);
 
 //sets the mouses XY position during mouse move via event system.
-void setmousepos(int16 x , int16 y);
+void widget_set_mouse_pos(int16 x , int16 y);
 
 //sets the uis clickevents for fallback
-void setuiclickevent(int8 button, int8 clicked);
+void widget_set_ui_click_event(int8 button, int8 clicked);
 
-//initilizes the User interface
-void widgetinit(void);
+//initilizes the User interface system.
+void widget_init_system(void);
 
 //switchs widgets within the same array.
-void switchwidget(widget_void_array *wgt, uint16 a, uint16 b);
+void widget_switch(widget_void_array *wgt, uint16 a, uint16 b);
 
 //moves a shown widget to the hidden array
-void hidewidget(widget *parent, uint16 index);
+void widget_hide(widget *parent, uint16 index);
 
 //moves a hidden widget to the shown array
-void showwidget(widget *parent, uint16 index);
+void widget_show(widget *parent, uint16 index);
 
 //adds a widget to a Parent in either the hidden or shown array.
-void addtowidget(widget *parent, widget *child, char hidden);
+void widget_add(widget *parent, widget *child, char hidden);
 
 //initilizes a widgets Data before use.
-void initwidget(widget *wgt);
+void widget_init(widget *wgt);
 
 //unloads a widget and its arrays
-void unloadwidget(widget *parent);
+void widget_unload(widget *parent);
 
 //initilizes a widgets dormant arrays, used to save ram.
-void initwidgetarray(widget *parent, char opt);
+void widget_init_array(widget *parent, char opt);
 
 //resizes a widgets arrays Max to allow more widgets.
-void widgetresize(widget *parent, char opt, uint16 size);//for dynamic widget arrays up to 65,535, the system currently uses static.
+void widget_array_resize(widget *parent, char opt, uint16 size);//for dynamic widget arrays up to 65,535, the system currently uses static.
 
 // clears the widgets arrays
-sbool clearbothwidgetarrays(widget *parent);
+sbool widget_clear_arrays(widget *parent);
 
 //clears the hidden array
-sbool clearhiddenarray(widget *parent);
+sbool widget_clear_hidden(widget *parent);
 
 //clears the shown array
-sbool clearshownarray(widget *parent);
+sbool widget_clear_shown(widget *parent);
 
 //resizes the ID for more Z depth of Deep ui systems for widget manager.
-void resizeid(uint16 *id, uint16 size);
+void widget_resize_id(uint16 *id, uint16 size);
 
 //Draws all the shown widgets to the screen.
-void widgetmanager(void);
+void widget_manager(void);
 
 //checks if widget is in the mouses location when click event happens
-sbool widgetrectcontains(widget *control, widget *parent);
+sbool widget_rect_contains(widget *control, widget *parent);
 
 //checks if the mouse is over a widget if so do event
-sbool ismouseover(widget *control);
+sbool widget_has_mouse_over(widget *control);
 
 //focuses a widget manually
-void focuswidget(widget * control);
+void widget_manual_focused(widget * control);
 
 //Used to set if a widget can be focused or not.
-void setfocusable(widget *control, int8 boolean);
+void widget_set_focusable(widget *control, int8 boolean);
 
 //Used to set if the widget is draggable or not
-void setmoveable(widget *control, int8 boolean);
+void widget_set_moveable(widget *control, int8 boolean);
 
 //checks if the widget on the focused widget is clicked if so sets as focused if it can and does event
-void isonwidgetfocused(void);
+void widget_focused_mouse_press(void);
 
 //checks if mouse was on widget released if so does event
-void isonmousereleasefocused(void);
+void widget_focused_mouse_release(void);
 
 //defualt check if widget was released, does event
-void isonmousereleasewidget(void);
+void widget_mouse_release(void);
 
 //defualt event if widget was clicked, does event
-void isonwidget(void);
+void widget_mouse_press(void);
 
 //temp initiate's. ignore these.//
-
 //Blank Drawing call
-void initdraw(void *wgt);
+void widget_init_draw(void *wgt);
 //blank keypressed
-void initkeypressed(void *wgt, int key, int pressed);
+void widget_init_key_pressed(void *wgt, int key, int pressed);
 //default eventful mouse press
-void initmousepress(void *wgt, int button, int pressed);
+void widget_init_mouse_press(void *wgt, int button, int pressed);
 //defualt eventful mouse release
-void initmouserelease(void *wgt, int button, int pressed);
+void widget_init_mouse_release(void *wgt, int button, int pressed);
 //blank mouse wheel event
-void initmousewheel(void *wgt, int moved);
+void widget_init_mouse_wheel(void *wgt, int moved);
 
 #endif
