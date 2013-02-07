@@ -23,7 +23,7 @@ int main(void)
 	glfwSetMouseButtonCallback(handle_mouse_press);//handles mouse button events
 	glfwSetMouseWheelCallback(handle_mouse_wheel);//handles mouse wheel scrolling
 
-	init_font("");
+	text_init_font("");
 	widget_init_system();
 	init_main_menu();
 
