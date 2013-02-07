@@ -8,9 +8,6 @@
     <ClCompile Include="text.c">
       <Filter>graphics</Filter>
     </ClCompile>
-    <ClCompile Include="render.c">
-      <Filter>graphics</Filter>
-    </ClCompile>
     <ClCompile Include="image.c">
       <Filter>graphics</Filter>
     </ClCompile>
@@ -41,15 +38,15 @@
     <ClCompile Include="mainmenu.c">
       <Filter>ui</Filter>
     </ClCompile>
+    <ClCompile Include="render.c">
+      <Filter>graphics</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="widget.h">
       <Filter>graphics</Filter>
     </ClInclude>
     <ClInclude Include="text.h">
-      <Filter>graphics</Filter>
-    </ClInclude>
-    <ClInclude Include="render.h">
       <Filter>graphics</Filter>
     </ClInclude>
     <ClInclude Include="image.h">
@@ -90,6 +87,9 @@
     </ClInclude>
     <ClInclude Include="bool.h">
       <Filter>core</Filter>
+    </ClInclude>
+    <ClInclude Include="render.h">
+      <Filter>graphics</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
