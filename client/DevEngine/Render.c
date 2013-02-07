@@ -176,10 +176,9 @@ void draw_widget(widget* control) //draws all the image widgets on the canvas.
 {
 	float x2,x1;
 	float y2,y1;
-	widget *parent = (widget *)control->parent;
 
-	control->actualpos.x = control->pos.x + parent->pos.x;
-	control->actualpos.y = control->pos.y + parent->pos.y;
+	control->actualpos.x = control->pos.x + control->parent->pos.x;
+	control->actualpos.y = control->pos.y + control->parent->pos.y;
 
 	x1 =   (float) control->imgpos.x  / control->img.width;
 	x2 =   (float) (control->imgpos.x + control->width) / control->img.width;
