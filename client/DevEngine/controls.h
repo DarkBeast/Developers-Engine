@@ -18,18 +18,29 @@ enum control_types
 	CONTROL_EMPTY = 0,
 	CONTROL_BUTTON,
 	CONTROL_LABEL,
-	CONTROL_WINDOW
+	CONTROL_WINDOW,
+	CONTROL_CHECKBOX,
+	CONTROL_RADIO,
+	CONTROL_TEXTBOX,
+	CONTROL_PICTUREBOX,
+	CONTROL_HSCROLL_BAR,
+	CONTROL_VSCROLL_BAR,
+	CONTROL_PROGRESSBAR,
+	CONTROL_FRAME,
+	CONTROL_SPINNER,
+	CONTROL_DROP_DOWN_LIST,
+	CONTROL_LISTBOX,
+	CONTROL_SLIDER,
+	CONTROL_TABBOX
 };
 
 //only need structs for special widgets.
 
 struct label{
-	sbool canuseevent;
 	text *string;
 };
 
 struct window{
-	sbool minimized;
 	framei frame;
 };
 
@@ -42,4 +53,8 @@ void draw_label(void *wgt);
 void create_window(widget *data, uint16 x, uint16 y, uint16 height, uint16 width, char *image_path);
 void create_window_framed(widget *data, uint16 x, uint16 y, uint16 height, uint16 width, uint16 framex, uint16 framey,uint16 frameh, uint16 framew, char *image_path);
 void draw_windows(void *wgt);
+
+void create_checkbox(widget *data, uint16 x, uint16 y, uint16 height, uint16 width, char *image_path);
+void draw_checkbox(void *wgt);
+
 #endif
