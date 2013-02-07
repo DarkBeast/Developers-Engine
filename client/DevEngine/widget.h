@@ -10,15 +10,15 @@
 #include "bool.h"
 
 typedef enum widget_flags_t widget_flags_t;
-typedef struct widget_void_array widget_void_array;
+typedef struct widget_array widget_array;
 typedef struct widget widget;
 typedef struct canvas canvas;
 typedef struct user_interface user_interface;
 
 //the Void array to store widgets via pointer
-struct widget_void_array
+struct widget_array
 {
-	void **data;
+	widget **data;
 	uint16 size;
 	uint16 count;
 };
@@ -35,6 +35,9 @@ enum widget_flags_t
 	WIDGET_MOVING = (1 << 5),
 	WIDGET_CAN_CLICK_BEHIND = (1 << 6),
 	WIDGET_ALWAYS_USEABLE= (1 << 7),
+	WIDGET_MINIMIZED= (1 << 8),
+	WIDGET_CHECKED= (1 << 9),
+	WIDGET_CAN_USE_EVENT= (1 << 10)
 };
 
 //A UI control structure.
@@ -44,18 +47,18 @@ struct widget
 	void *control;
 
 	//contains the parent of the widget.
-	void *parent;
+	widget *parent;
 
 	//contains events for quick calling
-	void(*draw)(void *);
-	void(*mousepress)(void *,int,int);
-	void(*mouserelease)(void *,int,int);
-	void(*mousewheel)(void *,int);
-	void(*keypressed)(void *,int,int);
+	void(*draw)(widget *);
+	void(*mousepress)(widget *,int,int);
+	void(*mouserelease)(widget *,int,int);
+	void(*mousewheel)(widget *,int);
+	void(*keypressed)(widget *,int,int);
 
 	//hidden and shown arrays
-	widget_void_array widgets;
-	widget_void_array hidden;
+	widget_array shown;
+	widget_array hidden;
 
 	vector2ui pos;
 	vector2ui actualpos;
@@ -75,7 +78,6 @@ struct canvas
 	uint8 button;
 	vector2ui mouseclick;
 	vector2i mousepos;
-	void *focused; //can hold any widget
 };
 
 //the UI system Struture.
@@ -88,6 +90,7 @@ struct user_interface
 //used to Obtain the UI system.
 user_interface widget_get_ui(void);
 
+widget *widget_get_focused(void);
 //checks if mouse is in the set move frame.
 sbool widget_frame_contains(widget *control, widget *parent);
 
@@ -97,8 +100,10 @@ void widget_move(int16 x, int16 y);
 //checks if the parent is focused to do click events.
 sbool widget_is_parent_focused(widget *control);
 
+void set_widget_mouse_press_event(widget *control,uint16 index);
+
 //sets the ison controls to focus and does action.
-void widget_set_focused(widget *control, widget *focused, uint32 index);
+void widget_set_focused(widget *control, uint32 index);
 
 //sets the isonrelease control release and does action.
 void widget_set_release(widget *control);
@@ -116,7 +121,7 @@ void widget_set_ui_click_event(int8 button, int8 clicked);
 void widget_init_system(void);
 
 //switchs widgets within the same array.
-void widget_switch(widget_void_array *wgt, uint16 a, uint16 b);
+void widget_switch(widget_array *wgt, uint32 a, uint32 b);
 
 //moves a shown widget to the hidden array
 void widget_hide(widget *parent, uint16 index);
@@ -125,7 +130,9 @@ void widget_hide(widget *parent, uint16 index);
 void widget_show(widget *parent, uint16 index);
 
 //adds a widget to a Parent in either the hidden or shown array.
-void widget_add(widget *parent, widget *child, char hidden);
+void widget_add(widget *parent, widget *child);
+
+void widget_add_hidden(widget *parent, widget *child);
 
 //initilizes a widgets Data before use.
 void widget_init(widget *wgt);
@@ -134,7 +141,9 @@ void widget_init(widget *wgt);
 void widget_unload(widget *parent);
 
 //initilizes a widgets dormant arrays, used to save ram.
-void widget_init_array(widget *parent, char opt);
+void widget_init_shown(widget *parent);
+
+void widget_init_hidden(widget *parent);
 
 //resizes a widgets arrays Max to allow more widgets.
 void widget_array_resize(widget *parent, char opt, uint16 size);//for dynamic widget arrays up to 65,535, the system currently uses static.
@@ -181,16 +190,20 @@ void widget_mouse_release(void);
 //defualt event if widget was clicked, does event
 void widget_mouse_press(void);
 
+void widget_set_clicked(widget *control);
+
+void widget_update(widget *control);
+
 //temp initiate's. ignore these.//
 //Blank Drawing call
-void widget_init_draw(void *wgt);
+void widget_init_draw(widget *control);
 //blank keypressed
-void widget_init_key_pressed(void *wgt, int key, int pressed);
+void widget_init_key_pressed(widget *control, int key, int pressed);
 //default eventful mouse press
-void widget_init_mouse_press(void *wgt, int button, int pressed);
+void widget_init_mouse_press(widget *control, int button, int pressed);
 //defualt eventful mouse release
-void widget_init_mouse_release(void *wgt, int button, int pressed);
+void widget_init_mouse_release(widget *control, int button, int pressed);
 //blank mouse wheel event
-void widget_init_mouse_wheel(void *wgt, int moved);
+void widget_init_mouse_wheel(widget *control, int moved);
 
 #endif
