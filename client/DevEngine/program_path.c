@@ -62,7 +62,7 @@ int get_program_directory(void)
 
 	ipath = strlen(spath) + 1;
 
-	if (program_path != NULL && isize  >= ipath){
+	if (program_path && isize  >= ipath){
 		memcpy(program_path, spath, ipath);
 	}
 
