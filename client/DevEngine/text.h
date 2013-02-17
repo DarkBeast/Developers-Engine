@@ -28,7 +28,8 @@ struct symbol
 {
 	FT_Glyph glyph;
 	FT_BitmapGlyph  glyph_bitmap;
-	GLuint tex;
+	uint16 x;
+	uint16 y;
 	int16 advancex;
 	int16 advancey;
 };		// character information
@@ -47,5 +48,4 @@ void text_draw(text *str, widget *parent);
 void text_set(text *text_data, uint16 x, uint16 y, uint8 size, uint8 red,uint8 blue,uint8 green,uint8 alpha, char *string);
 vector2ui text_get_string_hw(char *string, uint8 resize);
 symbol* text_get_character_array(void);
-
 #endif
