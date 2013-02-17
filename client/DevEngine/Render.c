@@ -41,13 +41,14 @@ void draw_push(void)
 
 void draw_state_reset(void)
 {
+	//TODO: redo with graphical level options later on =].
 	glDisable(GL_CULL_FACE);
 	glDisable(GL_LIGHTING);
 	glDisable (GL_DEPTH_TEST);
 	glEnable(GL_ALPHA_TEST);// makes images seen behind the transparent part of an Alpha image.
 	glEnable(GL_TEXTURE_2D);
 	//glEnable(GL_COLOR_MATERIAL);//sets a vertex color, migth slow down system some.
-	glEnable(GL_BLEND); //Enable alpha blending for better image qulity, turn off for better performace.
+	glEnable(GL_BLEND); //Enable alpha blending for better image quality, turn off for better performance.
 	glAlphaFunc ( GL_GREATER, (GLclampf)0.2);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);//Set the blend function
 
@@ -62,8 +63,11 @@ void set_draw_view(int x, int y, int swidth, int sheight)
 	glMatrixMode( GL_PROJECTION); //Switch to setting the camera perspective
 	//Set the camera perspective
 	glLoadIdentity(); //reset the camera
-
 	glOrtho (0, swidth, sheight, 0, 0, 1);
+
+	glMatrixMode (GL_MODELVIEW);
+	glLoadIdentity ();
+	glTranslatef(0.375, 0.375, 0);
 }
 
 //sets the screen, GLFW , and the Screen Title
@@ -92,14 +96,16 @@ void clear_screen(int red, int blue, int green, int alpha)
 void GLFWCALL handle_resize(int width,int height)
 {
 	//Tell OpenGL how to convert from coordinates to pixel values
-	glViewport( 0, 0, width, height);
+	//glViewport( 0, 0, width, height);
 
 	glMatrixMode( GL_PROJECTION); //Switch to setting the camera perspective
 	//Set the camera perspective
 	glLoadIdentity(); //reset the camera
-
 	glOrtho (0, width, height, 0, 0, 1);
 
+	glMatrixMode (GL_MODELVIEW);
+	glLoadIdentity ();
+	glTranslatef(0.375, 0.375, 0);
 	//set the new screen size from the resize
 	the_screen.height = height;
 	the_screen.width = width;
@@ -113,7 +119,7 @@ void init_image(image* img)
 	img ->width = 0;
 	img ->texid = 0;
 
-	if(img->pixels != NULL){
+	if(img->pixels){
 		free(img->pixels);
 		img->pixels = NULL;
 	}
@@ -134,40 +140,29 @@ void load_image(char *name, image* img)
 
 	glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MIN_FILTER,GL_LINEAR);
 	glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MAG_FILTER,GL_LINEAR);
+
+	free(img->pixels);
 }
 
 void draw(image* img, vector2i vecpos, vector2i imgpos,int width, int height)
 {
-	int x2,x1;
-	int y2,y1;
+	float x2,x1;
+	float y2,y1;
 
-	x1 = imgpos.x / img->width;
-	x2 = (imgpos.x + width) / img->width;
-	y1 = imgpos.y / img->height;
-	y2 = (imgpos.y +height) / img->height;
+	x1 = (float)imgpos.x / img->width;
+	x2 = (float)(imgpos.x + width) / img->width;
+	y1 = (float)imgpos.y / img->height;
+	y2 = (float)(imgpos.y +height) / img->height;
 
-	glMatrixMode (GL_MODELVIEW);
-	glLoadIdentity ();
-
-	glTranslatef(0.375, 0.375, 0);
-
-	glEnable (GL_TEXTURE_2D);
 	glBindTexture(GL_TEXTURE_2D, img ->texid);
 	glColor4f(1, 1, 1, 1);// set the image color properties, 1 being highest 0.0000 being lowest
 
 	glBegin (GL_QUADS);
 
-	glTexCoord2i (x1, y2);
-	glVertex2i (vecpos.x, vecpos.y);
-
-	glTexCoord2i (x2, y2);
-	glVertex2i (vecpos.x + width, vecpos.y);
-
-	glTexCoord2i (x2, y1);
-	glVertex2i (vecpos.x + width, vecpos.y +height);
-
-	glTexCoord2i (x1, y1);
-	glVertex2i (vecpos.x, vecpos.y +height);
+	glTexCoord2i (x1, y2);	glVertex2i (vecpos.x, vecpos.y);
+	glTexCoord2i (x2, y2);	glVertex2i (vecpos.x + width, vecpos.y);
+	glTexCoord2i (x2, y1);	glVertex2i (vecpos.x + width, vecpos.y +height);
+	glTexCoord2i (x1, y1);	glVertex2i (vecpos.x, vecpos.y +height);
 
 	glEnd ();
 }
@@ -180,33 +175,20 @@ void draw_widget(widget* control) //draws all the image widgets on the canvas.
 	control->actualpos.x = control->pos.x + control->parent->pos.x;
 	control->actualpos.y = control->pos.y + control->parent->pos.y;
 
-	x1 =   (float) control->imgpos.x  / control->img.width;
-	x2 =   (float) (control->imgpos.x + control->width) / control->img.width;
-	y1 =   (float) control->imgpos.y / control->img.height;
-	y2 =   (float)(control->imgpos.y +control->height) /control->img.height;
+	x1 = (float)control->imgpos.x  / control->img.width;
+	x2 = (float)(control->imgpos.x + control->width) / control->img.width;
+	y1 = (float)control->imgpos.y / control->img.height;
+	y2 = (float)(control->imgpos.y + control->height) /control->img.height;
 
-	glMatrixMode (GL_MODELVIEW);
-	glLoadIdentity ();
-
-	glTranslatef(0.375, 0.375, 0);
-
-	glEnable (GL_TEXTURE_2D);
 	glBindTexture(GL_TEXTURE_2D, control->img.texid);
 	glColor4f(1, 1, 1, 1);// set the image color properties, 1 being highest 0.0000 being lowest
 
 	glBegin (GL_QUADS);
 
-	glTexCoord2f (x1, y2);
-	glVertex2i (control->actualpos.x, control->actualpos.y);
-
-	glTexCoord2f (x2, y2);
-	glVertex2i (control->actualpos.x + control->width, control->actualpos.y);
-
-	glTexCoord2f (x2, y1);
-	glVertex2i (control->actualpos.x + control->width, control->actualpos.y + control->height);
-
-	glTexCoord2f (x1, y1);
-	glVertex2i (control->actualpos.x, control->actualpos.y + control->height);
+	glTexCoord2f (x1, y2);	glVertex2i (control->actualpos.x, control->actualpos.y);
+	glTexCoord2f (x2, y2);	glVertex2i (control->actualpos.x + control->width, control->actualpos.y);
+	glTexCoord2f (x2, y1);	glVertex2i (control->actualpos.x + control->width, control->actualpos.y + control->height);
+	glTexCoord2f (x1, y1);	glVertex2i (control->actualpos.x, control->actualpos.y + control->height);
 
 	glEnd ();
 }
