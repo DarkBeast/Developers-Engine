@@ -10,7 +10,9 @@ widget button1;
 widget button2;
 widget window1;
 widget window2;
-
+widget check1;
+widget radio1;
+widget radio2;
 int i = 0;
 
 void main_menu(void)
@@ -51,24 +53,22 @@ void main_menu(void)
 
 void init_main_menu(void)
 {
-	create_label(&label1,5,5,0,255,255,255,255,FALSE,"click me!");
-	create_button(&button1,3,5,60,100,"image\\buttons.png");
-	create_button(&button2,25,25,60,100,"image\\buttons.png");
-	create_window(&window1,5,5,150,150,"image\\window.png");
-	create_window(&window2,100,100,150,150,"image\\window.png");
+	create_window(&window1,5,5,150,150,NULL,"image\\window.png");
+	create_window(&window2,100,100,150,150,NULL,"image\\window.png");
+	create_label(&label1,5,5,8,255,255,255,255,FALSE,NULL,"click me!");
+	create_button(&button1,3,18,60,100,&window1,"image\\buttons.png");
+	create_button(&button2,3,75,60,100,&window1,"image\\buttons.png");
+	create_checkbox(&check1,40,25,16,16,&window2,"image\\check16.png");
+	create_radio(&radio1,16,16,16,16,TRUE,&window2,"image\\option.png");
+	create_radio(&radio2,16,32,16,16,FALSE,&window2,"image\\option.png");
+
+	link_radio(&radio1,&radio2);
 
 	label1.action |= WIDGET_CAN_CLICK_BEHIND;
 	window1.action |= WIDGET_MOVEABLE;
 	window1.action |= WIDGET_CAN_FOCUS;
 	window2.action |= WIDGET_MOVEABLE;
 	window2.action |= WIDGET_CAN_FOCUS;
-
-	widget_add(NULL,&window1);
-	widget_add(NULL,&window2);
-	widget_add(&window1,&button1);
-	widget_add(&window1,&button2);
-
-	widget_add(NULL,&label1);
 
 	button1.mousepress = button1_press;
 }
