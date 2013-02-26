@@ -1,3 +1,6 @@
+/*******************************************************************************
+* Credits:  Andrew Wheeler/Genusis
+******************************************************************************/
 #include "widget.h"
 #include "mainmenu.h"
 #include "controls.h"
@@ -13,6 +16,7 @@ widget window2;
 widget check1;
 widget radio1;
 widget radio2;
+
 int i = 0;
 
 void main_menu(void)
@@ -53,15 +57,16 @@ void main_menu(void)
 
 void init_main_menu(void)
 {
-	create_window(&window1,5,5,150,150,NULL,"image\\window.png");
-	create_window(&window2,100,100,150,150,NULL,"image\\window.png");
-	create_label(&label1,5,5,8,255,255,255,255,FALSE,NULL,"click me!");
-	create_button(&button1,3,18,60,100,&window1,"image\\buttons.png");
-	create_button(&button2,3,75,60,100,&window1,"image\\buttons.png");
-	create_checkbox(&check1,40,25,16,16,&window2,"image\\check16.png");
-	create_radio(&radio1,16,16,16,16,TRUE,&window2,"image\\option.png");
-	create_radio(&radio2,16,32,16,16,FALSE,&window2,"image\\option.png");
+	create_label(&label1, NULL, 5, 5, 8, 255, 255, 255, 255, FALSE, "click me!");
+	create_window(&window1, NULL, 5, 5, 150, 150, 150, 150, 2);
+	create_window(&window2, NULL, 100, 100, 150, 150, 150, 150, 2);
+	create_button(&button1, &window1, 3, 18, 60, 100, 60, 100, 1);
+	create_button(&button2, &window1, 3, 75, 60, 100, 60, 100, 1);
+	create_checkbox(&check1, &window2, 40, 25, 16, 16, 16, 16, 3);
+	create_radio(&radio1, &window2, 16, 16, 16, 16, 16, 16, TRUE, 4);
+	create_radio(&radio2, &window2, 16, 32, 16, 16, 16, 16, FALSE, 4);
 
+	set_control_image(&window2,"image\\window1.png");
 	link_radio(&radio1,&radio2);
 
 	label1.action |= WIDGET_CAN_CLICK_BEHIND;
