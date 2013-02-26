@@ -9,8 +9,7 @@
 #include "integer.h"
 #include "program_path.h"
 #include "bool.h"
-//hex example 0x0010FFFF = 1,114,111
-//example 0x00000000 = 0
+#include "error.h"
 
 uint32 ipath   = 0;
 uint32 isize   = 1024;
@@ -18,12 +17,14 @@ char* path;
 
 char* get_path(char* target)
 {
-	//TODO: Set Cache for string sizes
 	if(strlen(program_path)  + strlen(target) >= strlen(path))
 		path = (char *)realloc(path, next_power_of_two(strlen(program_path)  + strlen(target)));
 
 	strcpy(path ,program_path);
 	strcat(path ,target);
+
+	if(path == NULL)
+		fatal_error(ERROR_PATH_NULL);
 
 	return path;
 }
@@ -69,6 +70,7 @@ int get_program_directory(void)
 	free(spath);
 	strcat(program_path ,"\\");
 	if (program_path == NULL || isize  < ipath){
+		fatal_error(ERROR_PATH_INCORRECT);
 		return FALSE;
 	}
 
