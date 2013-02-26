@@ -344,8 +344,11 @@ void widget_init(widget *wgt)//initializes a widget so we can then use it error 
 	wgt->originalpos.y = 0;
 	wgt->imgpos.x = 0;
 	wgt->imgpos.y = 0;
+	wgt->img = NULL;
 	wgt->width = 0;
 	wgt->height = 0;
+	wgt->sizex = 0;
+	wgt->sizey = 0;
 	wgt->action = 0;
 	wgt->type = 0;
 }
