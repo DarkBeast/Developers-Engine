@@ -9,13 +9,14 @@
 #include "text.h"
 #include "mainmenu.h"
 #include "bool.h"
+#include "controls.h"
 
 int main(void)
 {
-	get_program_directory();
+	get_program_directory();//gets the programs path so we can use ti to retrieve image, saved files etc.
 
-	init_screen(800,600,GLFW_WINDOW);
-	glfwEnable(GLFW_KEY_REPEAT);
+	init_screen(800,600,GLFW_WINDOW);//initializes the program window.
+	glfwEnable(GLFW_KEY_REPEAT);//allows repeating of held down keyboard keys.
 
 	glfwSetWindowSizeCallback(handle_resize);//handles Window resize calls
 	glfwSetKeyCallback(handle_key_press);//handles Key presses
@@ -23,16 +24,17 @@ int main(void)
 	glfwSetMouseButtonCallback(handle_mouse_press);//handles mouse button events
 	glfwSetMouseWheelCallback(handle_mouse_wheel);//handles mouse wheel scrolling
 
-	text_init_font("");
-	widget_init_system();
-	init_main_menu();
+	text_init_font("");//initializes the Font characters for use.
 
-	// Main loop
-	main_menu();
+	widget_init_system();//initializes the widget system for storing widgets.
 
-	// Close window and terminate GLFW
-	glfwTerminate();
+	load_control_images();//Loads the Default control images into an array.
 
-	// Exit program
-	exit(TRUE);
+	init_main_menu();//initializes the first menu for use.
+
+	main_menu();//Start the First Menu, Menu main loop.
+
+	glfwTerminate();// Close window and terminate GLFW
+
+	exit(TRUE);// Exit program
 }
