@@ -22,6 +22,8 @@ enum error_flags_t
 	ERROR_GLFWINIT_ERROR = 8,
 	ERROR_GLFWWIN_ERROR = 9,
 	ERROR_IMAGELOADER_ERROR = 10,
+	ERROR_PATH_INCORRECT = 11,
+	ERROR_PATH_NULL = 12
 };
 
 void fatal_error(int error_flag);

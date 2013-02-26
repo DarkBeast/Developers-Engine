@@ -38,11 +38,17 @@ void fatal_error(int error_flag)
 	case ERROR_SOCKET_ADDR_ERROR:
 		fputs("Could not establish server address!\n", stderr);
 		break;
+	case ERROR_PATH_INCORRECT:
+		fputs("Could not establish Program_Path!\n", stderr);
+		break;
+	case ERROR_PATH_NULL:
+		fputs("ERROR:Path is NULL.\n", stderr);
+		break;
 	default:
 		fputs("An error has occurred!\n", stderr);
 	}
 	fputs("The Application will now close.", stderr);
-	_getch();
+	getchar();
 	shut_down();
 }
 
@@ -71,7 +77,7 @@ void render_error(int error_flag)
 		fputs("An error has occurred: Overflow!\n", stderr);
 		break;
 	case ERROR_GLFWINIT_ERROR:
-		fputs("An error has occurred: GLFW Did Not Intalize!\n", stderr);
+		fputs("An error has occurred: GLFW Did Not initialize!\n", stderr);
 		break;
 	case ERROR_GLFWWIN_ERROR:
 		fputs("An error has occurred: GLFW Did Not Open Window!\n", stderr);
@@ -83,7 +89,7 @@ void render_error(int error_flag)
 		fputs("An error has occurred!\n", stderr);
 	}
 	fputs("The Application will now close.", stderr);
-	_getch();
+	getchar();
 	shut_down();
 }
 
