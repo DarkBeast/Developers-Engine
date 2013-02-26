@@ -8,22 +8,44 @@
 #include "function.h"
 #include <stdlib.h>
 
+image *img;
+
+void load_control_images(void)
+{
+	img = (image *)calloc(1, 6 * sizeof(image));
+
+	load_image(get_path("image\\button.png"), &img[0]);
+	load_image(get_path("image\\button.png"), &img[1]);
+	load_image(get_path("image\\window.png"), &img[2]);
+	load_image(get_path("image\\check.png"), &img[3]);
+	load_image(get_path("image\\radio.png"), &img[4]);
+	load_image(get_path("image\\progress.png"), &img[5]);
+}
+
+void set_control_image(widget *control, char *path)
+{
+	control->img = (image *)calloc(1,sizeof(image));
+
+	load_image(get_path(path), control->img);
+}
+
 //Buttons
-void create_button(widget *control, uint16 x, uint16 y, uint16 height, uint16 width, widget *parent, char *image_path)
+void create_button(widget *control, widget *parent, uint16 x, uint16 y, uint16 height, uint16 width, uint16 sizey, uint16 sizex, uint8 image_id)
 {
 	widget_init(control);
 	control->pos.x = x;
 	control->pos.y = y;
 	control->height = height;
 	control->width = width;
+	control->sizey = sizey;
+	control->sizex = sizex;
 	control->imgpos.x = 0;
 	control->imgpos.y = 0;
 	control->type = CONTROL_BUTTON;
 	control->draw = &draw_buttons;
-	control->control = NULL;
 	control->controlmousepress = &handle_button_click;
+	control->img = &img[image_id];
 
-	load_image(get_path(image_path), &control->img);
 	widget_add(parent,control);
 }
 
@@ -52,7 +74,7 @@ void handle_button_click(widget *control, int button, int pressed)
 	control->mousepress(control,button,pressed);
 }
 //labels
-void create_label(widget *control, uint16 x, uint16 y, uint8 size, uint8 red, uint8 blue, uint8 green, uint8 alpha, sbool can_use_mouse, widget *parent, char *label_text)
+void create_label(widget *control, widget *parent, uint16 x, uint16 y, uint8 size, uint8 red, uint8 blue, uint8 green, uint8 alpha, sbool can_use_mouse, char *label_text)
 {
 	label *init_text;
 	vector2ui hw;
@@ -78,7 +100,11 @@ void create_label(widget *control, uint16 x, uint16 y, uint8 size, uint8 red, ui
 	control->height = hw.y;
 	control->width = hw.x;
 	control->control = init_text;
+
 	widget_add(parent,control);
+
+	init_text = NULL;
+	free(init_text);
 }
 
 void draw_label(widget *control)
@@ -94,7 +120,7 @@ void handle_label_click(widget *control, int button, int pressed)
 	}
 }
 
-void create_window(widget *control, uint16 x, uint16 y, uint16 height, uint16 width, widget *parent, char *image_path)
+void create_window(widget *control, widget *parent, uint16 x, uint16 y, uint16 height, uint16 width, uint16 sizey, uint16 sizex, uint8 image_id)
 {
 	window *init_window;
 
@@ -103,21 +129,21 @@ void create_window(widget *control, uint16 x, uint16 y, uint16 height, uint16 wi
 	control->pos.y = y;
 	control->height = height;
 	control->width = width;
+	control->sizey = sizey;
+	control->sizex = sizex;
 	control->imgpos.x = 0;
 	control->imgpos.y = 0;
 	control->type = CONTROL_WINDOW;
 	control->draw = &draw_windows;
 	control->controlmousepress = &handle_window_click;
+	control->img = &img[image_id];
 
 	init_window = (window *)calloc(1,sizeof(window));
 	init_window->frame.x = 0;
 	init_window->frame.y = 0;
 	init_window->frame.w = width;
 	init_window->frame.h = height;
-
 	control ->control = init_window;
-
-	load_image(get_path(image_path), &control->img);
 
 	widget_add(parent,control);
 
@@ -125,7 +151,7 @@ void create_window(widget *control, uint16 x, uint16 y, uint16 height, uint16 wi
 	free(init_window);
 }
 
-void create_window_framed(widget *control, uint16 x, uint16 y, uint16 height, uint16 width, uint16 framex, uint16 framey,uint16 frameh, uint16 framew, widget *parent, char *image_path)
+void create_window_framed(widget *control, widget *parent, uint16 x, uint16 y, uint16 height, uint16 width, uint16 sizey, uint16 sizex, uint16 framex, uint16 framey,uint16 frameh, uint16 framew, uint8 image_id)
 {
 	window *init_window;
 
@@ -134,22 +160,26 @@ void create_window_framed(widget *control, uint16 x, uint16 y, uint16 height, ui
 	control->pos.y = y;
 	control->height = height;
 	control->width = width;
+	control->sizey = sizey;
+	control->sizex = sizex;
 	control->imgpos.x = 0;
 	control->imgpos.y = 0;
 	control->type = CONTROL_WINDOW;
 	control->draw = &draw_windows;;
 	control->controlmousepress = &handle_window_click;
+	control->img = &img[image_id];
 
 	init_window = (window *)calloc(1,sizeof(window));
 	init_window->frame.x = framex;
 	init_window->frame.y = framey;
 	init_window->frame.w = framew;
 	init_window->frame.h = frameh;
-
 	control->control = init_window;
 
-	load_image(get_path(image_path), &control->img);
 	widget_add(parent,control);
+
+	init_window = NULL;
+	free(init_window);
 }
 
 void draw_windows(widget *control)
@@ -159,21 +189,22 @@ void draw_windows(widget *control)
 
 void handle_window_click(widget *control, int button, int pressed){}
 
-void create_checkbox(widget *control, uint16 x, uint16 y, uint16 height, uint16 width, widget *parent, char *image_path)
+void create_checkbox(widget *control, widget *parent, uint16 x, uint16 y, uint16 height, uint16 width, uint16 sizey, uint16 sizex, uint8 image_id)
 {
 	widget_init(control);
 	control->pos.x = x;
 	control->pos.y = y;
 	control->height = height;
 	control->width = width;
+	control->sizey = sizey;
+	control->sizex = sizex;
 	control->imgpos.x = 0;
 	control->imgpos.y = 0;
 	control->type = CONTROL_CHECKBOX;
 	control->draw = &draw_checkbox;
-	control->control = NULL;
 	control->controlmousepress = handle_check_click;
+	control->img = &img[image_id];
 
-	load_image(get_path(image_path), &control->img);
 	widget_add(parent,control);
 }
 
@@ -205,7 +236,7 @@ void handle_check_click(widget *control, int button, int pressed)
 	control->mousepress(control,button,pressed);
 }
 
-void create_radio(widget *control, uint16 x, uint16 y, uint16 height, uint16 width, sbool istrue, widget *parent, char *image_path)
+void create_radio(widget *control, widget *parent, uint16 x, uint16 y, uint16 height, uint16 width, uint16 sizey, uint16 sizex, sbool istrue, uint8 image_id)
 {
 	radio *init_radio;
 
@@ -214,10 +245,14 @@ void create_radio(widget *control, uint16 x, uint16 y, uint16 height, uint16 wid
 	control->pos.y = y;
 	control->height = height;
 	control->width = width;
+	control->sizey = sizey;
+	control->sizex = sizex;
 	control->imgpos.x = 0;
 	control->imgpos.y = 0;
 	control->type = CONTROL_RADIO;
 	control->draw = &draw_radio;
+	control->controlmousepress = handle_radio_click;
+	control->img = &img[image_id];
 
 	if(istrue)
 		control->action |= WIDGET_CHECKED;
@@ -227,12 +262,12 @@ void create_radio(widget *control, uint16 x, uint16 y, uint16 height, uint16 wid
 	init_radio->count = 0;
 	init_radio->main = NULL;
 	init_radio->list = NULL;
-
 	control->control = init_radio;
-	control->controlmousepress = handle_radio_click;
 
-	load_image(get_path(image_path), &control->img);
 	widget_add(parent,control);
+
+	init_radio = NULL;
+	free(init_radio);
 }
 
 void draw_radio(widget *control)
@@ -262,6 +297,8 @@ void resize_radio_list(radio *controls, uint16 size)
 		return;
 
 	controls->list = data;
+	data = NULL;
+	free(data);
 }
 
 void link_radio(widget *main, widget *control)
@@ -282,10 +319,10 @@ void link_radio(widget *main, widget *control)
 		data->count = 1;
 	}
 	else{
-		for( i == 0; i <= data->ammount; i++){
+		for( i = 0; i <= data->ammount; i++){
 			if( i >= data->ammount)
 			{
-				data->ammount = (uint16)next_power_of_two(data->ammount);
+				data->ammount = (uint8)next_power_of_two(data->ammount);
 				resize_radio_list(data,data->ammount);
 			}
 
@@ -298,6 +335,11 @@ void link_radio(widget *main, widget *control)
 	}
 	controldata->main =(widget *)calloc(1,sizeof(widget));
 	controldata->main = main;
+
+	data  = NULL;
+	free(data );
+	controldata = NULL;
+	free(controldata);
 }
 
 void reset_radio(widget *control)
@@ -318,6 +360,11 @@ void reset_radio(widget *control)
 		wgt = (widget *)data->list[i];
 		wgt->action &= ~(WIDGET_CHECKED);
 	}
+
+	data = NULL;
+	free(data);
+	wgt = NULL;
+	free(wgt);
 }
 
 void handle_radio_click(widget *control, int button, int pressed)
@@ -352,4 +399,65 @@ void handle_radio_click(widget *control, int button, int pressed)
 	else{
 		control->mousepress(control,button,pressed);
 	}
+
+	data = NULL;
+	free(data);
+}
+
+//TEST STUFF
+
+void create_progressbar(widget *control, widget *parent, uint16 x, uint16 y, uint16 height, uint16 width, uint16 sizey, uint16 sizex, uint8 value, uint8 image_id)
+{
+	progressbar *init_bar;
+
+	widget_init(control);
+	control->pos.x = x;
+	control->pos.y = y;
+	control->height = height;
+	control->width = width;
+	control->sizey = sizey;
+	control->sizex = sizex;
+	control->imgpos.x = 0;
+	control->imgpos.y = 0;
+	control->type = CONTROL_PROGRESSBAR;
+	control->draw = &draw_progressbar;
+	control->controlmousepress = handle_check_click;
+	control->img = &img[image_id];
+
+	init_bar = (progressbar *)calloc(1,sizeof(progressbar));
+	init_bar->value = value;
+	control->control = init_bar;
+
+	widget_add(parent,control);
+
+	init_bar = NULL;
+	free(init_bar);
+}
+
+void draw_progressbar(widget *control)
+{
+	if (control->action & WIDGET_CHECKED){
+		control->imgpos.x = 0;
+		control->imgpos.y = 0;
+	}
+	else{
+		control->imgpos.y = control->width;
+		control->imgpos.x = 0;
+	}
+
+	draw_widget(control);
+}
+
+void handle_progressbar_click(widget *control, int button, int pressed)
+{
+	if(button == 0 && pressed == TRUE)
+	{
+		if(control->action & WIDGET_CHECKED){
+			control->action &= ~(WIDGET_CHECKED);
+		}
+		else{
+			control->action |= WIDGET_CHECKED;
+		}
+	}
+	control->mousepress(control,button,pressed);
 }
