@@ -10,7 +10,7 @@
 #include "integer.h"
 #include "png.h"
 
-#define PNG_SIG_BYTES 8
+#define PNGSIGBYTES 8
 
 void load_png(const char *name, image *image)
 {
@@ -22,15 +22,15 @@ void load_png(const char *name, image *image)
 	png_byte** row_ptrs;
 	uint32 i;
 
-	unsigned char header[PNG_SIG_BYTES];
+	unsigned char header[PNGSIGBYTES];
 
 	FILE *png_file = fopen(name, "rb");
 
 	if (!png_file)
 		fatal_error(ERROR_FILE_ERROR);
 
-	fread(header, 1, PNG_SIG_BYTES, png_file);
-	if(png_sig_cmp(header, 0, PNG_SIG_BYTES))
+	fread(header, 1, PNGSIGBYTES, png_file);
+	if(png_sig_cmp(header, 0, PNGSIGBYTES))
 		fatal_error(ERROR_FILE_ERROR);
 
 	png_ptr = png_create_read_struct(PNG_LIBPNG_VER_STRING, NULL, NULL, NULL);
@@ -49,7 +49,7 @@ void load_png(const char *name, image *image)
 		fatal_error(ERROR_IO_ERROR);
 
 	png_init_io(png_ptr, png_file);
-	png_set_sig_bytes(png_ptr, PNG_SIG_BYTES);
+	png_set_sig_bytes(png_ptr, PNGSIGBYTES);
 	png_read_info(png_ptr, info_ptr);
 
 	image->width = (uint32)png_get_image_width(png_ptr, info_ptr);
