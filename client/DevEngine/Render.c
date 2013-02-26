@@ -10,6 +10,7 @@
 #include "integer.h"
 #include "render.h"
 #include "bool.h"
+
 screen_size the_screen;
 
 screen_size get_screen_size(void)
@@ -119,19 +120,19 @@ void init_image(image* img)
 	img ->width = 0;
 	img ->texid = 0;
 
-	if(img->pixels){
+	if(img->pixels != NULL){
 		free(img->pixels);
 		img->pixels = NULL;
 	}
 }
 
-void load_image(char *name, image* img)
+void load_image(char *name, image *img)
 {
 	// Read image from file
 	init_image(img);
 	load_png( name, img);
 
-	glGenTextures( 1, &img ->texid);
+	glGenTextures( 1, &img->texid);
 	glBindTexture( GL_TEXTURE_2D, img ->texid);
 	glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
 	glTexImage2D( GL_TEXTURE_2D, 0, img ->format,
@@ -159,10 +160,10 @@ void draw(image* img, vector2i vecpos, vector2i imgpos,int width, int height)
 
 	glBegin (GL_QUADS);
 
-	glTexCoord2i (x1, y2);	glVertex2i (vecpos.x, vecpos.y);
-	glTexCoord2i (x2, y2);	glVertex2i (vecpos.x + width, vecpos.y);
-	glTexCoord2i (x2, y1);	glVertex2i (vecpos.x + width, vecpos.y +height);
-	glTexCoord2i (x1, y1);	glVertex2i (vecpos.x, vecpos.y +height);
+	glTexCoord2f (x1, y2);	glVertex2i (vecpos.x, vecpos.y);
+	glTexCoord2f (x2, y2);	glVertex2i (vecpos.x + width, vecpos.y);
+	glTexCoord2f (x2, y1);	glVertex2i (vecpos.x + width, vecpos.y +height);
+	glTexCoord2f (x1, y1);	glVertex2i (vecpos.x, vecpos.y +height);
 
 	glEnd ();
 }
@@ -175,20 +176,20 @@ void draw_widget(widget* control) //draws all the image widgets on the canvas.
 	control->actualpos.x = control->pos.x + control->parent->pos.x;
 	control->actualpos.y = control->pos.y + control->parent->pos.y;
 
-	x1 = (float)control->imgpos.x  / control->img.width;
-	x2 = (float)(control->imgpos.x + control->width) / control->img.width;
-	y1 = (float)control->imgpos.y / control->img.height;
-	y2 = (float)(control->imgpos.y + control->height) /control->img.height;
+	x1 = (float)control->imgpos.x  / control->img->width;
+	x2 = (float)(control->imgpos.x + control->width) / control->img->width;
+	y1 = (float)control->imgpos.y / control->img->height;
+	y2 = (float)(control->imgpos.y + control->height) /control->img->height;
 
-	glBindTexture(GL_TEXTURE_2D, control->img.texid);
+	glBindTexture(GL_TEXTURE_2D, control->img->texid);
 	glColor4f(1, 1, 1, 1);// set the image color properties, 1 being highest 0.0000 being lowest
 
 	glBegin (GL_QUADS);
 
 	glTexCoord2f (x1, y2);	glVertex2i (control->actualpos.x, control->actualpos.y);
-	glTexCoord2f (x2, y2);	glVertex2i (control->actualpos.x + control->width, control->actualpos.y);
-	glTexCoord2f (x2, y1);	glVertex2i (control->actualpos.x + control->width, control->actualpos.y + control->height);
-	glTexCoord2f (x1, y1);	glVertex2i (control->actualpos.x, control->actualpos.y + control->height);
+	glTexCoord2f (x2, y2);	glVertex2i (control->actualpos.x + control->sizex, control->actualpos.y);
+	glTexCoord2f (x2, y1);	glVertex2i (control->actualpos.x + control->sizex, control->actualpos.y + control->sizey);
+	glTexCoord2f (x1, y1);	glVertex2i (control->actualpos.x, control->actualpos.y + control->sizey);
 
 	glEnd ();
 }
