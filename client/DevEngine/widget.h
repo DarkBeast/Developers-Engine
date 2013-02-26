@@ -70,9 +70,11 @@ struct widget
 	vector2ui actualpos;
 	vector2ui originalpos;
 	vector2i imgpos;
-	image img;
+	image *img;
 	uint16 width;
 	uint16 height;
+	uint16 sizex;
+	uint16 sizey;
 	uint8 type;
 	mbool action;//focused,WIDGET_CAN_FOCUS,mouse over,clicked,movable,moving,can click behind
 };
