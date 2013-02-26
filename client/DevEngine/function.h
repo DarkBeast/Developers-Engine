@@ -8,7 +8,7 @@
 #include <stdlib.h>
 
 size_t next_power_of_two(size_t input);
-
+//TODO:  redo max and min using functions instead of defines.
 #ifndef max
 #define max( a, b) ( ((a) > (b)) ? (a) : (b))
 #endif
