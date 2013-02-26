@@ -1,5 +1,3 @@
-//ignore this for now its crap
-
 /*******************************************************************************
 * Credits:  Andrew Wheeler/Genusis
 *           Freetype library 2
