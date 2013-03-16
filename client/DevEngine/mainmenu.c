@@ -16,6 +16,9 @@ widget window2;
 widget check1;
 widget radio1;
 widget radio2;
+widget progress1;
+widget pic1;
+widget scroll1;
 
 int i = 0;
 
@@ -65,6 +68,9 @@ void init_main_menu(void)
 	create_checkbox(&check1, &window2, 40, 25, 16, 16, 16, 16, 3);
 	create_radio(&radio1, &window2, 16, 16, 16, 16, 16, 16, TRUE, 4);
 	create_radio(&radio2, &window2, 16, 32, 16, 16, 16, 16, FALSE, 4);
+	create_hprogressbar(&progress1, NULL, 100, 100, 24, 150, 24, 150, 50, 5);
+	create_picturebox(&pic1,NULL,300,300,50,50,50,50, "image\\pictest.png");
+	create_hscrollbar(&scroll1,&window2,5,100,22,10,22,150,50,100);
 
 	set_control_image(&window2,"image\\window1.png");
 	link_radio(&radio1,&radio2);
@@ -76,31 +82,20 @@ void init_main_menu(void)
 	window2.action |= WIDGET_CAN_FOCUS;
 
 	button1.mousepress = button1_press;
+	button2.mousepress = button2_press;
+}
+
+void button2_press(widget *wgt, int button, int pressed)
+{
+	if(progress1.value >= 100){
+		progress1.value = 0;
+	}
+	else{
+		++progress1.value;
+	}
 }
 
 void button1_press(widget *wgt, int button, int pressed)
 {
-	label *z = (label *)label1.control;
-	switch(i){
-	case 0:
-
-		z->string->data = "fuck you!";
-		i++;
-		break;
-	case 1:
-		z->string->data = "You like me?";
-		i++;
-		break;
-	case 2:
-		z->string->data = "really hate you!";
-		i++;
-		break;
-	case 3:
-		z->string->data = "you know what!";
-		i = 0;
-		break;
-	default:
-		z->string->data = "trying to hack me ehh";
-		i = 0;
-	}
+	update_picturebox(&pic1, pic1.pos.x,pic1.pos.y,50,0,50,50,50,50,NULL);
 }
