@@ -669,7 +669,6 @@ void widget_manager(void)//used to draw the widgets onto the screen.
 	uint16 index = 0;
 	uint16 idindex;
 	uint16 idsize;
-	uint32 test;
 
 	id = (uint16 *)calloc(1, 32 * sizeof(uint16));
 	idsize = 32;
@@ -703,7 +702,6 @@ void widget_manager(void)//used to draw the widgets onto the screen.
 									widget_resize_id(id,idsize);
 								}
 								id[idindex] = 0;//set the new ID index to 0
-								test = id[idindex];
 							}
 						}
 						else{
@@ -731,10 +729,10 @@ void widget_manager(void)//used to draw the widgets onto the screen.
 //checks if the widget is in the area the mouse clicked.
 sbool widget_rect_contains(widget *control, widget *parent)
 {
-	if(ui.screen.mousepos.x < control->pos.x + parent->pos.x){return FALSE;}
-	if(ui.screen.mousepos.x > control->pos.x + parent->pos.x + control->width){return FALSE;}
-	if(ui.screen.mousepos.y < control->pos.y + parent->pos.y) {return FALSE;}
-	if(ui.screen.mousepos.y > control->pos.y + parent->pos.y + control->height){return FALSE;}
+	if(ui.screen.mousepos.x < control->actualpos.x ){return FALSE;}
+	if(ui.screen.mousepos.x > control->actualpos.x + control->sizex){return FALSE;}
+	if(ui.screen.mousepos.y < control->actualpos.y ) {return FALSE;}
+	if(ui.screen.mousepos.y > control->actualpos.y + control->sizey){return FALSE;}
 
 	return TRUE;
 }
@@ -757,9 +755,12 @@ sbool widget_is_parent_focused(widget *control)
 				}
 				else{
 					widget_manual_focused(parent);
-					parent->action |= WIDGET_CLICKED;
-					parent->controlmousepress(parent,ui.screen.button, ui.screen.clicked);
-					parent->mousepress(parent,ui.screen.button, ui.screen.clicked);
+
+					if(parent->action & WIDGET_FOCUS_CLICK){
+						parent->action |= WIDGET_CLICKED;
+						parent->controlmousepress(parent,ui.screen.button, ui.screen.clicked);
+					}
+
 					i = FALSE;
 					return TRUE;
 				}
@@ -860,13 +861,14 @@ void widget_set_moveable(widget *control, int8 boolean)
 	}
 }
 
-//checks if the Click was on a widget inside of the focused widget.
 void widget_focused_mouse_press(void)
 {
 	widget *child;
 	widget *child2; // used to determine if focusable
 	int16 index = focused->shown.count -1;
 	int16 index2 = 0;
+	int16 last = 0;
+	uint8 moveup = 0;
 
 	if(focused->shown.data){
 		for( index = focused->shown.count -1; index >= 0; --index){
@@ -875,6 +877,8 @@ void widget_focused_mouse_press(void)
 			if(widget_rect_contains(child, child->parent)){// if focusable check if in range
 				if(child->shown.data){
 					index2 = child->shown.count -1;
+					last = index2;
+
 					while(index2 >= 0){
 						child2 = child->shown.data[index2];
 
@@ -883,11 +887,37 @@ void widget_focused_mouse_press(void)
 								set_widget_mouse_press_event(child2,index2);
 								return;
 							}
+
+							index2 = child2->shown.count - 1;
+							last = index2;
+							moveup = 0;
 							child = child2->shown.data[index2];
-							index2 = child->shown.count -1;
+
+							if(child->shown.data){
+								index2 = child->shown.count -1;
+							}
+							else{
+								if(widget_rect_contains(child, child->parent)){
+									set_widget_mouse_press_event(child,index2);
+									return;
+								}
+								else{
+									if(moveup == 0){
+										child = child->parent;
+										index2 = last;
+										moveup = 1;
+									}
+									--index2;
+								}
+							}
 							continue;
 						}
-						child2 = child2->parent;
+
+						if(moveup == 0){
+							child = child2->parent;
+							index2 = last;
+							moveup = 1;
+						}
 						--index2;
 					}
 					set_widget_mouse_press_event(child,index);
@@ -905,35 +935,66 @@ void widget_focused_mouse_press(void)
 			focused->action |= WIDGET_MOVING;
 		}
 	}
+
 	widget_set_clicked(focused);
 }
 
-//checks to see if the focused widget was un-clicked.
 void widget_focused_mouse_release(void)
 {
 	widget *child;
 	widget *child2; // used to determine if focusable
 	int16 index = focused->shown.count -1;
 	int16 index2 = 0;
+	int16 last = 0;
+	uint8 moveup = 0;
 
 	if(focused->shown.data){
 		for( index = focused->shown.count -1; index >= 0; --index){
-			if(widget_rect_contains(focused->shown.data[index],focused)){// if focusable check if in range
-				child = focused->shown.data[index];
+			child = focused->shown.data[index];
 
+			if(widget_rect_contains(child, child->parent)){// if focusable check if in range
 				if(child->shown.data){
 					index2 = child->shown.count -1;
+					last = index2;
+
 					while(index2 >= 0){
 						child2 = child->shown.data[index2];
 
-						if(widget_rect_contains(child2, child2->parent)){// if focusable check if in range
+						if(widget_rect_contains(child2, child2->parent)){
 							if(child2->shown.data == NULL){//if in range check if widget array is null or not.
-								widget_set_release(child);
+								widget_set_release(child2);
 								return;
 							}
+
+							index2 = child2->shown.count - 1;
+							last = index2;
+							moveup = 0;
 							child = child2->shown.data[index2];
-							index2 = child->shown.count -1; //if not null repeat with new child index till one is found.
+
+							if(child->shown.data){
+								index2 = child->shown.count -1;
+							}
+							else{
+								if(widget_rect_contains(child2, child2->parent)){
+									widget_set_release(child);
+									return;
+								}
+								else{
+									if(moveup == 0){
+										child = child->parent;
+										index2 = last;
+										moveup = 1;
+									}
+									--index2;
+								}
+							}
 							continue;
+						}
+
+						if(moveup == 0){
+							child = child2->parent;
+							index2 = last;
+							moveup = 1;
 						}
 						--index2;
 					}
@@ -950,32 +1011,62 @@ void widget_focused_mouse_release(void)
 	widget_set_release(focused);
 }
 
-//checks if a widget was un-clicked Default check, looks through any widget shown.if un-clicked then do event.
 void widget_mouse_release(void)
 {
 	widget *child;
 	widget *child2; // used to determine if focusable
 	int16 index = ui.root->shown.count -1;
 	int16 index2 = 0;
+	int16 last = 0;
+	uint8 moveup = 0;
 
 	if(ui.root->shown.data){
 		for( index = ui.root->shown.count -1; index >= 0; --index){
-			if(widget_rect_contains(ui.root->shown.data[index], ui.root)){// if focusable check if in range
-				child = ui.root->shown.data[index];
+			child = ui.root->shown.data[index];
 
+			if(widget_rect_contains(child, child->parent)){// if focusable check if in range
 				if(child->shown.data){
 					index2 = child->shown.count -1;
+					last = index2;
+
 					while(index2 >= 0){
 						child2 = child->shown.data[index2];
 
-						if(widget_rect_contains(child2, child2->parent)){// if focusable check if in range
+						if(widget_rect_contains(child2, child2->parent)){
 							if(child2->shown.data == NULL){//if in range check if widget array is null or not.
-								widget_set_release(child);
+								widget_set_release(child2);
 								return;
 							}
+
+							index2 = child2->shown.count - 1;
+							last = index2;
+							moveup = 0;
 							child = child2->shown.data[index2];
-							index2 = child->shown.count -1; //if not null repeat with new child index till one is found.
+
+							if(child->shown.data){
+								index2 = child->shown.count -1;
+							}
+							else{
+								if(widget_rect_contains(child, child->parent)){
+									widget_set_release(child);
+									return;
+								}
+								else{
+									if(moveup == 0){
+										child = child->parent;
+										index2 = last;
+										moveup = 1;
+									}
+									--index2;
+								}
+							}
 							continue;
+						}
+
+						if(moveup == 0){
+							child = child2->parent;
+							index2 = last;
+							moveup = 1;
 						}
 						--index2;
 					}
@@ -989,6 +1080,7 @@ void widget_mouse_release(void)
 			}
 		}
 	}
+
 	widget_set_release(ui.root);
 }
 
@@ -1003,6 +1095,7 @@ void set_widget_mouse_press_event(widget *control,uint16 index)
 		}
 	}
 }
+
 //checks if the widget was clicked Default, if clicked set as focused if focusable or set parent if click able then do event.
 void widget_mouse_press(void)
 {
@@ -1010,6 +1103,8 @@ void widget_mouse_press(void)
 	widget *child2; // used to determine if focusable
 	int16 index = ui.root->shown.count -1;
 	int16 index2 = 0;
+	int16 last = 0;
+	uint8 moveup = 0;
 
 	if(ui.root->shown.data){
 		for( index = ui.root->shown.count -1; index >= 0; --index){
@@ -1018,6 +1113,7 @@ void widget_mouse_press(void)
 			if(widget_rect_contains(child, child->parent)){// if focusable check if in range
 				if(child->shown.data){
 					index2 = child->shown.count -1;
+					last = index2;
 
 					while(index2 >= 0){
 						child2 = child->shown.data[index2];
@@ -1027,11 +1123,37 @@ void widget_mouse_press(void)
 								set_widget_mouse_press_event(child2,index2);
 								return;
 							}
+
+							index2 = child2->shown.count - 1;
+							last = index2;
+							moveup = 0;
 							child = child2->shown.data[index2];
-							index2 = child->shown.count -1;
+
+							if(child->shown.data){
+								index2 = child->shown.count -1;
+							}
+							else{
+								if(widget_rect_contains(child, child->parent)){
+									set_widget_mouse_press_event(child,index2);
+									return;
+								}
+								else{
+									if(moveup == 0){
+										child = child->parent;
+										index2 = last;
+										moveup = 1;
+									}
+									--index2;
+								}
+							}
 							continue;
 						}
-						child2 = child2->parent;
+
+						if(moveup == 0){
+							child = child2->parent;
+							index2 = last;
+							moveup = 1;
+						}
 						--index2;
 					}
 					set_widget_mouse_press_event(child,index);

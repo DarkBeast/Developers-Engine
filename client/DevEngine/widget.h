@@ -34,10 +34,12 @@ enum widget_flags_t
 	WIDGET_MOVEABLE = (1 << 4),
 	WIDGET_MOVING = (1 << 5),
 	WIDGET_CAN_CLICK_BEHIND = (1 << 6),
-	WIDGET_ALWAYS_USEABLE= (1 << 7),
-	WIDGET_MINIMIZED= (1 << 8),
-	WIDGET_CHECKED= (1 << 9),
-	WIDGET_CAN_USE_EVENT= (1 << 10)
+	WIDGET_ALWAYS_USEABLE = (1 << 7),
+	WIDGET_MINIMIZED = (1 << 8),
+	WIDGET_CHECKED = (1 << 9),
+	WIDGET_CAN_USE_EVENT = (1 << 10),
+	WIDGET_FLIPPED = (1 << 11),
+	WIDGET_FOCUS_CLICK = (1 << 12)
 };
 
 //A UI control structure.
@@ -76,6 +78,7 @@ struct widget
 	uint16 sizex;
 	uint16 sizey;
 	uint8 type;
+	int32 value;
 	mbool action;//focused,WIDGET_CAN_FOCUS,mouse over,clicked,movable,moving,can click behind
 };
 
