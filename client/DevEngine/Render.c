@@ -145,7 +145,7 @@ void load_image(char *name, image *img)
 	free(img->pixels);
 }
 
-void draw(image* img, vector2i vecpos, vector2i imgpos,int width, int height)
+void draw(image *img, vector2i vecpos, vector2i imgpos,int width, int height)
 {
 	float x2,x1;
 	float y2,y1;
@@ -168,13 +168,13 @@ void draw(image* img, vector2i vecpos, vector2i imgpos,int width, int height)
 	glEnd ();
 }
 
-void draw_widget(widget* control) //draws all the image widgets on the canvas.
+void draw_widget(widget *control) //draws all the image widgets on the canvas.
 {
 	float x2,x1;
 	float y2,y1;
 
-	control->actualpos.x = control->pos.x + control->parent->pos.x;
-	control->actualpos.y = control->pos.y + control->parent->pos.y;
+	control->actualpos.x = control->pos.x + control->parent->actualpos.x;
+	control->actualpos.y = control->pos.y + control->parent->actualpos.y;
 
 	x1 = (float)control->imgpos.x  / control->img->width;
 	x2 = (float)(control->imgpos.x + control->width) / control->img->width;
@@ -190,6 +190,31 @@ void draw_widget(widget* control) //draws all the image widgets on the canvas.
 	glTexCoord2f (x2, y2);	glVertex2i (control->actualpos.x + control->sizex, control->actualpos.y);
 	glTexCoord2f (x2, y1);	glVertex2i (control->actualpos.x + control->sizex, control->actualpos.y + control->sizey);
 	glTexCoord2f (x1, y1);	glVertex2i (control->actualpos.x, control->actualpos.y + control->sizey);
+
+	glEnd ();
+}
+
+void draw_widget_vprogressbar(widget *control) //draws all the image widgets on the canvas.
+{
+	float x2,value;
+	float y2;
+
+	control->actualpos.x = control->pos.x + control->parent->pos.x;
+	control->actualpos.y = control->pos.y + control->parent->pos.y;
+
+	value = (float)(control->value / 100.f);
+	x2 = (float)(control->width / control->img->width) * value;
+	y2 = (float)(control->height / control->img->height);
+
+	glBindTexture(GL_TEXTURE_2D, control->img->texid);
+	glColor4f(1, 1, 1, 1);// set the image color properties, 1 being highest 0.0000 being lowest
+
+	glBegin (GL_QUADS);
+
+	glTexCoord2f (0, y2);	glVertex2i (control->actualpos.x, control->actualpos.y);
+	glTexCoord2f (x2, y2);	glVertex2i (control->actualpos.x + (control->sizex * value), control->actualpos.y);
+	glTexCoord2f (x2, .5);	glVertex2i (control->actualpos.x + (control->sizex * value), control->actualpos.y + control->sizey);
+	glTexCoord2f (0, .5);	glVertex2i (control->actualpos.x, control->actualpos.y + control->sizey);
 
 	glEnd ();
 }
