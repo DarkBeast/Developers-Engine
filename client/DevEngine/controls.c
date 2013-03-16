@@ -12,14 +12,18 @@ image *img;
 
 void load_control_images(void)
 {
-	img = (image *)calloc(1, 6 * sizeof(image));
+	img = (image *)calloc(1, 10 * sizeof(image));
 
-	load_image(get_path("image\\button.png"), &img[0]);
+	load_image(get_path("image\\null.png"), &img[0]);
 	load_image(get_path("image\\button.png"), &img[1]);
 	load_image(get_path("image\\window.png"), &img[2]);
 	load_image(get_path("image\\check.png"), &img[3]);
 	load_image(get_path("image\\radio.png"), &img[4]);
 	load_image(get_path("image\\progress.png"), &img[5]);
+	load_image(get_path("image\\scrollbar.png"), &img[6]);
+	load_image(get_path("image\\bar.png"), &img[7]);
+	load_image(get_path("image\\arrowleft.png"), &img[8]);
+	load_image(get_path("image\\arrowright.png"), &img[9]);
 }
 
 void set_control_image(widget *control, char *path)
@@ -406,10 +410,8 @@ void handle_radio_click(widget *control, int button, int pressed)
 
 //TEST STUFF
 
-void create_progressbar(widget *control, widget *parent, uint16 x, uint16 y, uint16 height, uint16 width, uint16 sizey, uint16 sizex, uint8 value, uint8 image_id)
+void create_hprogressbar(widget *control, widget *parent, uint16 x, uint16 y, uint16 height, uint16 width, uint16 sizey, uint16 sizex, uint8 value, uint8 image_id)
 {
-	progressbar *init_bar;
-
 	widget_init(control);
 	control->pos.x = x;
 	control->pos.y = y;
@@ -418,46 +420,199 @@ void create_progressbar(widget *control, widget *parent, uint16 x, uint16 y, uin
 	control->sizey = sizey;
 	control->sizex = sizex;
 	control->imgpos.x = 0;
-	control->imgpos.y = 0;
-	control->type = CONTROL_PROGRESSBAR;
-	control->draw = &draw_progressbar;
-	control->controlmousepress = handle_check_click;
+	control->imgpos.y = height;
+	control->type = CONTROL_HPROGRESSBAR;
+	control->draw = &draw_hprogressbar;
+	control->controlmousepress = handle_hprogressbar_click;
 	control->img = &img[image_id];
-
-	init_bar = (progressbar *)calloc(1,sizeof(progressbar));
-	init_bar->value = value;
-	control->control = init_bar;
+	control->value = value;
 
 	widget_add(parent,control);
-
-	init_bar = NULL;
-	free(init_bar);
 }
 
-void draw_progressbar(widget *control)
+void draw_hprogressbar(widget *control)
 {
-	if (control->action & WIDGET_CHECKED){
-		control->imgpos.x = 0;
-		control->imgpos.y = 0;
-	}
-	else{
-		control->imgpos.y = control->width;
-		control->imgpos.x = 0;
-	}
+	draw_widget(control);
+	draw_widget_vprogressbar(control);
+}
 
+void handle_hprogressbar_click(widget *control, int button, int pressed)
+{
+	control->mousepress(control,button,pressed);
+}
+
+void create_picturebox(widget *control, widget *parent, uint16 x, uint16 y, uint16 height, uint16 width, uint16 sizey, uint16 sizex, char *path)
+{
+	widget_init(control);
+	control->pos.x = x;
+	control->pos.y = y;
+	control->height = height;
+	control->width = width;
+	control->sizey = sizey;
+	control->sizex = sizex;
+	control->imgpos.x = 0;
+	control->imgpos.y = height;
+	control->type = CONTROL_PICTUREBOX;
+	control->draw = &draw_picturebox;
+	control->controlmousepress = handle_picturebox_click;
+
+	control->img  = (image *)calloc(1,sizeof(image));
+	load_image(get_path(path), control->img );
+
+	widget_add(parent,control);
+}
+
+void update_picturebox(widget *control, uint16 x, uint16 y, uint16 imgposx, uint16 imgposy, uint16 height, uint16 width, uint16 sizex, uint16 sizey, char *path)
+{
+	if(path != NULL){
+		free(control->img);
+		control->img  = (image *)calloc(1,sizeof(image));
+		load_image(get_path(path), control->img );
+	}
+	control->pos.x = x;
+	control->pos.y = y;
+	control->imgpos.x = imgposx;
+	control->imgpos.y = imgposy;
+	control->height = height;
+	control->width = width;
+	control->sizex = sizex;
+	control->sizey = sizey;
+}
+
+void draw_picturebox(widget *control)
+{
 	draw_widget(control);
 }
 
-void handle_progressbar_click(widget *control, int button, int pressed)
+void handle_picturebox_click(widget *control, int button, int pressed)
 {
-	if(button == 0 && pressed == TRUE)
-	{
-		if(control->action & WIDGET_CHECKED){
-			control->action &= ~(WIDGET_CHECKED);
-		}
-		else{
-			control->action |= WIDGET_CHECKED;
-		}
+	control->mousepress(control,button,pressed);
+}
+
+void create_hscrollbar(widget *control, widget *parent, uint16 x, uint16 y, uint16 height, uint16 width, uint16 sizey, uint16 sizex, uint16 value, uint16 max_value)
+{
+	widget *button_left = (widget *)calloc(1, sizeof(widget));
+	widget *button_right = (widget *)calloc(1, sizeof(widget));
+	widget *bar = (widget *)calloc(1, sizeof(widget));
+
+	widget_init(control);
+	widget_init(bar);//moving bar.
+	widget_init(button_left);//left
+	widget_init(button_right);//right
+
+	control->pos.x = x;
+	control->pos.y = y;
+	control->height = height;
+	control->width = width;
+	control->sizey = sizey;
+	control->sizex = sizex;
+	control->imgpos.x = 0;
+	control->imgpos.y = height;
+	control->type = CONTROL_HSCROLL_BAR;
+	control->draw = &draw_hscrollbar;
+	control->controlmousepress = handle_hscrollbar_click;
+	control->img = &img[6];
+	control->value = value;
+
+	button_left->pos.x = 0;
+	button_left->pos.y = 0;
+	button_left->height = 22;
+	button_left->width = 20;
+	button_left->sizex = ( sizex / button_left->width) + 20;
+	button_left->sizey = sizey;
+	button_left->controlmousepress = handle_harrowleft_click;
+	button_left->img = &img[8];
+
+	button_right->height = 22;
+	button_right->width = 20;
+	button_right->sizex = (sizex / button_right->width) + 20;
+	button_right->sizey = sizey;
+	button_right->pos.x = sizex - button_right->sizex;
+	button_right->pos.y = 0;
+	button_right->controlmousepress = handle_harrowright_click;
+	button_right->img = &img[9];
+
+	bar->height = 22;
+	bar->width = 8;
+	bar->sizex = (sizex - button_right->sizex -button_left->sizex) / max_value;
+	bar->sizey = sizey;
+	if(bar->sizex < 3)
+		bar->sizex = 3;
+
+	bar->pos.x += (value *(sizex - button_right->sizex -button_left->sizex - bar->sizex) / max_value);
+
+	bar->value = max_value;
+	bar->pos.y = 0;
+	//control->controlmousepress = handle_hscrollbar_click;
+	bar->img = &img[7];
+
+	if(bar->pos.x < button_left->pos.x + button_left->sizex)
+		bar->pos.x = button_left->pos.x + button_left->sizex;
+
+	if(bar->pos.x > button_right->pos.x - bar->sizex)
+		bar->pos.x = button_right->pos.x - bar->sizex;
+
+	widget_add(parent,control);
+	widget_add(control,button_left);
+	widget_add(control,button_right);
+	widget_add(control,bar);
+}
+
+void draw_hscrollbar(widget *control)
+{
+	draw_widget(control);
+
+	draw_widget(control->shown.data[0]);
+
+	draw_widget(control->shown.data[1]);
+
+	draw_widget(control->shown.data[2]);
+}
+
+void handle_hscrollbar_click(widget *control, int button, int pressed)
+{
+	control->mousepress(control,button,pressed);
+}
+
+void handle_harrowleft_click(widget *control, int button, int pressed)
+{
+	--control->parent->value;
+
+	if(control->parent->value < 0)
+		control->parent->value = 0;
+
+	if(control->parent->shown.data[2]->pos.x > control->pos.x + control->parent->shown.data[2]->sizex){
+		control->parent->shown.data[2]->pos.x = control->parent->pos.x +
+			(control->parent->value *(control->parent->sizex - control->parent->shown.data[0]->sizex - control->parent->shown.data[1]->sizex - control->parent->shown.data[2]->sizex) /
+			control->parent->shown.data[2]->value);
 	}
+	else{
+		control->parent->shown.data[2]->pos.x -= control->parent->shown.data[2]->sizex;
+	}
+
+	control->mousepress(control,button,pressed);
+}
+
+void handle_harrowright_click(widget *control, int button, int pressed)
+{
+	++control->parent->value;
+
+	if(control->parent->value > 100)
+		control->parent->value = 100;
+
+	if(control->parent->shown.data[2]->pos.x < control->pos.x - control->parent->shown.data[2]->sizex){
+		control->parent->shown.data[2]->pos.x = control->parent->pos.x +
+			(control->parent->value *(control->parent->sizex - control->parent->shown.data[0]->sizex - control->parent->shown.data[1]->sizex - control->parent->shown.data[2]->sizex) /
+			control->parent->shown.data[2]->value);
+	}
+	else{
+		control->parent->shown.data[2]->pos.x += control->parent->shown.data[2]->sizex;
+	}
+
+	control->mousepress(control,button,pressed);
+}
+
+void handle_hbar_click(widget *control, int button, int pressed)
+{
 	control->mousepress(control,button,pressed);
 }
