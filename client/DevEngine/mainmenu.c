@@ -70,7 +70,7 @@ void init_main_menu(void)
 	create_radio(&radio2, &window2, 16, 32, 16, 16, 16, 16, FALSE, 4);
 	create_hprogressbar(&progress1, NULL, 100, 100, 24, 150, 24, 150, 50, 5);
 	create_picturebox(&pic1,NULL,300,300,50,50,50,50, "image\\pictest.png");
-	create_hscrollbar(&scroll1,&window2,5,100,22,10,22,150,50,100);
+	create_hscrollbar(&scroll1,&window2,5,100,22,10,22,150,100,200);
 
 	set_control_image(&window2,"image\\window1.png");
 	link_radio(&radio1,&radio2);

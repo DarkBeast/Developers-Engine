@@ -534,23 +534,23 @@ void create_hscrollbar(widget *control, widget *parent, uint16 x, uint16 y, uint
 
 	bar->height = 22;
 	bar->width = 8;
-	bar->sizex = (sizex - button_right->sizex -button_left->sizex) / max_value;
+	bar->sizex = (sizex - button_right->sizex) / max_value;
 	bar->sizey = sizey;
 	if(bar->sizex < 3)
 		bar->sizex = 3;
 
-	bar->pos.x += (value *(sizex - button_right->sizex -button_left->sizex - bar->sizex) / max_value);
+	bar->pos.x = (button_left->pos.x + button_left->sizex) + (value *(sizex - (button_left->sizex * 2) ) / max_value);
 
 	bar->value = max_value;
 	bar->pos.y = 0;
 	//control->controlmousepress = handle_hscrollbar_click;
 	bar->img = &img[7];
 
-	if(bar->pos.x < button_left->pos.x + button_left->sizex)
-		bar->pos.x = button_left->pos.x + button_left->sizex;
+	if(bar->pos.x < button_left->pos.x)
+		bar->pos.x = button_left->pos.x;
 
-	if(bar->pos.x > button_right->pos.x - bar->sizex)
-		bar->pos.x = button_right->pos.x - bar->sizex;
+	if(bar->pos.x > button_right->pos.x)
+		bar->pos.x = button_right->pos.x;
 
 	widget_add(parent,control);
 	widget_add(control,button_left);
@@ -581,14 +581,8 @@ void handle_harrowleft_click(widget *control, int button, int pressed)
 	if(control->parent->value < 0)
 		control->parent->value = 0;
 
-	if(control->parent->shown.data[2]->pos.x > control->pos.x + control->parent->shown.data[2]->sizex){
-		control->parent->shown.data[2]->pos.x = control->parent->pos.x +
-			(control->parent->value *(control->parent->sizex - control->parent->shown.data[0]->sizex - control->parent->shown.data[1]->sizex - control->parent->shown.data[2]->sizex) /
-			control->parent->shown.data[2]->value);
-	}
-	else{
-		control->parent->shown.data[2]->pos.x -= control->parent->shown.data[2]->sizex;
-	}
+	control->parent->shown.data[2]->pos.x = (control->pos.x + control->sizex) +
+		(control->parent->value *(control->parent->sizex - (control->sizex * 2) ) / control->parent->shown.data[2]->value);
 
 	control->mousepress(control,button,pressed);
 }
@@ -597,17 +591,11 @@ void handle_harrowright_click(widget *control, int button, int pressed)
 {
 	++control->parent->value;
 
-	if(control->parent->value > 100)
-		control->parent->value = 100;
+	if(control->parent->value > control->parent->shown.data[2]->value)
+		control->parent->value = control->parent->shown.data[2]->value;
 
-	if(control->parent->shown.data[2]->pos.x < control->pos.x - control->parent->shown.data[2]->sizex){
-		control->parent->shown.data[2]->pos.x = control->parent->pos.x +
-			(control->parent->value *(control->parent->sizex - control->parent->shown.data[0]->sizex - control->parent->shown.data[1]->sizex - control->parent->shown.data[2]->sizex) /
-			control->parent->shown.data[2]->value);
-	}
-	else{
-		control->parent->shown.data[2]->pos.x += control->parent->shown.data[2]->sizex;
-	}
+	control->parent->shown.data[2]->pos.x = (control->parent->shown.data[0]->pos.x + control->parent->shown.data[0]->sizex) +
+		(control->parent->value *(control->parent->sizex - (control->parent->shown.data[0]->sizex * 2)) / control->parent->shown.data[2]->value);
 
 	control->mousepress(control,button,pressed);
 }
