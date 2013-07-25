@@ -2,6 +2,7 @@
 * Credits:  Andrew Wheeler/Genusis
 ******************************************************************************/
 // /ENTRY:"mainCRTStartup"
+#include <GL/glew.h>
 #include <glfw.h>
 #include "input.h"
 #include "program_path.h"
@@ -10,12 +11,14 @@
 #include "mainmenu.h"
 #include "bool.h"
 #include "controls.h"
+#include "error.h"
 
 int main(void)
 {
-	get_program_directory();//gets the programs path so we can use ti to retrieve image, saved files etc.
+	get_program_directory();//gets the programs path.
 
 	init_screen(800,600,GLFW_WINDOW);//initializes the program window.
+
 	glfwEnable(GLFW_KEY_REPEAT);//allows repeating of held down keyboard keys.
 
 	glfwSetWindowSizeCallback(handle_resize);//handles Window resize calls
@@ -27,8 +30,6 @@ int main(void)
 	text_init_font("");//initializes the Font characters for use.
 
 	widget_init_system();//initializes the widget system for storing widgets.
-
-	load_control_images();//Loads the Default control images into an array.
 
 	init_main_menu();//initializes the first menu for use.
 
