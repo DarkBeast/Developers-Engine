@@ -8,6 +8,7 @@
 #include "function.h"
 #include "controls.h"
 #include "Render.h"
+
 user_interface ui;
 widget *focused; //holds the widget currently focused on.
 
@@ -28,19 +29,19 @@ sbool widget_frame_contains(widget *control, widget *parent)
 	case CONTROL_BUTTON:
 	case CONTROL_LABEL:
 
-		if(ui.screen.mousepos.x < control->pos.x + parent->pos.x){return FALSE; break;}
-		if(ui.screen.mousepos.x > control->pos.x + parent->pos.x + control->width){return FALSE; break;}
-		if(ui.screen.mousepos.y < control->pos.y + parent->pos.y) {return FALSE; break;}
-		if(ui.screen.mousepos.y > control->pos.y + parent->pos.y + control->height){return FALSE; break;}
+		if(ui.screen.mousepos.x < control->actualpos.x){return FALSE; break;}
+		if(ui.screen.mousepos.x > control->actualpos.x + control->width){return FALSE; break;}
+		if(ui.screen.mousepos.y < control->actualpos.y) {return FALSE; break;}
+		if(ui.screen.mousepos.y > control->actualpos.y + control->height){return FALSE; break;}
 		return TRUE;
 		break;
 	case CONTROL_WINDOW:{
 		window *data = (window *)control->control;
 
-		if(ui.screen.mousepos.x < control->pos.x + parent->pos.x + data->frame.x){return FALSE; break;}
-		if(ui.screen.mousepos.x > control->pos.x + parent->pos.x + data->frame.w){return FALSE; break;}
-		if(ui.screen.mousepos.y < control->pos.y + parent->pos.y + data->frame.y) {return FALSE; break;}
-		if(ui.screen.mousepos.y > control->pos.y + parent->pos.y + data->frame.h){return FALSE; break;}
+		if(ui.screen.mousepos.x < control->actualpos.x + data->frame.x){return FALSE; break;}
+		if(ui.screen.mousepos.x > control->actualpos.x + data->frame.w){return FALSE; break;}
+		if(ui.screen.mousepos.y < control->actualpos.y + data->frame.y) {return FALSE; break;}
+		if(ui.screen.mousepos.y > control->actualpos.y + data->frame.h){return FALSE; break;}
 		return TRUE;
 						}
 						break;
