@@ -34,7 +34,7 @@
 extern "C" {
 #endif
 
-#define GLFW_INCLUDE_GL3
+//#define GLFW_INCLUDE_GL3
 /*************************************************************************
  * Global definitions
  *************************************************************************/
@@ -171,7 +171,7 @@ extern "C" {
  #endif
 #else
  #if defined(GLFW_INCLUDE_GL3)
-  #include <gl3.h>
+#include <GL/gl3.h>
  #else
   #include <GL/gl.h>
  #endif
