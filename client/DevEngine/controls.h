@@ -14,28 +14,28 @@ typedef struct label label;
 typedef struct window window;
 typedef struct radio radio;
 typedef struct scrollbar scrollbar;
+typedef struct textbox textbox;
 
 enum control_types
 {
 	CONTROL_EMPTY = 0,
-	CONTROL_BUTTON,//
-	CONTROL_LABEL,//
-	CONTROL_WINDOW,//
-	CONTROL_CHECKBOX,//
-	CONTROL_RADIO,//
+	CONTROL_BUTTON,
+	CONTROL_LABEL,
+	CONTROL_WINDOW,
+	CONTROL_CHECKBOX,
+	CONTROL_RADIO,
 	CONTROL_TEXTBOX,
-	CONTROL_PICTUREBOX,//
+	CONTROL_PICTUREBOX,
 	CONTROL_HSCROLL_BAR,
 	CONTROL_VSCROLL_BAR,
-	CONTROL_HPROGRESSBAR,//
+	CONTROL_HPROGRESSBAR,
+	CONTROL_VPROGRESSBAR,
 	CONTROL_SPINNER,
-	CONTROL_DROP_DOWN_LIST,
 	CONTROL_LISTBOX,
-	CONTROL_SLIDER,
 	CONTROL_TABBOX
 };
 
-//only need structs for special widgets.
+//only need structures for special widgets.
 struct label{
 	text *string;
 };
@@ -55,7 +55,13 @@ struct scrollbar{
 	uint32 max;
 };
 
-void load_control_images(void);
+struct textbox{
+	text *string;
+	uint16 count;
+	uint16 cursorchar;
+	vector2i cursorpos;
+};
+
 void set_control_image(widget *control, char *path);
 
 void create_button(widget *control, widget *parent, uint16 x, uint16 y, uint16 height, uint16 width, uint16 sizey, uint16 sizex, uint8 image_id);
@@ -66,7 +72,7 @@ void create_label(widget *control, widget *parent, uint16 x, uint16 y, uint8 siz
 void draw_label(widget *control);
 void handle_label_click(widget *control, int button, int pressed);
 
-void create_window(widget *control, widget *parent, uint16 x, uint16 y, uint16 height, uint16 width, uint16 sizey, uint16 sizex, uint8 image_id);
+void create_window(widget *control, widget *parent, uint16 x, uint16 y, uint16 height, uint16 width, uint16 sizey, uint16 sizex, char * image_path);
 void create_window_framed(widget *control, widget *parent, uint16 x, uint16 y, uint16 height, uint16 width, uint16 sizey, uint16 sizex, uint16 framex, uint16 framey,uint16 frameh, uint16 framew, uint8 image_id);
 void draw_windows(widget *control);
 void handle_window_click(widget *control, int button, int pressed);
@@ -97,5 +103,16 @@ void handle_hscrollbar_click(widget *control, int button, int pressed);
 void handle_harrowleft_click(widget *control, int button, int pressed);
 void handle_harrowright_click(widget *control, int button, int pressed);
 void handle_hbar_click(widget *control, int button, int pressed);
+
+void create_vscrollbar(widget *control, widget *parent, uint16 x, uint16 y, uint16 height, uint16 width, uint16 sizey, uint16 sizex, uint16 value, uint16 max_value);
+void draw_vscrollbar(widget *control);
+void handle_vscrollbar_click(widget *control, int button, int pressed);
+void handle_varrowtop_click(widget *control, int button, int pressed);
+void handle_varrowbottom_click(widget *control, int button, int pressed);
+void handle_vbar_click(widget *control, int button, int pressed);
+
+void create_vprogressbar(widget *control, widget *parent, uint16 x, uint16 y, uint16 height, uint16 width, uint16 sizey, uint16 sizex, uint8 value, uint8 image_id);
+void draw_vprogressbar(widget *control);
+void handle_vprogressbar_click(widget *control, int button, int pressed);
 
 #endif
