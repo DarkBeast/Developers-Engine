@@ -20,6 +20,11 @@ typedef struct vector2i vector2i;
 typedef struct cstring cstring;
 typedef struct color color;
 typedef struct void_array void_array;
+typedef struct vertex_t vertex_t;
+typedef struct openext openext;
+typedef struct vertex_array vertex_array;
+typedef struct multi_buffer multi_buffer;
+typedef struct vertex_array vertex_array;
 
 struct void_array
 {
@@ -102,6 +107,28 @@ struct image{
 	uint16 format; // the format of the image.
 	uint16 bpp; //how many bytes per pixel are in the image
 	unsigned char *pixels; //actual pixel data of image
+};
+
+struct vertex_t {
+	float x, y;
+	float u, v;
+	float r, g, b, a;
+};
+
+struct vertex_array {
+	vertex_t vertex[4];
+};
+
+struct openext{
+	GLuint vertex_buffer; //texture vertex buffer.
+	GLuint index_buffer; //index buffer.
+	vertex_t buffer[4];
+};
+
+struct multi_buffer{
+	GLuint vertex_buffer; //texture vertex buffer.
+	GLuint index_buffer; //index buffer.
+	vertex_array *buffer;
 };
 
 #endif
