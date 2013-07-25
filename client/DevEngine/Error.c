@@ -3,6 +3,7 @@
 ******************************************************************************/
 
 #include <conio.h>
+#include <GL/glew.h>
 #include <glfw.h>
 #include <stdio.h> //For file reading/writing and other functions. open document for more info.
 #include <stdlib.h>
@@ -84,6 +85,9 @@ void render_error(int error_flag)
 		break;
 	case ERROR_IMAGELOADER_ERROR:
 		fputs("An error has occurred: Image Did Not Load!\n", stderr);
+		break;
+	case ERROR_GLEWINIT_ERROR:
+		fputs("An error has occurred: GLEW Did Not initialize!\n", stderr);
 		break;
 	default:
 		fputs("An error has occurred!\n", stderr);
