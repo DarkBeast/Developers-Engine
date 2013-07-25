@@ -10,10 +10,10 @@
 #include "integer.h"
 #include "bool.h"
 
-/* Public globals */
-//see globals.c it contains public globals types and a example.
+/* Public global's */
+//see globals.c it contains public global's types and a example.
 
-/* static globals
+/* static global's
 *  can be const Uint8 test = 5; or #defines
 */
 

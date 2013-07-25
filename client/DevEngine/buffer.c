@@ -1,13 +1,12 @@
 /*******************************************************************************
 * Credits:  Anthony Ianozi
 ******************************************************************************/
-
 #include<string.h>
 #include<stdint.h>
 #include"buffer.h"
 #include"integer.h"
 
-//bytearry code
+//byte array code
 /*NOTE: All buffer functions return one on overflow*/
 int add_buffer(buffer_t *buffer, const void* source, size_t size)
 {

@@ -23,7 +23,7 @@ struct widget_array
 	uint16 count;
 };
 
-//toggles for the sbool action.
+//toggles for the action.
 
 enum widget_flags_t
 {
@@ -39,7 +39,9 @@ enum widget_flags_t
 	WIDGET_CHECKED = (1 << 9),
 	WIDGET_CAN_USE_EVENT = (1 << 10),
 	WIDGET_FLIPPED = (1 << 11),
-	WIDGET_FOCUS_CLICK = (1 << 12)
+	WIDGET_FOCUS_CLICK = (1 << 12),
+	WIDGET_FUNCTION_FOCUS = (1 << 13),
+	WIDGET_IS_PASSWORD = (1 << 14)
 };
 
 //A UI control structure.
@@ -73,6 +75,7 @@ struct widget
 	vector2ui originalpos;
 	vector2i imgpos;
 	image *img;
+	openext oglbuf;// opengl buffer
 	uint16 width;
 	uint16 height;
 	uint16 sizex;
@@ -122,7 +125,7 @@ void widget_set_release(widget *control);
 //checks focused object to see if we need to check inside of it or not.
 sbool widget_check_focus(void);
 
-//sets the mouses XY position during mouse move via event system.
+//sets the mouse's XY position during mouse move via event system.
 void widget_set_mouse_pos(int16 x , int16 y);
 
 //sets the ui's click events for fall back
@@ -169,13 +172,13 @@ sbool widget_clear_hidden(widget *parent);
 //clears the shown array
 sbool widget_clear_shown(widget *parent);
 
-//resizes the ID for more Z depth of Deep ui systems for widget manager.
+//resizes the ID for more Z depth of Deep user interface systems for widget manager.
 void widget_resize_id(uint16 *id, uint16 size);
 
 //Draws all the shown widgets to the screen.
 void widget_manager(void);
 
-//checks if widget is in the mouses location when click event happens
+//checks if widget is in the mouse's location when click event happens
 sbool widget_rect_contains(widget *control, widget *parent);
 
 //checks if the mouse is over a widget if so do event
@@ -207,7 +210,7 @@ void widget_set_clicked(widget *control);
 //default initiates. ignore these.//
 //Blank Drawing call
 void widget_init_draw(widget *control);
-//blank keypressed
+//blank key pressed
 void widget_init_key_pressed(widget *control, int key, int pressed);
 //default eventful mouse press
 void widget_init_mouse_press(widget *control, int button, int pressed);

@@ -7,37 +7,37 @@
 #define DE_BOOL_H
 
 /*********************************************************************************************************
-this is for True/False as well as bitsetting sigilar varible's.
+this is for True/False as well as bit setting singular variable's.
 If you need more than 32bits for a x86 OS or 64bits for a x64 OS then you should create an Bit set array .
-If you do create a bitset array use only unsigned int don;t use anything else as that is the best/Fastest
+If you do create a bit set array use only unsigned integer don't use anything else as that is the best/Fastest
 for both systems.
 *********************************************************************************************************/
 //for people who are not use to bit methods.
 
 /*
-To use Bits basically use the boolean operators |,& and ~. Examples of how to use bit multiplation is as shown.
+To use Bits basically use the Boolean operators |,& and ~. Examples of how to use bit multiplication is as shown.
 
-if(Varible & (1 << Mask))
+if(Variable & (1 << Mask))
 or
-if(Varible & ENUM_MASK)
+if(Variable & ENUM_MASK)
 
 To set a bit you would do this.
-Varible |= (1 << Mask);
+Variable |= (1 << Mask);
 or
-Varible |= ENUM_MASK;
+Variable |= ENUM_MASK;
 
 To clear all the bits you would do.
-Varible = 0;
+Variable = 0;
 
 To clear just 1 bit out of any bit you would do.
-Varible &= ~(1 << Mask);
+Variable &= ~(1 << Mask);
 or
-Varible &= ~(ENUM_MASK);
+Variable &= ~(ENUM_MASK);
 
 To Toggle the bit on or off based on its last setting you would use.
-Varible ^= (1 << Mask);
+Variable ^= (1 << Mask);
 or
-Varible ^= ENUM_MASK;
+Variable ^= ENUM_MASK;
 */
 
 typedef unsigned int lbool;
