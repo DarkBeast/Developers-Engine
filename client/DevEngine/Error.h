@@ -24,7 +24,8 @@ enum error_flags_t
 	ERROR_IMAGELOADER_ERROR = 10,
 	ERROR_PATH_INCORRECT = 11,
 	ERROR_PATH_NULL = 12,
-	ERROR_GLEWINIT_ERROR = 13
+	ERROR_GLEWINIT_ERROR = 13,
+	ERROR_POINTER_NULL = 14
 };
 
 void fatal_error(int error_flag);

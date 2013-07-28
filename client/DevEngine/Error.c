@@ -45,6 +45,9 @@ void fatal_error(int error_flag)
 	case ERROR_PATH_NULL:
 		fputs("ERROR:Path is NULL.\n", stderr);
 		break;
+	case ERROR_POINTER_NULL:
+		fputs("ERROR:Pointer is NULL.\n", stderr);
+		break;
 	default:
 		fputs("An error has occurred!\n", stderr);
 	}
