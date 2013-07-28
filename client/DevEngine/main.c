@@ -36,6 +36,6 @@ int main(void)
 	main_menu();//Start the First Menu, Menu main loop.
 
 	glfwTerminate();// Close window and terminate GLFW
-
+	path_destroy();
 	exit(TRUE);// Exit program
 }
