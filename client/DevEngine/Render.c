@@ -151,7 +151,6 @@ void load_image(char *name, image *img)
 	glTexParameterf(GL_TEXTURE_2D,GL_TEXTURE_MIN_FILTER,GL_LINEAR);
 	glTexParameterf(GL_TEXTURE_2D,GL_TEXTURE_MAG_FILTER,GL_LINEAR);
 
-	glBindTexture( GL_TEXTURE_2D, NULL);
 	free(img->pixels);
 }
 
@@ -251,10 +250,10 @@ void draw_widget_hprogressbar(widget *control)
 
 	glBegin (GL_QUADS);
 
-	glTexCoord2f (0, y2);	glVertex2i (control->actualpos.x, control->actualpos.y);
-	glTexCoord2f (x2, y2);	glVertex2i (control->actualpos.x + (control->sizex * value), control->actualpos.y);
-	glTexCoord2f (x2, .5);	glVertex2i (control->actualpos.x + (control->sizex * value), control->actualpos.y + control->sizey);
-	glTexCoord2f (0, .5);	glVertex2i (control->actualpos.x, control->actualpos.y + control->sizey);
+	glTexCoord2f (0, y2);	glVertex2f (control->actualpos.x, control->actualpos.y);
+	glTexCoord2f (x2, y2);	glVertex2f (control->actualpos.x + (control->sizex * value), control->actualpos.y);
+	glTexCoord2f (x2, .5);	glVertex2f (control->actualpos.x + (control->sizex * value), control->actualpos.y + control->sizey);
+	glTexCoord2f (0, .5);	glVertex2f (control->actualpos.x, control->actualpos.y + control->sizey);
 
 	glEnd ();
 }
