@@ -89,15 +89,12 @@ void create_label(widget *control, widget *parent, uint16 x, uint16 y, uint8 siz
 
 	widget_add(parent,control);
 	create_text_vertex(init_text->string, control);
-
-	init_text = NULL;
-	free(init_text);
 }
 
 void draw_label(widget *control)
 {
 	label *data = (label *)control->control;
-	text_draw_beta(data->string, control->parent);
+	text_draw_beta(data->string);
 }
 
 void handle_label_click(widget *control, int button, int pressed)
@@ -135,9 +132,6 @@ void create_window(widget *control, widget *parent, uint16 x, uint16 y, uint16 h
 
 	widget_add(parent,control);
 	create_widget_vertex_buffer(control); // must be called after widget add to get the correct Parent.
-
-	init_window = NULL;
-	free(init_window);
 }
 
 void create_window_framed(widget *control, widget *parent, uint16 x, uint16 y, uint16 height, uint16 width, uint16 sizey, uint16 sizex, uint16 framex, uint16 framey,uint16 frameh, uint16 framew, char *path)
@@ -166,9 +160,6 @@ void create_window_framed(widget *control, widget *parent, uint16 x, uint16 y, u
 	control->control = init_window;
 
 	widget_add(parent,control);
-
-	init_window = NULL;
-	free(init_window);
 }
 
 void draw_windows(widget *control)
@@ -255,9 +246,6 @@ void create_radio(widget *control, widget *parent, uint16 x, uint16 y, uint16 he
 	control->control = init_radio;
 
 	widget_add(parent,control);
-
-	init_radio = NULL;
-	free(init_radio);
 }
 
 void draw_radio(widget *control)
@@ -276,7 +264,7 @@ void draw_radio(widget *control)
 
 void resize_radio_list(radio *controls, uint16 size)
 {
-	widget **data = NULL;
+	widget **data;
 
 	if(controls == NULL)
 		return;//TODO: add error handler here.
@@ -287,8 +275,6 @@ void resize_radio_list(radio *controls, uint16 size)
 		return;
 
 	controls->list = data;
-	data = NULL;
-	free(data);
 }
 
 void link_radio(widget *main, widget *control)
@@ -325,17 +311,12 @@ void link_radio(widget *main, widget *control)
 	}
 	controldata->main =(widget *)calloc(1,sizeof(widget));
 	controldata->main = main;
-
-	data  = NULL;
-	free(data );
-	controldata = NULL;
-	free(controldata);
 }
 
 void reset_radio(widget *control)
 {
 	radio *data = (radio *)control->control;
-	widget *wgt = NULL;
+	widget *wgt;
 	uint16 i = 0;
 
 	if(data->main){
@@ -350,11 +331,6 @@ void reset_radio(widget *control)
 		wgt = (widget *)data->list[i];
 		wgt->action &= ~(WIDGET_CHECKED);
 	}
-
-	data = NULL;
-	free(data);
-	wgt = NULL;
-	free(wgt);
 }
 
 void handle_radio_click(widget *control, int button, int pressed)
@@ -389,9 +365,6 @@ void handle_radio_click(widget *control, int button, int pressed)
 	else{
 		control->mousepress(control,button,pressed);
 	}
-
-	data = NULL;
-	free(data);
 }
 
 //TEST STUFF
@@ -464,6 +437,8 @@ void update_picturebox(widget *control, uint16 x, uint16 y, uint16 imgposx, uint
 	control->width = width;
 	control->sizex = sizex;
 	control->sizey = sizey;
+
+	//TODO: Update for VBO modifying.
 }
 
 void draw_picturebox(widget *control)
