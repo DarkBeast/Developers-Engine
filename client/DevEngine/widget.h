@@ -6,7 +6,6 @@
 #define DE_WIDGET_H
 
 #include "types.h"
-#include "integer.h"
 #include "bool.h"
 
 typedef enum widget_flags_t widget_flags_t;
@@ -173,7 +172,7 @@ sbool widget_clear_hidden(widget *parent);
 sbool widget_clear_shown(widget *parent);
 
 //resizes the ID for more Z depth of Deep user interface systems for widget manager.
-void widget_resize_id(uint16 *id, uint16 size);
+void widget_resize_id(uint16 **id, uint16 size);
 
 //Draws all the shown widgets to the screen.
 void widget_manager(void);

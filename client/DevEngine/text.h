@@ -4,13 +4,12 @@
 ******************************************************************************/
 #ifndef DE_TEXT_H
 #define DE_TEXT_H
-
 #include <ft2build.h>
 #include FT_FREETYPE_H
 #include <freetype/ftglyph.h>
+#include "widget.h"
 #include "types.h"
 #include "integer.h"
-#include "widget.h"
 
 typedef struct fonts fonts;
 typedef struct symbol symbol;
@@ -40,6 +39,7 @@ struct text
 	vector2ui xy; // X location and Y location on screen
 	uint16 size;
 	uint16 count;
+	uint16 max;
 	uint8 resize;
 };
 
@@ -50,7 +50,7 @@ void text_set(text *text_data, uint16 x, uint16 y, uint8 size, uint8 red,uint8 b
 vector2ui text_get_string_hw(char *string, uint8 resize);
 symbol* text_get_character_array(void);
 
-void text_draw_beta(text *str, widget *parent);
-void text_resize_buffer(openext *buffer, uint16 size);
+void text_draw_beta(text *str);
+void text_resize_buffer(vertex_array **buffer, size_t size);
 void create_text_vertex(text *str, widget *control);
 #endif

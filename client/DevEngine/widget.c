@@ -88,7 +88,7 @@ sbool widget_check_focus(void)
 	return FALSE;
 }
 
-//sets the mouses position form screen movement.
+//sets the mouse's position form screen movement.
 void widget_set_mouse_pos(int16 x , int16 y)
 {
 	ui.screen.mousepos.x = x;
@@ -151,8 +151,6 @@ void widget_switch(widget_array *wgt, uint32 a, uint32 b)//switch's widget posit
 	clone = wgt->data[a];
 	wgt->data[a] = wgt->data[b];
 	wgt->data[b] = clone;
-	clone = NULL;
-	free(clone);
 }
 
 //takes a shown widget and hides it.
@@ -359,9 +357,6 @@ void widget_unload(widget *parent)
 {
 	if(!widget_clear_arrays(parent))
 		return;// add error message
-
-	free(parent);
-	parent = NULL;
 }
 
 void widget_init_shown(widget *parent)// only use once and if only we wanted to add a widget to a Array with no size.
@@ -459,7 +454,6 @@ sbool widget_clear_arrays(widget *parent)
 					}
 				}
 			}
-			free(parent->hidden.data[index]);//TODO: child->hidden.data = NULL;
 		}
 	}
 
@@ -504,7 +498,6 @@ sbool widget_clear_arrays(widget *parent)
 					}
 				}
 			}
-			free(parent->shown.data[index]);
 		}
 	}
 
@@ -571,7 +564,6 @@ sbool widget_clear_hidden(widget *parent)
 					}
 				}
 			}
-			free(parent->hidden.data[index]);//TODO: child->hidden.data = NULL;
 		}
 	}
 
@@ -633,7 +625,6 @@ sbool widget_clear_shown(widget *parent)
 					}
 				}
 			}
-			free(parent->shown.data[index]);
 		}
 	}
 
@@ -647,7 +638,7 @@ sbool widget_clear_shown(widget *parent)
 }
 
 //resizes the ID for the widget manager when handling deep UI systems, default Z is 32.
-void widget_resize_id(uint16 *id, uint16 size)
+void widget_resize_id(uint16 **id, uint16 size)
 {
 	uint16 *data = NULL;
 
@@ -659,7 +650,7 @@ void widget_resize_id(uint16 *id, uint16 size)
 	if (data == NULL)
 		return;
 
-	id = data;
+	*id = data;
 }
 
 //This is the Main widget That displays All the widgets in the Widget array aka shown. it Displays them via Tree branch style.
@@ -700,7 +691,7 @@ void widget_manager(void)//used to draw the widgets onto the screen.
 
 								if(idindex + 1 >= idsize){//make sure there is not too many layers for the id array.
 									idsize = (uint16)next_power_of_two(idsize);
-									widget_resize_id(id,idsize);
+									widget_resize_id(&id,idsize);
 								}
 								id[idindex] = 0;//set the new ID index to 0
 							}
@@ -792,7 +783,7 @@ sbool widget_has_mouse_over(widget *control)
 		return TRUE;
 	}
 
-	if(!control->action & WIDGET_IS_FOCUSED){
+	if(!(control->action & WIDGET_IS_FOCUSED)){
 		while(i){
 			if(parent != ui.root){
 				if(parent->action & WIDGET_CAN_FOCUS && parent->action & WIDGET_IS_FOCUSED){
