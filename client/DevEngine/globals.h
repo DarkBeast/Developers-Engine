@@ -7,7 +7,6 @@
 #ifndef DE_GLOBALS_H
 #define DE_GLOBALS_H
 
-#include "integer.h"
 #include "bool.h"
 
 /* Public global's */
