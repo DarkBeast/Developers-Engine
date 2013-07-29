@@ -1,13 +1,9 @@
 #ifndef __gl3_h_
 #define __gl3_h_
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 /*
 ** Copyright (c) 2007-2012 The Khronos Group Inc.
-** 
+**
 ** Permission is hereby granted, free of charge, to any person obtaining a
 ** copy of this software and/or associated documentation files (the
 ** "Materials"), to deal in the Materials without restriction, including
@@ -15,10 +11,10 @@ extern "C" {
 ** distribute, sublicense, and/or sell copies of the Materials, and to
 ** permit persons to whom the Materials are furnished to do so, subject to
 ** the following conditions:
-** 
+**
 ** The above copyright notice and this permission notice shall be included
 ** in all copies or substantial portions of the Materials.
-** 
+**
 ** THE MATERIALS ARE PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
 ** EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
 ** MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
@@ -29,41 +25,41 @@ extern "C" {
 */
 
 /* This is a draft release of gl3.h, a header for use with OpenGL 3.1, and
- * 3.2 and later core profile implementations. The current version is
- * available at http://www.opengl.org/registry/ . Please don't package
- * gl3.h for release with other software until it's out of draft status.
- * The structure of the file may change significantly, and the details
- * will probably change slightly as we make sure exactly the right set
- * of interfaces is included.
- *
- * gl3.h last updated on $Date: 2012-06-18 11:26:35 -0700 (Mon, 18 Jun 2012) $
- *
- * RELEASE NOTES - 2012/06/18
- *
- * gl3.h should be placed under a directory 'GL3' and included as
- * '<GL3/gl3.h>'.
- *
- * gl3.h is supposed to only include APIs in a OpenGL 3.1 (without
- * GL_ARB_compatibility) or OpenGL 3.2-4.2 (inclusive) core profile
- * implementation, as well as interfaces for newer ARB extensions which
- * can be supported by the core profile. It does not, and never will
- * include functionality removed from the core profile, such as
- * fixed-function vertex and fragment processing.
- *
- * Implementations of OpenGL 3.1 supporting the optional
- * GL_ARB_compatibility extension continue to provide that functionality,
- * as do implementations of the OpenGL 3.2+ compatibility profiles, and
- * source code requiring it should use the traditional <GL/gl.h> and
- * <GL/glext.h> headers instead of <GL3/gl3.h>.
- *
- * It is not possible to #include both <GL3/gl3.h> and either of
- * <GL/gl.h> or <GL/glext.h> in the same source file.
- *
- * We welcome feedback on gl3.h. Please register for the Khronos Bugzilla
- * (www.khronos.org/bugzilla) and file issues there under product
- * "OpenGL", category "Registry". Feedback on the opengl.org forums
- * may not be responded to in a timely fashion.
- */
+* 3.2 and later core profile implementations. The current version is
+* available at http://www.opengl.org/registry/ . Please don't package
+* gl3.h for release with other software until it's out of draft status.
+* The structure of the file may change significantly, and the details
+* will probably change slightly as we make sure exactly the right set
+* of interfaces is included.
+*
+* gl3.h last updated on $Date: 2012-06-18 11:26:35 -0700 (Mon, 18 Jun 2012) $
+*
+* RELEASE NOTES - 2012/06/18
+*
+* gl3.h should be placed under a directory 'GL3' and included as
+* '<GL3/gl3.h>'.
+*
+* gl3.h is supposed to only include APIs in a OpenGL 3.1 (without
+* GL_ARB_compatibility) or OpenGL 3.2-4.2 (inclusive) core profile
+* implementation, as well as interfaces for newer ARB extensions which
+* can be supported by the core profile. It does not, and never will
+* include functionality removed from the core profile, such as
+* fixed-function vertex and fragment processing.
+*
+* Implementations of OpenGL 3.1 supporting the optional
+* GL_ARB_compatibility extension continue to provide that functionality,
+* as do implementations of the OpenGL 3.2+ compatibility profiles, and
+* source code requiring it should use the traditional <GL/gl.h> and
+* <GL/glext.h> headers instead of <GL3/gl3.h>.
+*
+* It is not possible to #include both <GL3/gl3.h> and either of
+* <GL/gl.h> or <GL/glext.h> in the same source file.
+*
+* We welcome feedback on gl3.h. Please register for the Khronos Bugzilla
+* (www.khronos.org/bugzilla) and file issues there under product
+* "OpenGL", category "Registry". Feedback on the opengl.org forums
+* may not be responded to in a timely fashion.
+*/
 
 /* Function declaration macros - to move into glplatform.h */
 
@@ -1940,7 +1936,6 @@ typedef void GLvoid;
 #define GL_TEXTURE_IMMUTABLE_FORMAT       0x912F
 #endif
 
-
 /*************************************************************/
 
 #include <stddef.h>
@@ -3620,11 +3615,6 @@ typedef void (APIENTRYP PFNGLTEXSTORAGE3DPROC) (GLenum target, GLsizei levels, G
 typedef void (APIENTRYP PFNGLTEXTURESTORAGE1DEXTPROC) (GLuint texture, GLenum target, GLsizei levels, GLenum internalformat, GLsizei width);
 typedef void (APIENTRYP PFNGLTEXTURESTORAGE2DEXTPROC) (GLuint texture, GLenum target, GLsizei levels, GLenum internalformat, GLsizei width, GLsizei height);
 typedef void (APIENTRYP PFNGLTEXTURESTORAGE3DEXTPROC) (GLuint texture, GLenum target, GLsizei levels, GLenum internalformat, GLsizei width, GLsizei height, GLsizei depth);
-#endif
-
-
-#ifdef __cplusplus
-}
 #endif
 
 #endif

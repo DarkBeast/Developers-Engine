@@ -1,207 +1,194 @@
 /************************************************************************
- * GLFW - An OpenGL framework
- * API version: 2.7
- * WWW:         http://www.glfw.org/
- *------------------------------------------------------------------------
- * Copyright (c) 2002-2006 Marcus Geelnard
- * Copyright (c) 2006-2010 Camilla Berglund
- *
- * This software is provided 'as-is', without any express or implied
- * warranty. In no event will the authors be held liable for any damages
- * arising from the use of this software.
- *
- * Permission is granted to anyone to use this software for any purpose,
- * including commercial applications, and to alter it and redistribute it
- * freely, subject to the following restrictions:
- *
- * 1. The origin of this software must not be misrepresented; you must not
- *    claim that you wrote the original software. If you use this software
- *    in a product, an acknowledgment in the product documentation would
- *    be appreciated but is not required.
- *
- * 2. Altered source versions must be plainly marked as such, and must not
- *    be misrepresented as being the original software.
- *
- * 3. This notice may not be removed or altered from any source
- *    distribution.
- *
- *************************************************************************/
+* GLFW - An OpenGL framework
+* API version: 2.7
+* WWW:         http://www.glfw.org/
+*------------------------------------------------------------------------
+* Copyright (c) 2002-2006 Marcus Geelnard
+* Copyright (c) 2006-2010 Camilla Berglund
+*
+* This software is provided 'as-is', without any express or implied
+* warranty. In no event will the authors be held liable for any damages
+* arising from the use of this software.
+*
+* Permission is granted to anyone to use this software for any purpose,
+* including commercial applications, and to alter it and redistribute it
+* freely, subject to the following restrictions:
+*
+* 1. The origin of this software must not be misrepresented; you must not
+*    claim that you wrote the original software. If you use this software
+*    in a product, an acknowledgment in the product documentation would
+*    be appreciated but is not required.
+*
+* 2. Altered source versions must be plainly marked as such, and must not
+*    be misrepresented as being the original software.
+*
+* 3. This notice may not be removed or altered from any source
+*    distribution.
+*
+*************************************************************************/
 
 #ifndef __glfw_h_
 #define __glfw_h_
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 //#define GLFW_INCLUDE_GL3
 /*************************************************************************
- * Global definitions
- *************************************************************************/
+* Global definitions
+*************************************************************************/
 
 /* We need a NULL pointer from time to time */
-#ifndef NULL
- #ifdef __cplusplus
-  #define NULL 0
- #else
-  #define NULL ((void *)0)
- #endif
-#endif /* NULL */
-
+#if !defined(NULL)
+#define NULL ((void*)0)
+#endif
 
 /* ------------------- BEGIN SYSTEM/COMPILER SPECIFIC -------------------- */
 
 /* Please report any probles that you find with your compiler, which may
- * be solved in this section! There are several compilers that I have not
- * been able to test this file with yet.
- *
- * First: If we are we on Windows, we want a single define for it (_WIN32)
- * (Note: For Cygwin the compiler flag -mwin32 should be used, but to
- * make sure that things run smoothly for Cygwin users, we add __CYGWIN__
- * to the list of "valid Win32 identifiers", which removes the need for
- * -mwin32)
- */
+* be solved in this section! There are several compilers that I have not
+* been able to test this file with yet.
+*
+* First: If we are we on Windows, we want a single define for it (_WIN32)
+* (Note: For Cygwin the compiler flag -mwin32 should be used, but to
+* make sure that things run smoothly for Cygwin users, we add __CYGWIN__
+* to the list of "valid Win32 identifiers", which removes the need for
+* -mwin32)
+*/
 #if !defined(_WIN32) && (defined(__WIN32__) || defined(WIN32) || defined(__CYGWIN__))
- #define _WIN32
+#define _WIN32
 #endif /* _WIN32 */
 
 /* In order for extension support to be portable, we need to define an
- * OpenGL function call method. We use the keyword APIENTRY, which is
- * defined for Win32. (Note: Windows also needs this for <GL/gl.h>)
- */
+* OpenGL function call method. We use the keyword APIENTRY, which is
+* defined for Win32. (Note: Windows also needs this for <GL/gl.h>)
+*/
 #ifndef APIENTRY
- #ifdef _WIN32
-  #define APIENTRY __stdcall
- #else
-  #define APIENTRY
- #endif
- #define GL_APIENTRY_DEFINED
+#ifdef _WIN32
+#define APIENTRY __stdcall
+#else
+#define APIENTRY
+#endif
+#define GL_APIENTRY_DEFINED
 #endif /* APIENTRY */
 
-
 /* The following three defines are here solely to make some Windows-based
- * <GL/gl.h> files happy. Theoretically we could include <windows.h>, but
- * it has the major drawback of severely polluting our namespace.
- */
+* <GL/gl.h> files happy. Theoretically we could include <windows.h>, but
+* it has the major drawback of severely polluting our namespace.
+*/
 
 /* Under Windows, we need WINGDIAPI defined */
 #if !defined(WINGDIAPI) && defined(_WIN32)
- #if defined(_MSC_VER) || defined(__BORLANDC__) || defined(__POCC__)
-  /* Microsoft Visual C++, Borland C++ Builder and Pelles C */
-  #define WINGDIAPI __declspec(dllimport)
- #elif defined(__LCC__)
-  /* LCC-Win32 */
-  #define WINGDIAPI __stdcall
- #else
-  /* Others (e.g. MinGW, Cygwin) */
-  #define WINGDIAPI extern
- #endif
- #define GL_WINGDIAPI_DEFINED
+#if defined(_MSC_VER) || defined(__BORLANDC__) || defined(__POCC__)
+/* Microsoft Visual C++, Borland C++ Builder and Pelles C */
+#define WINGDIAPI __declspec(dllimport)
+#elif defined(__LCC__)
+/* LCC-Win32 */
+#define WINGDIAPI __stdcall
+#else
+/* Others (e.g. MinGW, Cygwin) */
+#define WINGDIAPI extern
+#endif
+#define GL_WINGDIAPI_DEFINED
 #endif /* WINGDIAPI */
 
 /* Some <GL/glu.h> files also need CALLBACK defined */
 #if !defined(CALLBACK) && defined(_WIN32)
- #if defined(_MSC_VER)
-  /* Microsoft Visual C++ */
-  #if (defined(_M_MRX000) || defined(_M_IX86) || defined(_M_ALPHA) || defined(_M_PPC)) && !defined(MIDL_PASS)
-   #define CALLBACK __stdcall
-  #else
-   #define CALLBACK
-  #endif
- #else
-  /* Other Windows compilers */
-  #define CALLBACK __stdcall
- #endif
- #define GLU_CALLBACK_DEFINED
+#if defined(_MSC_VER)
+/* Microsoft Visual C++ */
+#if (defined(_M_MRX000) || defined(_M_IX86) || defined(_M_ALPHA) || defined(_M_PPC)) && !defined(MIDL_PASS)
+#define CALLBACK __stdcall
+#else
+#define CALLBACK
+#endif
+#else
+/* Other Windows compilers */
+#define CALLBACK __stdcall
+#endif
+#define GLU_CALLBACK_DEFINED
 #endif /* CALLBACK */
 
 /* Microsoft Visual C++, Borland C++ and Pelles C <GL*glu.h> needs wchar_t */
 #if defined(_WIN32) && (defined(_MSC_VER) || defined(__BORLANDC__) || defined(__POCC__)) && !defined(_WCHAR_T_DEFINED)
- typedef unsigned short wchar_t;
- #define _WCHAR_T_DEFINED
+typedef unsigned short wchar_t;
+#define _WCHAR_T_DEFINED
 #endif /* _WCHAR_T_DEFINED */
-
 
 /* ---------------- GLFW related system specific defines ----------------- */
 
 #if defined(_WIN32) && defined(GLFW_BUILD_DLL)
 
- /* We are building a Win32 DLL */
- #define GLFWAPI      __declspec(dllexport)
- #define GLFWAPIENTRY __stdcall
- #define GLFWCALL     __stdcall
+/* We are building a Win32 DLL */
+#define GLFWAPI      __declspec(dllexport)
+#define GLFWAPIENTRY __stdcall
+#define GLFWCALL     __stdcall
 
 #elif defined(_WIN32) && defined(GLFW_DLL)
 
- /* We are calling a Win32 DLL */
- #if defined(__LCC__)
-  #define GLFWAPI      extern
- #else
-  #define GLFWAPI      __declspec(dllimport)
- #endif
- #define GLFWAPIENTRY __stdcall
- #define GLFWCALL     __stdcall
+/* We are calling a Win32 DLL */
+#if defined(__LCC__)
+#define GLFWAPI      extern
+#else
+#define GLFWAPI      __declspec(dllimport)
+#endif
+#define GLFWAPIENTRY __stdcall
+#define GLFWCALL     __stdcall
 
 #else
 
- /* We are either building/calling a static lib or we are non-win32 */
- #define GLFWAPIENTRY
- #define GLFWAPI
- #define GLFWCALL
+/* We are either building/calling a static lib or we are non-win32 */
+#define GLFWAPIENTRY
+#define GLFWAPI
+#define GLFWCALL
 
 #endif
 
 /* -------------------- END SYSTEM/COMPILER SPECIFIC --------------------- */
 
 /* Include standard OpenGL headers: GLFW uses GL_FALSE/GL_TRUE, and it is
- * convenient for the user to only have to include <GL/glfw.h>. This also
- * solves the problem with Windows <GL/gl.h> and <GL/glu.h> needing some
- * special defines which normally requires the user to include <windows.h>
- * (which is not a nice solution for portable programs).
- */
+* convenient for the user to only have to include <GL/glfw.h>. This also
+* solves the problem with Windows <GL/gl.h> and <GL/glu.h> needing some
+* special defines which normally requires the user to include <windows.h>
+* (which is not a nice solution for portable programs).
+*/
 #if defined(__APPLE_CC__)
- #if defined(GLFW_INCLUDE_GL3)
-  #include <OpenGL/gl3.h>
- #else
-  #define GL_GLEXT_LEGACY
-  #include <OpenGL/gl.h>
- #endif
- #ifndef GLFW_NO_GLU
-  #include <OpenGL/glu.h>
- #endif
+#if defined(GLFW_INCLUDE_GL3)
+#include <OpenGL/gl3.h>
 #else
- #if defined(GLFW_INCLUDE_GL3)
+#define GL_GLEXT_LEGACY
+#include <OpenGL/gl.h>
+#endif
+#ifndef GLFW_NO_GLU
+#include <OpenGL/glu.h>
+#endif
+#else
+#if defined(GLFW_INCLUDE_GL3)
 #include <GL/gl3.h>
- #else
-  #include <GL/gl.h>
- #endif
- #ifndef GLFW_NO_GLU
-  #include <GL/glu.h>
- #endif
+#else
+#include <GL/gl.h>
+#endif
+#ifndef GLFW_NO_GLU
+#include <GL/glu.h>
+#endif
 #endif
 
-
 /*************************************************************************
- * GLFW version
- *************************************************************************/
+* GLFW version
+*************************************************************************/
 
 #define GLFW_VERSION_MAJOR    2
 #define GLFW_VERSION_MINOR    7
 #define GLFW_VERSION_REVISION 7
 
-
 /*************************************************************************
- * Input handling definitions
- *************************************************************************/
+* Input handling definitions
+*************************************************************************/
 
 /* Key and button state/action definitions */
 #define GLFW_RELEASE            0
 #define GLFW_PRESS              1
 
 /* Keyboard key definitions: 8-bit ISO-8859-1 (Latin 1) encoding is used
- * for printable keys (such as A-Z, 0-9 etc), and values above 256
- * represent special (non-printable) keys (e.g. F1, Page Up etc).
- */
+* for printable keys (such as A-Z, 0-9 etc), and values above 256
+* represent special (non-printable) keys (e.g. F1, Page Up etc).
+*/
 #define GLFW_KEY_UNKNOWN      -1
 #define GLFW_KEY_SPACE        32
 #define GLFW_KEY_SPECIAL      256
@@ -292,7 +279,6 @@ extern "C" {
 #define GLFW_MOUSE_BUTTON_RIGHT  GLFW_MOUSE_BUTTON_2
 #define GLFW_MOUSE_BUTTON_MIDDLE GLFW_MOUSE_BUTTON_3
 
-
 /* Joystick identifiers */
 #define GLFW_JOYSTICK_1          0
 #define GLFW_JOYSTICK_2          1
@@ -312,10 +298,9 @@ extern "C" {
 #define GLFW_JOYSTICK_16         15
 #define GLFW_JOYSTICK_LAST       GLFW_JOYSTICK_16
 
-
 /*************************************************************************
- * Other definitions
- *************************************************************************/
+* Other definitions
+*************************************************************************/
 
 /* glfwOpenWindow modes */
 #define GLFW_WINDOW               0x00010001
@@ -334,8 +319,8 @@ extern "C" {
 #define GLFW_STENCIL_BITS         0x0002000A
 
 /* The following constants are used for both glfwGetWindowParam
- * and glfwOpenWindowHint
- */
+* and glfwOpenWindowHint
+*/
 #define GLFW_REFRESH_RATE         0x0002000B
 #define GLFW_ACCUM_RED_BITS       0x0002000C
 #define GLFW_ACCUM_GREEN_BITS     0x0002000D
@@ -381,23 +366,22 @@ extern "C" {
 /* Time spans longer than this (seconds) are considered to be infinity */
 #define GLFW_INFINITY 100000.0
 
-
 /*************************************************************************
- * Typedefs
- *************************************************************************/
+* Typedefs
+*************************************************************************/
 
 /* The video mode structure used by glfwGetVideoModes() */
 typedef struct {
-    int Width, Height;
-    int RedBits, BlueBits, GreenBits;
+	int Width, Height;
+	int RedBits, BlueBits, GreenBits;
 } GLFWvidmode;
 
 /* Image/texture information */
 typedef struct {
-    int Width, Height;
-    int Format;
-    int BytesPerPixel;
-    unsigned char *Data;
+	int Width, Height;
+	int Format;
+	int BytesPerPixel;
+	unsigned char *Data;
 } GLFWimage;
 
 /* Thread ID */
@@ -420,10 +404,9 @@ typedef void (GLFWCALL * GLFWkeyfun)(int,int);
 typedef void (GLFWCALL * GLFWcharfun)(int,int);
 typedef void (GLFWCALL * GLFWthreadfun)(void *);
 
-
 /*************************************************************************
- * Prototypes
- *************************************************************************/
+* Prototypes
+*************************************************************************/
 
 /* GLFW initialization, termination and version querying */
 GLFWAPI int  GLFWAPIENTRY glfwInit( void );
@@ -509,10 +492,4 @@ GLFWAPI int  GLFWAPIENTRY glfwLoadTexture2D( const char *name, int flags );
 GLFWAPI int  GLFWAPIENTRY glfwLoadMemoryTexture2D( const void *data, long size, int flags );
 GLFWAPI int  GLFWAPIENTRY glfwLoadTextureImage2D( GLFWimage *img, int flags );
 
-
-#ifdef __cplusplus
-}
-#endif
-
 #endif /* __glfw_h_ */
-
