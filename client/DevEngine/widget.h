@@ -64,6 +64,7 @@ struct widget
 	void(*controlmouserelease)(widget *,int,int);
 	void(*controlmousewheel)(widget *,int);
 	void(*controlkeypressed)(widget *,int,int);
+	void(*controlupdatepos)(widget *);
 
 	//hidden and shown arrays
 	widget_array shown;
@@ -109,6 +110,7 @@ sbool widget_frame_contains(widget *control, widget *parent);
 
 //changes the moving widgets position via mouse pos.
 void widget_move(int16 x, int16 y);
+void widget_position_update(widget *parent);
 
 //checks if the parent is focused to do click events.
 sbool widget_is_parent_focused(widget *control);
@@ -222,5 +224,6 @@ void widget_init_control_mouse_press(widget *control, int button, int pressed);
 void widget_init_control_mouse_release(widget *control, int button, int pressed);
 void widget_init_control_mouse_wheel(widget *control, int moved);
 void widget_init_control_key_pressed(widget *control, int key, int pressed);
+void widget_init_control_update_pos(widget *control);
 
 #endif
