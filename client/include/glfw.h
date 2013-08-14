@@ -37,7 +37,7 @@
 
 /* We need a NULL pointer from time to time */
 #if !defined(NULL)
-#define NULL ((void*)0)
+#define NULL (0)
 #endif
 
 /* ------------------- BEGIN SYSTEM/COMPILER SPECIFIC -------------------- */
