@@ -52,10 +52,9 @@ sbool widget_frame_contains(widget *control, widget *parent)
 
 void widget_move(int16 x, int16 y)
 {
-	int16 tempx;
-	int16 tempy;
-
 	if(focused && focused->action & WIDGET_MOVING){
+		int16 tempx;
+		int16 tempy;
 		tempx = x - ui.screen.mousepos.x ;
 		tempy = y - ui.screen.mousepos.y ;
 
@@ -70,7 +69,74 @@ void widget_move(int16 x, int16 y)
 		focused->pos.x = focused->pos.x + tempx ;
 
 		focused->pos.y = focused->pos.y + tempy ;
+		widget_position_update(focused);
 	}
+}
+
+void widget_position_update(widget *parent)//used to update the parent widgets position and its children's positions.
+{
+	widget *child;
+	uint16 *id;
+	uint16 index = 0;
+	uint16 idindex;
+	uint16 idsize;
+
+	id = (uint16 *)calloc(1, 32 * sizeof(uint16));
+	idsize = 32;
+	idindex = 0;
+	id[idindex] = 0;
+
+	parent->controlupdatepos(parent);
+
+	for( index = 0; index < parent->shown.count; ++index){
+		child = parent->shown.data[index];
+		child->controlupdatepos(child);
+
+		if(child->shown.data){
+			id[idindex] = 0;
+			while(id[idindex] <= child->shown.count){
+				if(child->shown.data){
+					if(id[idindex]  >= child->shown.count && idindex != 0){
+						id[idindex] = 0;
+
+						--idindex;
+						child = child->parent;
+					}
+					else{
+						if(id[idindex] < child->shown.count){
+							if (child->shown.data[id[idindex]]){
+								child = child->shown.data[id[idindex]];
+								child->controlupdatepos(child);
+								++id[idindex];
+								++idindex;//we set the z buffer index to know which layer we are in
+
+								if(idindex + 1 >= idsize){//make sure there is not too many layers for the id array.
+									idsize = (uint16)next_power_of_two(idsize);
+									widget_resize_id(&id,idsize);
+								}
+								id[idindex] = 0;//set the new ID index to 0
+							}
+						}
+						else{
+							++id[idindex];
+						}
+					}
+				}
+				else{
+					if(idindex != 0){
+						id[idindex] = 0;
+						--idindex;
+						child = child->parent;
+					}
+					else{
+						break;
+					}
+				}
+			}
+		}
+	}
+
+	free(id);
 }
 
 //Pre-checked if we are on a focused object to decide if we should check inside it or not.
@@ -328,6 +394,7 @@ void widget_init(widget *wgt)//initializes a widget so we can then use it error 
 	wgt->controlmouserelease = &widget_init_control_mouse_release;
 	wgt->controlmousewheel = &widget_init_control_mouse_wheel;
 	wgt->controlkeypressed = &widget_init_control_key_pressed;
+	wgt->controlupdatepos = &widget_init_control_update_pos;
 	wgt->shown.data  = NULL; //set the size of the widget array
 	wgt->shown.count = 0;
 	wgt->shown.size = 0;
@@ -1216,3 +1283,4 @@ void widget_init_control_mouse_press(widget *control, int button, int pressed){c
 void widget_init_control_mouse_release(widget *control, int button, int pressed){control->mouserelease(control,button, pressed);}
 void widget_init_control_mouse_wheel(widget *control, int moved){}
 void widget_init_control_key_pressed(widget *control, int key, int pressed){}
+void widget_init_control_update_pos(widget *control){}
