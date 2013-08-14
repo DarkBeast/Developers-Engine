@@ -19,12 +19,9 @@ struct screen_size
 
 screen_size get_screen_size(void);
 void clear_screen(int red, int blue, int green, int alpha);
-void draw(image *img, vector2i vecpos, vector2i imgpos,int width, int height);
+void draw_primitive(image *img, vector2i vecpos, vector2i imgpos,int width, int height);
 void draw_push(void);
 void draw_state_reset(void);
-void draw_widget(widget *control);
-void draw_widget_vprogressbar(widget *control);
-void draw_widget_hprogressbar(widget *control);
 void GLFWCALL handle_resize(int width,int height);
 void init_image(image *img);
 void init_screen(int swidth, int sheight, int mode);
@@ -33,7 +30,11 @@ void set_draw_view(int x, int y, int swidth, int sheight);
 int get_screen_height(void);
 int get_screen_width(void);
 
-void draw_widget_test(widget *control);
+void draw_widget(widget *control);
 void create_widget_vertex_buffer(widget *control);
 void create_widget_vertex(widget *control);
+void widget_update_vector(widget *control);
+void widget_update_texture_vector(widget *control);
+void widget_update_progressbars_vector(widget *control);
+void update_widget_vertex_buffer(widget *control);
 #endif

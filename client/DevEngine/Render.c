@@ -49,6 +49,7 @@ void draw_state_reset(void)
 	glDisable(GL_DEPTH_TEST);
 	glEnable(GL_ALPHA_TEST);// transparency
 	glEnable(GL_TEXTURE_2D);
+	//glEnable(GL_SMOOTH);
 	glEnable(GL_BLEND); //Enable alpha blending for better image quality, turn off for better performance.
 	glAlphaFunc ( GL_GREATER, (GLclampf)0.2);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -154,7 +155,7 @@ void load_image(char *name, image *img)
 	free(img->pixels);
 }
 
-void draw(image *img, vector2i vecpos, vector2i imgpos,int width, int height)
+void draw_primitive(image *img, vector2i vecpos, vector2i imgpos,int width, int height)
 {
 	float x2,x1;
 	float y2,y1;
@@ -177,87 +178,6 @@ void draw(image *img, vector2i vecpos, vector2i imgpos,int width, int height)
 	glEnd ();//stop drawing to the new frame buffer.
 }
 
-void draw_widget(widget *control)
-{
-	float x2,x1;
-	float y2,y1;
-
-	control->actualpos.x = control->pos.x + control->parent->actualpos.x;
-	control->actualpos.y = control->pos.y + control->parent->actualpos.y;
-
-	x1 = (float)control->imgpos.x  / control->img->width;
-	x2 = (float)(control->imgpos.x + control->width) / control->img->width;
-	y1 = (float)control->imgpos.y / control->img->height;
-	y2 = (float)(control->imgpos.y + control->height) /control->img->height;
-
-	glBindTexture(GL_TEXTURE_2D, control->img->texid);
-	glColor4f(1, 1, 1, 1);
-
-	glBegin (GL_QUADS);
-
-	glTexCoord2f (x1, y2);	glVertex2i (control->actualpos.x, control->actualpos.y);
-	glTexCoord2f (x2, y2);	glVertex2i (control->actualpos.x + control->sizex, control->actualpos.y);
-	glTexCoord2f (x2, y1);	glVertex2i (control->actualpos.x + control->sizex, control->actualpos.y + control->sizey);
-	glTexCoord2f (x1, y1);	glVertex2i (control->actualpos.x, control->actualpos.y + control->sizey);
-
-	glEnd ();
-}
-
-void draw_widget_vprogressbar(widget *control)
-{
-	float x2,value;
-	float y2,x;
-
-	control->actualpos.x = control->pos.x + control->parent->actualpos.x;
-	control->actualpos.y = control->pos.y + control->parent->actualpos.y + control->sizey;
-
-	value = (float)(control->value / -100.f);
-	x2 = (float)(control->width / control->img->width);
-	y2 = (float)(control->height / control->img->height) * value;
-
-	if(value == -1){
-		x = 0;
-	}else{
-		x = -1;
-	}
-	glBindTexture(GL_TEXTURE_2D, control->img->texid);
-	glColor4f(1, 1, 1, 1);
-
-	glBegin (GL_QUADS);
-
-	glTexCoord2f (.5, y2);	glVertex2i (control->actualpos.x, control->actualpos.y + x);
-	glTexCoord2f (x2, y2);	glVertex2i (control->actualpos.x + control->sizex, control->actualpos.y + x);
-	glTexCoord2f (x2, 0);	glVertex2i (control->actualpos.x + control->sizex, control->actualpos.y + (control->sizey * value));
-	glTexCoord2f (.5, 0);	glVertex2i (control->actualpos.x, control->actualpos.y + (control->sizey * value));
-
-	glEnd ();
-}
-
-void draw_widget_hprogressbar(widget *control)
-{
-	float x2,value;
-	float y2;
-
-	control->actualpos.x = control->pos.x + control->parent->pos.x;
-	control->actualpos.y = control->pos.y + control->parent->pos.y;
-
-	value = (float)(control->value / 100.f);
-	x2 = (float)(control->width / control->img->width) * value;
-	y2 = (float)(control->height / control->img->height);
-
-	glBindTexture(GL_TEXTURE_2D, control->img->texid);
-	glColor4f(1, 1, 1, 1);
-
-	glBegin (GL_QUADS);
-
-	glTexCoord2f (0, y2);	glVertex2f (control->actualpos.x, control->actualpos.y);
-	glTexCoord2f (x2, y2);	glVertex2f (control->actualpos.x + (control->sizex * value), control->actualpos.y);
-	glTexCoord2f (x2, .5);	glVertex2f (control->actualpos.x + (control->sizex * value), control->actualpos.y + control->sizey);
-	glTexCoord2f (0, .5);	glVertex2f (control->actualpos.x, control->actualpos.y + control->sizey);
-
-	glEnd ();
-}
-
 void create_widget_vertex_buffer(widget *control)
 {
 	GLuint index[4] = {0,1,2,3};
@@ -268,10 +188,90 @@ void create_widget_vertex_buffer(widget *control)
 	glGenBuffers(1,&control->oglbuf.index_buffer);
 
 	glBindBuffer(GL_ARRAY_BUFFER,control->oglbuf.vertex_buffer);
-	glBufferData(GL_ARRAY_BUFFER,sizeof(control->oglbuf.buffer),control->oglbuf.buffer,GL_STATIC_DRAW);//fill up the array with vertex and color-data
+	glBufferData(GL_ARRAY_BUFFER,sizeof(control->oglbuf.buffer),control->oglbuf.buffer,GL_STREAM_DRAW);//fill up the array with vertex and color-data
 
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER,control->oglbuf.index_buffer);
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER,4 * sizeof(GLuint),index,GL_STATIC_DRAW);//this one with indices
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
+}
+
+void widget_update_vector(widget *control)
+{
+	control->actualpos.x = control->pos.x + control->parent->actualpos.x;
+	control->actualpos.y = control->pos.y + control->parent->actualpos.y;
+
+	/*index 0*/
+	control->oglbuf.buffer[0].x = control->actualpos.x; control->oglbuf.buffer[0].y = control->actualpos.y;
+
+	/*index 1*/
+	control->oglbuf.buffer[1].x = control->actualpos.x + control->sizex; control->oglbuf.buffer[1].y = control->actualpos.y;
+
+	/*index 2*/
+	control->oglbuf.buffer[2].x = control->actualpos.x + control->sizex; control->oglbuf.buffer[2].y = control->actualpos.y + control->sizey;
+
+	/*index 3*/
+	control->oglbuf.buffer[3].x = control->actualpos.x; control->oglbuf.buffer[3].y = control->actualpos.y + control->sizey;
+
+	glBindBuffer(GL_ARRAY_BUFFER,control->oglbuf.vertex_buffer);
+	glBufferSubData(GL_ARRAY_BUFFER, 0, 4 * sizeof(struct vertex_t), &control->oglbuf.buffer[0]);
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
+}
+
+void widget_update_progressbars_vector(widget *control)
+{
+	float value,x;
+
+	control->actualpos.x = control->pos.x + control->parent->actualpos.x;
+	control->actualpos.y = control->pos.y + control->parent->actualpos.y;
+
+	if(control->type == CONTROL_HPROGRESSBAR){
+		value = (float)(control->value / 100.f);
+		/*0*/control->oglbuf.buffer[0].x = control->actualpos.x; control->oglbuf.buffer[0].y = control->actualpos.y;
+		/*1*/control->oglbuf.buffer[1].x = control->actualpos.x + (control->sizex * value); control->oglbuf.buffer[1].y = control->actualpos.y;
+		/*2*/control->oglbuf.buffer[2].x = control->actualpos.x + (control->sizex * value); control->oglbuf.buffer[2].y = control->actualpos.y + control->sizey;
+		/*3*/control->oglbuf.buffer[3].x = control->actualpos.x; control->oglbuf.buffer[3].y = control->actualpos.y + control->sizey;
+	}
+	else{
+		value = (float)(control->value / -100.f);
+		if(value == -1){
+			x = 0;
+		}else{
+			x = -1;
+		}
+		/*0*/control->oglbuf.buffer[0].x = control->actualpos.x; control->oglbuf.buffer[0].y = control->actualpos.y + x;
+		/*1*/control->oglbuf.buffer[1].x = control->actualpos.x + control->sizex ; control->oglbuf.buffer[1].y = control->actualpos.y + x;
+		/*2*/control->oglbuf.buffer[2].x = control->actualpos.x + control->sizex ; control->oglbuf.buffer[2].y = control->actualpos.y + (control->sizey * value);
+		/*3*/control->oglbuf.buffer[3].x = control->actualpos.x; control->oglbuf.buffer[3].y = control->actualpos.y + (control->sizey * value);
+	}
+	glBindBuffer(GL_ARRAY_BUFFER,control->oglbuf.vertex_buffer);
+	glBufferSubData(GL_ARRAY_BUFFER, 0, 4 * sizeof(struct vertex_t), &control->oglbuf.buffer[0]);
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
+}
+
+void widget_update_texture_vector(widget *control)
+{
+	float x2,x1;
+	float y2,y1;
+
+	x1 = (float)control->imgpos.x  / control->img->width;
+	x2 = (float)(control->imgpos.x + control->width) / control->img->width;
+	y1 = (float)control->imgpos.y / control->img->height;
+	y2 = (float)(control->imgpos.y + control->height) /control->img->height;
+
+	control->oglbuf.buffer[0].u = x1; control->oglbuf.buffer[0].v = y2;
+
+	/*index 1*/
+	control->oglbuf.buffer[1].u = x2; control->oglbuf.buffer[1].v = y2;
+
+	/*index 2*/
+	control->oglbuf.buffer[2].u = x2; control->oglbuf.buffer[2].v = y1;
+
+	/*index 3*/
+	control->oglbuf.buffer[3].u = x1; control->oglbuf.buffer[3].v = y1;
+
+	glBindBuffer(GL_ARRAY_BUFFER,control->oglbuf.vertex_buffer);
+	glBufferSubData(GL_ARRAY_BUFFER, 0, 4 * sizeof(struct vertex_t), &control->oglbuf.buffer[0]);
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
 }
 
 void create_widget_vertex(widget *control)
@@ -308,7 +308,16 @@ void create_widget_vertex(widget *control)
 	control->oglbuf.buffer[3].r = 1.0; control->oglbuf.buffer[3].b = 1.0; control->oglbuf.buffer[3].g = 1.0; control->oglbuf.buffer[3].a = 1.0;
 }
 
-void draw_widget_test(widget *control)
+void update_widget_vertex_buffer(widget *control)
+{
+	create_widget_vertex(control);
+
+	glBindBuffer(GL_ARRAY_BUFFER,control->oglbuf.vertex_buffer);
+	glBufferData(GL_ARRAY_BUFFER,sizeof(control->oglbuf.buffer),control->oglbuf.buffer,GL_STREAM_DRAW);//fill up the array with vertex and color-data
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
+}
+
+void draw_widget(widget *control)
 {
 	glEnableClientState(GL_VERTEX_ARRAY);
 	glEnableClientState(GL_TEXTURE_COORD_ARRAY);
