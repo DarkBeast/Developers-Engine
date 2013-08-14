@@ -127,6 +127,8 @@ struct openext{
 
 struct multi_buffer{
 	GLuint vertex_buffer; //texture vertex buffer.
+	uint16 vbuffer_size;
+	uint16 vbuffer_count;
 	GLuint index_buffer; //index buffer.
 	vertex_array *buffer;
 };
