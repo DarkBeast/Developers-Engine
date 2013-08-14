@@ -63,28 +63,13 @@ void main_menu(void)
 void init_main_menu(void)
 {
 	create_window(&window1, NULL, 0, 0, 600, 800, 600, 800, "image\\main.png");
-	create_label(&label1,&window1,85,300,8,0,0,0,255,FALSE," Hello there this is a VBO test on strings");
-	create_label(&label2,&window1,85,325,8,0,0,0,255,FALSE,"And this is a somewhat paragraph test for");
-	create_label(&label3,&window1,85,350,8,0,0,0,255,FALSE,"Jason whom wanted to test the difference");
-	create_label(&label4,&window1,85,375,8,0,0,0,255,FALSE,"in speed and so far it seems reliable.");
-	create_label(&label5,&window1,85,400,8,0,0,0,255,FALSE,"in speed and so far it seems reliable.");
-	create_label(&label6,&window1,85,425,8,0,0,0,255,FALSE,"in speed and so far it seems reliable.");
-	create_label(&label7,&window1,85,450,8,0,0,0,255,FALSE,"a bleak understanding");
+	create_label(&label1,&window1,85,300,1,0,0,0,255,FALSE," 1-_abcdefghijklmnopqrstuvwxyz.'[]{}");
+	create_label(&label2,&window1,85,325,16,0,0,0,255,FALSE,"16-_abcdefghijklmnopqrstuvwxyz.");
+	create_label(&label3,&window1,85,350,40,0,0,0,255,FALSE,"40-_abcdefghijklmnopqrstuvwxyz.");
+	create_label(&label5,&window1,85,375,40,0,0,0,255,FALSE,"40-ABCDEFGHIJKLMNOPQRSTUVWXYZ.");
+	create_label(&label4,&window1,85,400,8,0,0,0,255,FALSE,"8-_abcdefghijklmnopqrstuvwxyz.");
+	create_label(&label7,&window1,85,450,22,0,0,0,255,FALSE,"22-_abcdefghijklmnopqrstuvwxyz.");
 	window1.action |= WIDGET_CAN_FOCUS;
-	//window1.action |= WIDGET_MOVEABLE;
+	window1.action |= WIDGET_MOVEABLE;
 	widget_manual_focused(&window1);
-}
-
-void button2_press(widget *wgt, int button, int pressed)
-{
-}
-
-void button1_press(widget *wgt, int button, int pressed)
-{
-}
-
-void button3_press(widget *wgt, int button, int pressed)
-{
-	glfwTerminate();// Close window and terminate GLFW
-	exit(TRUE);// Exit program
 }
