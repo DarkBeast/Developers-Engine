@@ -45,12 +45,12 @@ struct text
 
 void text_init_font(char *fontname);
 void text_init_atlas(void);
-void text_draw(text *str, widget *parent);
+void text_draw(text *str);
 void text_set(text *text_data, uint16 x, uint16 y, uint8 size, uint8 red,uint8 blue,uint8 green,uint8 alpha, char *string);
 vector2ui text_get_string_hw(char *string, uint8 resize);
 symbol* text_get_character_array(void);
 
-void text_draw_beta(text *str);
 void text_resize_buffer(vertex_array **buffer, size_t size);
 void create_text_vertex(text *str, widget *control);
+void text_position_update(text *str, widget *parent);
 #endif
