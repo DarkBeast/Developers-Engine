@@ -104,7 +104,7 @@ void create_label(widget *control, widget *parent, uint16 x, uint16 y, uint8 siz
 void draw_label(widget *control)
 {
 	label *data = (label *)control->control;
-	text_draw_beta(data->string);
+	text_draw(data->string);
 }
 
 void handle_label_click(widget *control, int button, int pressed)
