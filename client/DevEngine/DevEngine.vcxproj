@@ -188,12 +188,9 @@
       <MinimalRebuild>false</MinimalRebuild>
       <WholeProgramOptimization>
       </WholeProgramOptimization>
-      <EnableParallelCodeGeneration>
-      </EnableParallelCodeGeneration>
       <EnablePREfast>false</EnablePREfast>
       <WarningLevel>EnableAllWarnings</WarningLevel>
       <DisableSpecificWarnings>4996;4820;4100</DisableSpecificWarnings>
-      <BufferSecurityCheck>false</BufferSecurityCheck>
       <ExceptionHandling>false</ExceptionHandling>
     </ClCompile>
     <Link>
@@ -201,6 +198,8 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <IgnoreSpecificDefaultLibraries>libc.lib, msvcrt.lib, libcd.lib, libcmtd.lib, msvcrtd.lib</IgnoreSpecificDefaultLibraries>
       <AdditionalOptions>/NODEFAULTLIB:LIBCMT.LIB %(AdditionalOptions)</AdditionalOptions>
+      <Version>
+      </Version>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='XP_debug|Win32'">
