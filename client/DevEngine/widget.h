@@ -40,7 +40,8 @@ enum widget_flags_t
 	WIDGET_FLIPPED = (1 << 11),
 	WIDGET_FOCUS_CLICK = (1 << 12),
 	WIDGET_FUNCTION_FOCUS = (1 << 13),
-	WIDGET_IS_PASSWORD = (1 << 14)
+	WIDGET_IS_PASSWORD = (1 << 14),
+	WIDGET_AVOID_BUFFER_UPDATE = (1 << 15)
 };
 
 //A UI control structure.
@@ -54,6 +55,8 @@ struct widget
 
 	//contains events for quick calling
 	void(*draw)(widget *);
+	void(*mouseover)(widget *);
+	void(*mouseexit)(widget *);
 	void(*mousepress)(widget *,int,int);
 	void(*mouserelease)(widget *,int,int);
 	void(*mousewheel)(widget *,int);
@@ -65,6 +68,8 @@ struct widget
 	void(*controlmousewheel)(widget *,int);
 	void(*controlkeypressed)(widget *,int,int);
 	void(*controlupdatepos)(widget *);
+	void(*controlmouseover)(widget *);
+	void(*controlmouseexit)(widget *);
 
 	//hidden and shown arrays
 	widget_array shown;
@@ -110,7 +115,9 @@ sbool widget_frame_contains(widget *control, widget *parent);
 
 //changes the moving widgets position via mouse pos.
 void widget_move(int16 x, int16 y);
+void widget_mouse_over(widget *control);
 void widget_position_update(widget *parent);
+sbool widget_usable(widget *control);
 
 //checks if the parent is focused to do click events.
 sbool widget_is_parent_focused(widget *control);
@@ -219,11 +226,15 @@ void widget_init_mouse_press(widget *control, int button, int pressed);
 void widget_init_mouse_release(widget *control, int button, int pressed);
 //blank mouse wheel event
 void widget_init_mouse_wheel(widget *control, int moved);
+void widget_init_mouse_over(widget *control);
+void widget_init_mouse_exit(widget *control);
 
 void widget_init_control_mouse_press(widget *control, int button, int pressed);
 void widget_init_control_mouse_release(widget *control, int button, int pressed);
 void widget_init_control_mouse_wheel(widget *control, int moved);
 void widget_init_control_key_pressed(widget *control, int key, int pressed);
 void widget_init_control_update_pos(widget *control);
+void widget_init_control_mouse_over(widget *control);
+void widget_init_control_mouse_exit(widget *control);
 
 #endif

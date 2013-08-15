@@ -31,7 +31,10 @@ void create_button(widget *control, widget *parent, uint16 x, uint16 y, uint16 h
 	control->type = CONTROL_BUTTON;
 	control->draw = &draw_buttons;
 	control->controlmousepress = &handle_button_click;
+	control->controlmouserelease = &handle_button_release;
 	control->controlupdatepos = &handle_button_move;
+	control->controlmouseover = &handle_button_mouse_over;
+	control->controlmouseexit = &handle_button_mouse_exit;
 	set_control_image(control, path);
 
 	widget_add(parent,control);
@@ -40,27 +43,54 @@ void create_button(widget *control, widget *parent, uint16 x, uint16 y, uint16 h
 
 void draw_buttons(widget *control)
 {
-	if (widget_has_mouse_over(control)){
-		if (control->action & WIDGET_CLICKED){
-			control->imgpos.x = control->width;
-			control->imgpos.y = 0;
-		}
-		else{
-			control->imgpos.y = 0;
-			control->imgpos.x = 2 * control->width;
-		}
-	}
-	else{
-		control->imgpos.y = 0;
-		control->imgpos.x = 0;
-	}
-
 	draw_widget(control);
+}
+
+void handle_button_release(widget *control, int button, int pressed)
+{
+	if (widget_has_mouse_over(control)){
+		control->action &= ~(WIDGET_AVOID_BUFFER_UPDATE);
+		//control->action |= WIDGET_MOUSE_OVER;
+		handle_button_mouse_over(control);
+	}
+	control->mouserelease(control,button,pressed);
 }
 
 void handle_button_click(widget *control, int button, int pressed)
 {
+	if (widget_has_mouse_over(control)){
+		if (control->action & WIDGET_CLICKED){
+			control->imgpos.x = control->width;
+			control->imgpos.y = 0;
+			widget_update_texture_vector(control);
+		}
+	}
+
 	control->mousepress(control,button,pressed);
+}
+
+void handle_button_mouse_over(widget *control)
+{
+	if(!(control->action & WIDGET_AVOID_BUFFER_UPDATE)){
+		if (control->action & WIDGET_MOUSE_OVER){
+			control->imgpos.y = 0;
+			control->imgpos.x = 2 * control->width;
+			control->action |= WIDGET_AVOID_BUFFER_UPDATE;
+			widget_update_texture_vector(control);
+		}
+	}
+
+	control->mouseover(control);
+}
+
+void handle_button_mouse_exit(widget *control)
+{
+	control->imgpos.y = 0;
+	control->imgpos.x = 0;
+
+	widget_update_texture_vector(control);
+
+	control->mouseexit(control);
 }
 
 void handle_button_move(widget *control)

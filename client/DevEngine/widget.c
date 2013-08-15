@@ -71,6 +71,106 @@ void widget_move(int16 x, int16 y)
 		focused->pos.y = focused->pos.y + tempy ;
 		widget_position_update(focused);
 	}
+
+	if(focused && widget_rect_contains(focused, focused->parent)){
+		widget_mouse_over(focused);
+	}
+	else{
+		if(ui.root){
+			widget_mouse_over(ui.root);
+		}
+	}
+}
+
+void widget_mouse_over(widget *control)
+{
+	widget *child;
+	widget *child2; // used to determine if focusable
+	int16 index = ui.root->shown.count -1;
+	int16 index2 = 0;
+	int16 last = 0;
+	uint8 moveup = 0;
+
+	if(control->shown.data){
+		for( index = control->shown.count -1; index >= 0; --index){
+			child = control->shown.data[index];
+
+			if(widget_rect_contains(child, child->parent)){// if focusable check if in range
+				if(child->shown.data){
+					index2 = child->shown.count -1;
+					last = index2;
+
+					while(index2 >= 0){
+						child2 = child->shown.data[index2];
+
+						if(widget_rect_contains(child2, child2->parent)){
+							if(child2->shown.data == NULL && widget_usable(child2)){//if in range check if widget array is null or not.
+								child->action |= WIDGET_MOUSE_OVER;
+								child2->controlmouseover(child2);
+								return;
+							}
+
+							index2 = child2->shown.count - 1;
+							last = index2;
+							moveup = 0;
+							child = child2->shown.data[index2];
+
+							if(child->shown.data){
+								index2 = child->shown.count -1;
+							}
+							else{
+								if(widget_rect_contains(child, child->parent) && widget_usable(child)){
+									child->action |= WIDGET_MOUSE_OVER;
+									child->controlmouseover(child);
+									return;
+								}
+								else{
+									if(moveup == 0){
+										child = child->parent;
+										index2 = last;
+										moveup = 1;
+									}
+									--index2;
+								}
+							}
+							continue;
+						}
+
+						if(moveup == 0){
+							child = child2->parent;
+							index2 = last;
+							moveup = 1;
+						}
+						--index2;
+					}
+
+					if(widget_usable(child)){
+						child->action |= WIDGET_MOUSE_OVER;
+						child->controlmouseover(child);
+					}
+					return;
+				}
+				else{
+					if(widget_usable(child)){
+						child->action |= WIDGET_MOUSE_OVER;
+						child->controlmouseover(child);
+					}
+					return;
+				}
+			}
+			else{
+				if(child->action & WIDGET_MOUSE_OVER){
+					child->action &= ~(WIDGET_AVOID_BUFFER_UPDATE);
+					child->action &= ~(WIDGET_MOUSE_OVER);
+					child->controlmouseexit(child);
+				}
+			}
+		}
+	}
+
+	if(widget_usable(control)){
+		control->controlmouseover(control);
+	}
 }
 
 void widget_position_update(widget *parent)//used to update the parent widgets position and its children's positions.
@@ -390,11 +490,15 @@ void widget_init(widget *wgt)//initializes a widget so we can then use it error 
 	wgt->mouserelease = &widget_init_mouse_release;
 	wgt->mousewheel = &widget_init_mouse_wheel;
 	wgt->keypressed = &widget_init_key_pressed;
+	wgt->mouseover = &widget_init_mouse_over;
+	wgt->mouseexit = &widget_init_mouse_exit;
 	wgt->controlmousepress = &widget_init_control_mouse_press;
 	wgt->controlmouserelease = &widget_init_control_mouse_release;
 	wgt->controlmousewheel = &widget_init_control_mouse_wheel;
 	wgt->controlkeypressed = &widget_init_control_key_pressed;
 	wgt->controlupdatepos = &widget_init_control_update_pos;
+	wgt->controlmouseover = &widget_init_control_mouse_over;
+	wgt->controlmouseexit = &widget_init_control_mouse_exit;
 	wgt->shown.data  = NULL; //set the size of the widget array
 	wgt->shown.count = 0;
 	wgt->shown.size = 0;
@@ -874,6 +978,46 @@ sbool widget_has_mouse_over(widget *control)
 	return FALSE; //if can't find any then FALSE
 }
 
+sbool widget_usable(widget *control)
+{
+	widget *parent;
+	int8 i = TRUE;
+
+	if(control->parent){
+		parent = control->parent;
+	}
+	else{
+		return FALSE;
+	}
+
+	if(control->action & WIDGET_ALWAYS_USEABLE){
+		return TRUE;
+	}
+
+	if(!(control->action & WIDGET_IS_FOCUSED)){
+		while(i){
+			if(parent != ui.root){
+				if(parent->action & WIDGET_CAN_FOCUS && parent->action & WIDGET_IS_FOCUSED){
+					i = FALSE;
+					return TRUE;
+				}
+				else{
+					parent = parent->parent;
+				}
+			}
+			else{
+				i = FALSE;
+				return FALSE;
+			}
+		}
+	}
+	else{
+		return TRUE;
+	}
+
+	return FALSE; //if can't find any then FALSE
+}
+
 //Manually sets a widget to Focus
 void widget_manual_focused(widget * control)
 {
@@ -1278,9 +1422,13 @@ void widget_init_mouse_release(widget *control, int button, int pressed){}
 void widget_init_mouse_wheel(widget *control, int moved){}
 void widget_init_key_pressed(widget *control, int key, int pressed){}
 void widget_init_draw(widget *control){}
+void widget_init_mouse_over(widget *control){}
+void widget_init_mouse_exit(widget *control){}
 
 void widget_init_control_mouse_press(widget *control, int button, int pressed){control->mousepress(control,button, pressed);}
 void widget_init_control_mouse_release(widget *control, int button, int pressed){control->mouserelease(control,button, pressed);}
 void widget_init_control_mouse_wheel(widget *control, int moved){}
 void widget_init_control_key_pressed(widget *control, int key, int pressed){}
 void widget_init_control_update_pos(widget *control){}
+void widget_init_control_mouse_over(widget *control){control->mouseover(control);}
+void widget_init_control_mouse_exit(widget *control){control->mouseexit(control);}

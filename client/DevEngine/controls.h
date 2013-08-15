@@ -67,7 +67,10 @@ void set_control_image(widget *control, char *path);
 void create_button(widget *control, widget *parent, uint16 x, uint16 y, uint16 height, uint16 width, uint16 sizey, uint16 sizex, char *path);
 void draw_buttons(widget *control);
 void handle_button_click(widget *control, int button, int pressed);
+void handle_button_release(widget *control, int button, int pressed);
 void handle_button_move(widget *control);
+void handle_button_mouse_over(widget *control);
+void handle_button_mouse_exit(widget *control);
 
 void create_label(widget *control, widget *parent, uint16 x, uint16 y, uint8 size, uint8 red, uint8 blue, uint8 green, uint8 alpha, sbool can_use_mouse, char *label_text);
 void draw_label(widget *control);

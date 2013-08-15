@@ -10,6 +10,7 @@
 #include "bool.h"
 
 widget window1;
+widget button1;
 widget label1;
 widget label2;
 widget label3;
@@ -69,6 +70,7 @@ void init_main_menu(void)
 	create_label(&label5,&window1,85,375,40,0,0,0,255,FALSE,"40-ABCDEFGHIJKLMNOPQRSTUVWXYZ.");
 	create_label(&label4,&window1,85,400,8,0,0,0,255,FALSE,"8-_abcdefghijklmnopqrstuvwxyz.");
 	create_label(&label7,&window1,85,450,22,0,0,0,255,FALSE,"22-_abcdefghijklmnopqrstuvwxyz.");
+	create_button(&button1,&window1,20,20,60,100,60,100,"image\\button.png");
 	window1.action |= WIDGET_CAN_FOCUS;
 	window1.action |= WIDGET_MOVEABLE;
 	widget_manual_focused(&window1);
