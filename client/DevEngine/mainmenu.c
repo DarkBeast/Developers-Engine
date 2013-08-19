@@ -41,7 +41,8 @@ void main_menu(void)
 		//Clear information from last draw
 
 		glFlush();
-		glfwSwapBuffers();
+		glfwSwapBuffers(get_the_window());
+		glfwPollEvents();
 
 		if(lpstimer < time){//calculates the loops per second the code does, through everything
 			printf("%i\n",lps);
@@ -55,7 +56,7 @@ void main_menu(void)
 		//glfwSleep(.005); //used to save cpu
 
 		// Check if ESC key was pressed or window was closed
-		running = glfwGetWindowParam(GLFW_OPENED);
+		running = is_window_open();
 	}
 
 	widget_unload(&window1);
