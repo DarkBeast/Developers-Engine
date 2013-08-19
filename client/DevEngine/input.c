@@ -2,18 +2,18 @@
 * Credits:  Andrew Wheeler/Genusis
 ******************************************************************************/
 
-#include <glfw.h>
 #include <stdio.h>
+#include "render.h"
 #include "input.h"
 #include "widget.h"
 #include "globals.h"
 
-void GLFWCALL handle_key_press(int key,int press) //The key that was pressed
+void handle_key_press(GLFWwindow * screen, int key, int scancode, int press, int mods) //The key that was pressed
 {
 	//TODO: make HANDLE ARRAY FOR KEYS THAT ARE PUSHED SO IF MULTIPLE KEYS ARE PRESSED IT CAN HANDLE THEM ALL.
 }
 
-void GLFWCALL handle_mouse_pos(int x,int y)
+void handle_mouse_pos(GLFWwindow * screen, double x, double y)
 {
 	widget_move((int16)x,(int16)y);
 	widget_set_mouse_pos((int16)x,(int16)y);
@@ -24,7 +24,7 @@ void GLFWCALL handle_mouse_pos(int x,int y)
 #endif
 }
 
-void GLFWCALL handle_mouse_press(int button,int pressed)
+void handle_mouse_press(GLFWwindow * screen, int button, int pressed, int mods)
 {
 	widget_set_ui_click_event((int8)button, (int8)pressed);
 
@@ -46,6 +46,11 @@ void GLFWCALL handle_mouse_press(int button,int pressed)
 	}
 }
 
-void GLFWCALL handle_mouse_wheel(int moved)
+void handle_mouse_wheel(GLFWwindow * screen, double x, double y)
 {
+}
+
+void handle_window_close(GLFWwindow * screen)
+{
+	set_if_window_should_close();
 }
