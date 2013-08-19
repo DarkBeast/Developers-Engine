@@ -113,7 +113,7 @@ widget *widget_get_focused(void);
 //checks if mouse is in the set move frame.
 sbool widget_frame_contains(widget *control, widget *parent);
 
-//changes the moving widgets position via mouse pos.
+//changes the moving widgets position via mouse position.
 void widget_move(int16 x, int16 y);
 void widget_mouse_over(widget *control);
 void widget_position_update(widget *parent);
@@ -136,7 +136,7 @@ sbool widget_check_focus(void);
 //sets the mouse's XY position during mouse move via event system.
 void widget_set_mouse_pos(int16 x , int16 y);
 
-//sets the ui's click events for fall back
+//sets the user interface's click events for fall back
 void widget_set_ui_click_event(int8 button, int8 clicked);
 
 //initializes the User interface system.
