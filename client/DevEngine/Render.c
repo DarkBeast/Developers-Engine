@@ -2,7 +2,7 @@
 * Credits:  Andrew Wheeler/Genusis
 ******************************************************************************/
 #include <GL/glew.h>
-#include <glfw.h>
+#include <glfw3.h>
 #include <stdlib.h>
 #include "error.h"
 #include "globals.h"
@@ -12,10 +12,27 @@
 #include "bool.h"
 
 screen_size the_screen;
+GLFWwindow *the_window;
+sbool window_open;
+
+GLFWwindow *get_the_window(void)
+{
+	return the_window;
+}
 
 screen_size get_screen_size(void)
 {
 	return the_screen;
+}
+
+sbool is_window_open(void)
+{
+	return window_open;
+}
+
+void set_if_window_should_close(void)
+{
+	window_open = FALSE;
 }
 
 int get_screen_height(void)
@@ -73,21 +90,25 @@ void set_draw_view(int x, int y, int swidth, int sheight)
 }
 
 //sets the screen, GLFW , and the Screen Title
-void init_screen(int swidth, int sheight, int mode)
+void init_screen(int swidth, int sheight, GLFWmonitor *monitor, GLFWwindow *shared)
 {
 	GLenum err = 0;
 
-	if( !glfwInit())
+	if(glfwInit() == FALSE)
 		render_error(ERROR_GLFWINIT_ERROR);
 
 	// Finally we can Open an OpenGL window
-	if(!glfwOpenWindow ( swidth, sheight, 0,0,0,0,0,0, mode))
+
+	the_window = glfwCreateWindow( swidth, sheight, TITLE, monitor, shared);
+
+	if(the_window == NULL)
 		render_error(ERROR_GLFWWIN_ERROR);
 
-	glfwSetWindowTitle( TITLE);//Sets the Windows Name
 	the_screen.height = sheight;
 	the_screen.width = swidth;
+	glfwMakeContextCurrent(the_window);
 
+	window_open = TRUE;
 	err = glewInit();
 
 	if(err!=GLEW_OK)
@@ -95,6 +116,7 @@ void init_screen(int swidth, int sheight, int mode)
 		//Problem: glewInit failed, something is seriously wrong.
 		render_error(ERROR_GLEWINIT_ERROR);
 	}
+	handle_resize(the_window,swidth,sheight);
 }
 
 void clear_screen(int red, int blue, int green, int alpha)
@@ -104,9 +126,10 @@ void clear_screen(int red, int blue, int green, int alpha)
 }
 
 //Called when the window is resized
-void GLFWCALL handle_resize(int width,int height)
+void handle_resize(GLFWwindow * screen,int width,int height)
 {
 	//Tell OpenGL how to convert from coordinates to pixel values
+	//glfwGetFramebufferSize(screen, &width, &height);
 	glViewport( 0, 0, width, height);
 
 	glMatrixMode( GL_PROJECTION); //Switch to setting the camera perspective

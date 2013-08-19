@@ -17,14 +17,17 @@ struct screen_size
 	int height;
 };
 
+GLFWwindow *get_the_window(void);
 screen_size get_screen_size(void);
+sbool is_window_open(void);
+void set_if_window_should_close(void);
 void clear_screen(int red, int blue, int green, int alpha);
 void draw_primitive(image *img, vector2i vecpos, vector2i imgpos,int width, int height);
 void draw_push(void);
 void draw_state_reset(void);
-void GLFWCALL handle_resize(int width,int height);
+void handle_resize(GLFWwindow * screen,int width,int height);
 void init_image(image *img);
-void init_screen(int swidth, int sheight, int mode);
+void init_screen(int swidth, int sheight, GLFWmonitor *monitor, GLFWwindow *shared);
 void load_image(char *name, image *img);
 void set_draw_view(int x, int y, int swidth, int sheight);
 int get_screen_height(void);
