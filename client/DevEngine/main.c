@@ -3,7 +3,7 @@
 ******************************************************************************/
 // /ENTRY:"mainCRTStartup"
 #include <GL/glew.h>
-#include <glfw.h>
+#include <glfw3.h>
 #include "input.h"
 #include "program_path.h"
 #include "render.h"
@@ -17,15 +17,14 @@ int main(void)
 {
 	get_program_directory();//gets the programs path.
 
-	init_screen(800,600,GLFW_WINDOW);//initializes the program window.
+	init_screen(800,600,NULL,NULL);//initializes the program window.
 
-	glfwEnable(GLFW_KEY_REPEAT);//allows repeating of held down keyboard keys.
-
-	glfwSetWindowSizeCallback(handle_resize);//handles Window resize calls
-	glfwSetKeyCallback(handle_key_press);//handles Key presses
-	glfwSetMousePosCallback(handle_mouse_pos);//handles mouse move events
-	glfwSetMouseButtonCallback(handle_mouse_press);//handles mouse button events
-	glfwSetMouseWheelCallback(handle_mouse_wheel);//handles mouse wheel scrolling
+	glfwSetWindowCloseCallback(get_the_window(),handle_window_close);//checks if the window closed or not.
+	glfwSetWindowSizeCallback(get_the_window(),handle_resize);//handles Window resize calls
+	glfwSetKeyCallback(get_the_window(),handle_key_press);//handles Key presses
+	glfwSetCursorPosCallback(get_the_window(),handle_mouse_pos);//handles mouse move events
+	glfwSetMouseButtonCallback(get_the_window(),handle_mouse_press);//handles mouse button events
+	glfwSetScrollCallback(get_the_window(),handle_mouse_wheel);//handles mouse wheel scrolling
 
 	text_init_font("");//initializes the Font characters for use.
 
@@ -35,6 +34,7 @@ int main(void)
 
 	main_menu();//Start the First Menu, Menu main loop.
 
+	glfwDestroyWindow(get_the_window());
 	glfwTerminate();// Close window and terminate GLFW
 	path_destroy();
 	exit(TRUE);// Exit program
