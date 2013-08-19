@@ -30,9 +30,6 @@
 #ifndef _glfw3_native_h_
 #define _glfw3_native_h_
 
-#ifdef __cplusplus
-extern "C" {
-#endif
 
 
 /*************************************************************************
@@ -171,10 +168,6 @@ GLFWAPI EGLContext glfwGetEGLContext(GLFWwindow* window);
  *  @ingroup native
  */
 GLFWAPI EGLSurface glfwGetEGLSurface(GLFWwindow* window);
-#endif
-
-#ifdef __cplusplus
-}
 #endif
 
 #endif /* _glfw3_native_h_ */
