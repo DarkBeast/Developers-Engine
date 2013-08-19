@@ -5,7 +5,7 @@
 #ifndef DE_TYPES_H
 #define DE_TYPES_H
 
-#include <glfw.h>
+#include <glfw3.h>
 #include "integer.h"
 
 typedef struct image image;
