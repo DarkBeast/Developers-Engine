@@ -41,19 +41,32 @@ enum widget_flags_t
 	WIDGET_FOCUS_CLICK = (1 << 12),
 	WIDGET_FUNCTION_FOCUS = (1 << 13),
 	WIDGET_IS_PASSWORD = (1 << 14),
-	WIDGET_AVOID_BUFFER_UPDATE = (1 << 15)
+	WIDGET_AVOID_BUFFER_UPDATE = (1 << 15),
+	WIDGET_BUFFER_RESIZE = (1 << 16),
+	WIDGET_IS_MULTI_LINED = (1 << 17)
 };
 
 //A UI control structure.
 struct widget
 {
-	//contains control special data
-	void *control;
-
-	//contains the parent of the widget.
 	widget *parent;
+	widget_array shown; //widgets drawn
+	widget_array hidden; //widgets not drawn.
+	vector2ui pos;//default position.
+	vector2ui actualpos;//offset position
+	vector2i imgpos;//texture position
+	image *img; //image data
+	sbuffer buf;// opengl buffer
+	uint16 width;
+	uint16 height;
+	uint16 sizex;
+	uint16 sizey;
+	uint8 type; //control_types
+	int32 value;
+	lbool action;//widget_flags_t
+	void *control; //special control data
 
-	//contains events for quick calling
+	//User Events
 	void(*draw)(widget *);
 	void(*mouseover)(widget *);
 	void(*mouseexit)(widget *);
@@ -62,32 +75,14 @@ struct widget
 	void(*mousewheel)(widget *,int);
 	void(*keypressed)(widget *,int,int);
 
-	//system controls for the widget.
+	//system Events.
 	void(*controlmousepress)(widget *,int,int);
 	void(*controlmouserelease)(widget *,int,int);
 	void(*controlmousewheel)(widget *,int);
-	void(*controlkeypressed)(widget *,int,int);
+	void(*controlkeypressed)(widget *,int);
 	void(*controlupdatepos)(widget *);
 	void(*controlmouseover)(widget *);
 	void(*controlmouseexit)(widget *);
-
-	//hidden and shown arrays
-	widget_array shown;
-	widget_array hidden;
-
-	vector2ui pos;
-	vector2ui actualpos;
-	vector2ui originalpos;
-	vector2i imgpos;
-	image *img;
-	openext oglbuf;// opengl buffer
-	uint16 width;
-	uint16 height;
-	uint16 sizex;
-	uint16 sizey;
-	uint8 type;
-	int32 value;
-	mbool action;//focused,WIDGET_CAN_FOCUS,mouse over,clicked,movable,moving,can click behind
 };
 
 //The main screens Settings
@@ -200,20 +195,12 @@ void widget_set_focusable(widget *control, int8 boolean);
 
 //Used to set if the widget is drag able or not
 void widget_set_moveable(widget *control, int8 boolean);
-
-//checks if the widget on the focused widget is clicked if so sets as focused if it can and does event
-void widget_focused_mouse_press(void);
-
-//checks if mouse was on widget released if so does event
-void widget_focused_mouse_release(void);
-
-//default check if widget was released, does event
-void widget_mouse_release(void);
-
-//default event if widget was clicked, does event
-void widget_mouse_press(void);
-
+//used to set a widgets click event.
 void widget_set_clicked(widget *control);
+
+//Mouse events
+void widget_mouse_release(widget * control);
+void widget_mouse_press(widget * control);
 
 //default initiates. ignore these.//
 //Blank Drawing call
@@ -232,7 +219,7 @@ void widget_init_mouse_exit(widget *control);
 void widget_init_control_mouse_press(widget *control, int button, int pressed);
 void widget_init_control_mouse_release(widget *control, int button, int pressed);
 void widget_init_control_mouse_wheel(widget *control, int moved);
-void widget_init_control_key_pressed(widget *control, int key, int pressed);
+void widget_init_control_key_pressed(widget *control, int key);
 void widget_init_control_update_pos(widget *control);
 void widget_init_control_mouse_over(widget *control);
 void widget_init_control_mouse_exit(widget *control);
