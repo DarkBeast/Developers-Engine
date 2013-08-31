@@ -17,7 +17,7 @@ widget label3;
 widget label4;
 widget label5;
 widget label6;
-widget label7;
+widget textbox1;
 
 image img;
 int i = 0;
@@ -65,14 +65,21 @@ void main_menu(void)
 void init_main_menu(void)
 {
 	create_window(&window1, NULL, 0, 0, 600, 800, 600, 800, "image\\main.png");
-	create_label(&label1,&window1,85,300,1,0,0,0,255,FALSE," 1-_abcdefghijklmnopqrstuvwxyz.'[]{}");
-	create_label(&label2,&window1,85,325,16,0,0,0,255,FALSE,"16-_abcdefghijklmnopqrstuvwxyz.");
-	create_label(&label3,&window1,85,350,40,0,0,0,255,FALSE,"40-_abcdefghijklmnopqrstuvwxyz.");
-	create_label(&label5,&window1,85,375,40,0,0,0,255,FALSE,"40-ABCDEFGHIJKLMNOPQRSTUVWXYZ.");
-	create_label(&label4,&window1,85,400,8,0,0,0,255,FALSE,"8-_abcdefghijklmnopqrstuvwxyz.");
-	create_label(&label7,&window1,85,450,22,0,0,0,255,FALSE,"22-_abcdefghijklmnopqrstuvwxyz.");
-	create_button(&button1,&window1,20,20,60,100,60,100,"image\\button.png");
+	create_label(&label1,&window1,85,300,100,32,0,0,0,255,FALSE,1,TRUE,"input text in text box then press the button");
+	create_textbox(&textbox1,&window1,500,300,100,32,2,2,200,32,0,0,0,255,15,1,FALSE,FALSE,"image\\textbox.png");
+	create_button(&button1,&window1,520,350,60,100,60,100,"image\\button.png");
+	button1.mousepress = button1_press;
+	textbox1.action |= WIDGET_CAN_FOCUS;
 	window1.action |= WIDGET_CAN_FOCUS;
 	window1.action |= WIDGET_MOVEABLE;
 	widget_manual_focused(&window1);
+}
+
+void button1_press(widget *control, int button, int pressed)
+{
+	textbox *data = (textbox *)textbox1.shown.data[0]->control;
+
+	if(data->string->data){
+		update_label_string(&label1, data->string->data);
+	}
 }
