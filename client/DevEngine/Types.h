@@ -21,9 +21,9 @@ typedef struct cstring cstring;
 typedef struct color color;
 typedef struct void_array void_array;
 typedef struct vertex_t vertex_t;
-typedef struct openext openext;
+typedef struct sbuffer sbuffer;
 typedef struct vertex_array vertex_array;
-typedef struct multi_buffer multi_buffer;
+typedef struct mbuffer mbuffer;
 typedef struct vertex_array vertex_array;
 
 struct void_array
@@ -119,18 +119,22 @@ struct vertex_array {
 	vertex_t vertex[4];
 };
 
-struct openext{
-	GLuint vertex_buffer; //texture vertex buffer.
-	GLuint index_buffer; //index buffer.
-	vertex_t buffer[4];
+struct sbuffer{
+	GLuint buffer; //texture vertex buffer.
+	uint16 size;  //buffer size.
+	uint16 count; //buffer count.
+	GLuint index; //index buffer.
+	uint16 isize; //index size.
+	vertex_t data[4];
 };
 
-struct multi_buffer{
-	GLuint vertex_buffer; //texture vertex buffer.
-	uint16 vbuffer_size;
-	uint16 vbuffer_count;
-	GLuint index_buffer; //index buffer.
-	vertex_array *buffer;
+struct mbuffer{
+	GLuint buffer; //texture vertex buffer.
+	uint16 size;  //buffer size.
+	uint16 count; //buffer count.
+	GLuint index; //index buffer.
+	uint16 isize; //index size.
+	vertex_array *data;
 };
 
 #endif
