@@ -24,7 +24,6 @@ enum control_types
 	CONTROL_WINDOW,
 	CONTROL_CHECKBOX,
 	CONTROL_RADIO,
-	CONTROL_TEXTBOX,
 	CONTROL_PICTUREBOX,
 	CONTROL_HSCROLL_BAR,
 	CONTROL_VSCROLL_BAR,
@@ -32,7 +31,9 @@ enum control_types
 	CONTROL_VPROGRESSBAR,
 	CONTROL_SPINNER,
 	CONTROL_LISTBOX,
-	CONTROL_TABBOX
+	CONTROL_TABBOX,
+	CONTROL_TEXTBOX,
+	CONTROL_TEXTBOX_TEXT
 };
 
 //only need structures for special widgets.
@@ -57,8 +58,12 @@ struct scrollbar{
 
 struct textbox{
 	text *string;
-	uint16 count;
-	uint16 cursorchar;
+	sbool cusorenabled;
+	uint32 cursorblink;
+	uint32 cursortime;
+	uint32 cursorchar;
+	uint16 cursorheight;
+	uint16 cursorwidth;
 	vector2i cursorpos;
 };
 
@@ -72,10 +77,11 @@ void handle_button_move(widget *control);
 void handle_button_mouse_over(widget *control);
 void handle_button_mouse_exit(widget *control);
 
-void create_label(widget *control, widget *parent, uint16 x, uint16 y, uint8 size, uint8 red, uint8 blue, uint8 green, uint8 alpha, sbool can_use_mouse, char *label_text);
+void create_label(widget *control, widget *parent, uint16 x, uint16 y, uint16 width, uint16 height, uint8 red, uint8 blue, uint8 green, uint8 alpha, sbool events, uint8 fontid, sbool multi_lined, char *string);
 void draw_label(widget *control);
 void handle_label_click(widget *control, int button, int pressed);
 void handle_label_move(widget *control);
+void update_label_string(widget *control, char *string);
 
 void create_window(widget *control, widget *parent, uint16 x, uint16 y, uint16 height, uint16 width, uint16 sizey, uint16 sizex, char * image_path);
 void create_window_framed(widget *control, widget *parent, uint16 x, uint16 y, uint16 height, uint16 width, uint16 sizey, uint16 sizex, uint16 framex, uint16 framey,uint16 frameh, uint16 framew, char *path);
@@ -129,4 +135,13 @@ void draw_vprogressbar(widget *control);
 void handle_vprogressbar_click(widget *control, int button, int pressed);
 void handle_vprogressbar_move(widget *control);
 void handle_vprogressbars_move(widget *control);
+
+void create_textbox(widget *control, widget *parent, uint16 x, uint16 y, uint16 width, uint16 height, uint16 offsetx, uint16 offsety, uint16 sx, uint16 sy, uint8 red, uint8 blue, uint8 green, uint8 alpha, uint32 maxchars, uint8 fontid, sbool ispass, sbool ismulti, char *imgpath);
+void draw_textbox(widget *control);
+void handle_textbox_click(widget *control, int button, int pressed);
+void handle_textbox_move(widget *control);
+void handle_textbox_input(widget *control, int key, int mod);
+void draw_textbox_text(widget *control);
+void handle_textbox_text_move(widget *control);
+
 #endif

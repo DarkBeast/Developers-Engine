@@ -99,10 +99,9 @@ void handle_button_move(widget *control)
 }
 
 //labels
-void create_label(widget *control, widget *parent, uint16 x, uint16 y, uint8 size, uint8 red, uint8 blue, uint8 green, uint8 alpha, sbool can_use_mouse, char *label_text)
+void create_label(widget *control, widget *parent, uint16 x, uint16 y, uint16 width, uint16 height, uint8 red, uint8 blue, uint8 green, uint8 alpha, sbool events, uint8 fontid, sbool multi_lined, char *string)
 {
 	label *init_text;
-	vector2ui hw;
 
 	widget_init(control);
 	control->pos.x = x;
@@ -113,19 +112,22 @@ void create_label(widget *control, widget *parent, uint16 x, uint16 y, uint8 siz
 	control->draw = &draw_label;
 	control->controlmousepress = &handle_label_click;
 	control->controlupdatepos = &handle_label_move;
-	if(can_use_mouse){
+	if(events){
 		control->action |= WIDGET_CAN_USE_EVENT;
 	}
 
 	init_text = (label *)calloc(1,sizeof(label));
 	init_text->string = (text *)calloc(1,sizeof(text));
 
-	text_set(init_text->string,x,y,size,red,blue,green,alpha,label_text);
+	text_set(init_text->string,x,y,width,height,0,0,0,fontid,red,blue,green,alpha,string);
 
-	hw = text_get_string_hw(label_text,size);
-	control->height = hw.y;
-	control->width = hw.x;
+	control->height = height;
+	control->width = width;
 	control->control = init_text;
+
+	if(multi_lined){
+		control->action |= WIDGET_IS_MULTI_LINED;
+	}
 
 	widget_add(parent,control);
 	create_text_vertex(init_text->string, control);
@@ -144,10 +146,18 @@ void handle_label_click(widget *control, int button, int pressed)
 	}
 }
 
+void update_label_string(widget *control, char *string)
+{
+	label *data = (label *)control->control;
+
+	data->string->data = string;
+	create_text_vertex(data->string, control);
+}
+
 void handle_label_move(widget *control)
 {
 	label *data = (label *)control->control;
-	text_position_update(data->string,control->parent);
+	text_position_update(data->string,control);
 }
 
 void create_window(widget *control, widget *parent, uint16 x, uint16 y, uint16 height, uint16 width, uint16 sizey, uint16 sizex, char * path)
@@ -906,4 +916,134 @@ void handle_vprogressbar_move(widget *control)
 void handle_vprogressbars_move(widget *control)
 {
 	widget_update_progressbars_vector(control);
+}
+
+//text box
+void create_textbox(widget *control, widget *parent, uint16 x, uint16 y, uint16 width, uint16 height, uint16 offsetx, uint16 offsety, uint16 sx, uint16 sy, uint8 red, uint8 blue, uint8 green, uint8 alpha, uint32 maxchars, uint8 fontid, sbool ispass, sbool ismulti, char *imgpath)
+{
+	textbox *init_text;
+	widget *string = (widget *)calloc(1, sizeof(widget));
+
+	widget_init(control);
+	control->pos.x = x;
+	control->pos.y = y;
+	control->sizex = sx;
+	control->sizey = sy;
+	control->imgpos.x = 0;
+	control->imgpos.y = 0;
+	control->type = CONTROL_TEXTBOX;
+	control->draw = &draw_textbox;
+	control->controlmousepress = &handle_textbox_click;
+	control->controlupdatepos = &handle_textbox_move;
+	control->controlkeypressed = &handle_textbox_input;
+	set_control_image(control, imgpath);
+
+	widget_init(string);
+	string->pos.x = x;
+	string->pos.y = y;
+	string->imgpos.x = 0;
+	string->imgpos.y = 0;
+	string->type = CONTROL_TEXTBOX_TEXT;
+	string->draw = &draw_textbox_text;
+	string->controlmousepress = &handle_textbox_click;
+	string->controlupdatepos = &handle_textbox_text_move;
+
+	if(ispass){
+		string->action |= WIDGET_IS_PASSWORD;
+	}
+	if(ismulti){
+		string->action |= WIDGET_IS_MULTI_LINED;
+	}
+
+	init_text = (textbox *)calloc(1,sizeof(textbox));
+	init_text->string = (text *)calloc(1,sizeof(text));
+
+	text_set(init_text->string,string->pos.x,string->pos.y,width,height,offsetx,offsety,maxchars,fontid,red,blue,green,alpha,NULL);
+
+	control->height = height;
+	control->width = width;
+	string->height = height;
+	string->width = width;
+	string->control = init_text;
+
+	widget_add(parent,control);
+	widget_add(control,string);
+	create_widget_vertex_buffer(control);
+}
+
+void draw_textbox(widget *control)
+{
+	draw_widget(control);
+}
+
+void draw_textbox_text(widget *control)
+{
+	textbox *data = (textbox *)control->control;
+
+	if(data->string->buf.isize > 0){
+		text_draw(data->string);
+	}
+}
+
+void handle_textbox_click(widget *control, int button, int pressed)
+{
+	textbox *data = (textbox *)control->shown.data[0]->control;
+
+	if(data->cusorenabled == FALSE){
+		data->cusorenabled = TRUE;
+	}
+
+	control->mousepress(control,button,pressed);
+}
+
+void handle_textbox_move(widget *control)
+{
+	widget_update_vector(control);
+}
+
+void handle_textbox_text_move(widget *control)
+{
+	textbox *data = (textbox *)control->control;
+	text_position_update(data->string,control->parent);
+}
+
+void handle_textbox_input(widget *control, int key)
+{
+	textbox *data = (textbox *)control->shown.data[0]->control;
+
+	if(data->string->data == NULL){
+		data->string->data = (char *)calloc(1, 16 * sizeof(char));
+		data->string->size = 16;
+	}
+
+	if(data->cusorenabled){
+		switch(key)
+		{
+		case GLFW_KEY_BACKSPACE:
+			if(data->string->data){
+				if(data->string->count > 0){
+					data->string->count--;
+				}
+				data->string->data[data->string->count] = NULL;
+
+				textbox_text_update(data->string, control->shown.data[0]);
+			}
+			break;
+
+		default:
+			if(data->string->data){
+				if(data->string->count < data->string->maxchars || data->string->maxchars == 0){
+					if(data->string->count + 1 >= data->string->size){
+						data->string->size = data->string->size * 2;
+						string_resize(data->string, data->string->size);
+						control->action |= WIDGET_BUFFER_RESIZE;
+					}
+
+					data->string->data[data->string->count] = key;
+					data->string->count++;
+					textbox_text_update(data->string, control->shown.data[0]);
+				}
+			}
+		}
+	}
 }
