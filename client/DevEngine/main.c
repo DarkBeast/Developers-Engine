@@ -21,7 +21,8 @@ int main(void)
 
 	glfwSetWindowCloseCallback(get_the_window(),handle_window_close);//checks if the window closed or not.
 	glfwSetWindowSizeCallback(get_the_window(),handle_resize);//handles Window resize calls
-	glfwSetKeyCallback(get_the_window(),handle_key_press);//handles Key presses
+	glfwSetCharCallback(get_the_window(),handle_char_callback);//handles character presses
+	glfwSetKeyCallback(get_the_window(),handle_key_callback);
 	glfwSetCursorPosCallback(get_the_window(),handle_mouse_pos);//handles mouse move events
 	glfwSetMouseButtonCallback(get_the_window(),handle_mouse_press);//handles mouse button events
 	glfwSetScrollCallback(get_the_window(),handle_mouse_wheel);//handles mouse wheel scrolling
