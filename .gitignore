@@ -5,15 +5,11 @@
 *.tlog
 *.log
 *.xml
-client/DevEnginevs11.opensdf
 *.rar
 *.lnk
 *.idb
 *.pdb
-
 *.lastbuildstate
 *.ipch
 *.idb
 *.pdb
-client/DevEngine/Debug/vc110.pdb
-client/DevEngine/Debug/vc110.idb
