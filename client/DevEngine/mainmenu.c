@@ -12,11 +12,6 @@
 widget window1;
 widget button1;
 widget label1;
-widget label2;
-widget label3;
-widget label4;
-widget label5;
-widget label6;
 widget textbox1;
 
 image img;
@@ -66,7 +61,7 @@ void init_main_menu(void)
 {
 	create_window(&window1, NULL, 0, 0, 600, 800, 600, 800, "image\\main.png");
 	create_label(&label1,&window1,85,300,100,32,0,0,0,255,FALSE,1,TRUE,"input text in text box then press the button");
-	create_textbox(&textbox1,&window1,500,300,100,32,2,2,200,32,0,0,0,255,15,1,FALSE,FALSE,"image\\textbox.png");
+	create_textbox(&textbox1,&window1,500,300,100,32,2,2,100,32,0,255,0,255,15,1,FALSE,FALSE,"image\\textbox.png");
 	create_button(&button1,&window1,520,350,60,100,60,100,"image\\button.png");
 	button1.mousepress = button1_press;
 	textbox1.action |= WIDGET_CAN_FOCUS;
