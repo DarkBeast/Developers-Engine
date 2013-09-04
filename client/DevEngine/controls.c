@@ -1022,6 +1022,17 @@ void handle_textbox_input(widget *control, int key)
 		case GLFW_KEY_BACKSPACE:
 			if(data->string->data){
 				if(data->string->count > 0){
+					if(data->string->displayoffset > 0){
+						data->string->displayoffset--;
+					}
+
+					if(data->string->font->c[data->string->data[data->string->count - 1]].left >= 0){
+						data->string->textwidth -= (data->string->font->c[data->string->data[data->string->count - 1]].ax + data->string->font->c[data->string->data[data->string->count - 1]].left);
+					}
+					else{
+						data->string->textwidth -= data->string->font->c[data->string->data[data->string->count - 1]].ax;
+					}
+
 					data->string->count--;
 				}
 				data->string->data[data->string->count] = NULL;
@@ -1033,15 +1044,61 @@ void handle_textbox_input(widget *control, int key)
 		default:
 			if(data->string->data){
 				if(data->string->count < data->string->maxchars || data->string->maxchars == 0){
-					if(data->string->count + 1 >= data->string->size){
-						data->string->size = data->string->size * 2;
-						string_resize(data->string, data->string->size);
-						control->action |= WIDGET_BUFFER_RESIZE;
-					}
+					uint32 i = 0;
 
-					data->string->data[data->string->count] = key;
-					data->string->count++;
-					textbox_text_update(data->string, control->shown.data[0]);
+					if(control->shown.data[0]->action & WIDGET_IS_MULTI_LINED){
+						if(data->string->textheight == 0){
+							for(i = 0; i <= data->string->count; i++){
+							}
+						}
+					}
+					else{
+						if(data->string->font->c[key].left >= 0){
+							data->string->textwidth += (data->string->font->c[key].ax + data->string->font->c[key].left);
+						}
+						else{
+							data->string->textwidth += (data->string->font->c[key].ax);
+						}
+
+						if(data->string->textwidth >= data->string->width - data->string->offsetx){
+							uint16 offset = 0;
+							i = 0;
+							data->string->displayoffset++;
+
+							for(i = data->string->displayoffset; i <= data->string->count + 1; i++){
+								if(data->string->font->c[data->string->data[i]].left >= 0){
+									offset += (data->string->font->c[data->string->data[i]].ax + data->string->font->c[data->string->data[i]].left);
+								}
+								else{
+									offset += (data->string->font->c[data->string->data[i]].ax);
+								}
+
+								if(i == data->string->count +1){
+									if(data->string->font->c[key].left >= 0){
+										offset += (data->string->font->c[key].ax + data->string->font->c[key].left);
+									}
+									else{
+										offset += (data->string->font->c[key].ax);
+									}
+								}
+								if(offset >= data->string->width - data->string->offsetx){
+									data->string->displayoffset++;
+									i = data->string->displayoffset;
+									offset = 0;
+								}
+							}
+						}
+
+						if(data->string->count + 1 >= data->string->size){
+							data->string->size = data->string->size * 2;
+							string_resize(data->string, data->string->size);
+							control->action |= WIDGET_BUFFER_RESIZE;
+						}
+
+						data->string->data[data->string->count] = key;
+						data->string->count++;
+						textbox_text_update(data->string, control->shown.data[0]);
+					}
 				}
 			}
 		}
