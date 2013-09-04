@@ -46,7 +46,6 @@ struct symbol
 struct text
 {
 	char *data; //the entire string.
-	char *drawable; //whats being drawn if supported.
 	uint16 size; //string max size.
 	uint16 count; //string count.
 	mbuffer buf; //opengl buffer.
@@ -60,6 +59,8 @@ struct text
 	uint8 offsety; //rendering offset y.
 	uint16 textheight; //text height.
 	uint16 textwidth; //text width.
+	uint16 displayoffset; //variable used to update drawable.
+	uint16 *tamount; //total number of character per line, used for multi-lined.
 	atlas *font; //font used for drawing.
 };
 
@@ -74,5 +75,4 @@ void create_text_vertex(text *str, widget *control);
 void text_position_update(text *str, widget *parent);
 void string_resize(text *str, uint32 size);
 void textbox_text_update(text *str, widget *control);
-
 #endif
