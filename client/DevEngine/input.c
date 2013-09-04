@@ -7,10 +7,15 @@
 #include "input.h"
 #include "widget.h"
 #include "globals.h"
+#include "error.h"
 
 void handle_char_callback(GLFWwindow *screen, unsigned int key) //The character that was pressed.
 {
 	if(widget_get_focused()->type == CONTROL_TEXTBOX ){
+		if(key > 128){
+			fatal_error(ERROR_NONE_ACSII);
+			return;
+		}
 		widget_get_focused()->controlkeypressed(widget_get_focused(),key);
 	}
 }
