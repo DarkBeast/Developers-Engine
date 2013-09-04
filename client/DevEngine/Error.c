@@ -48,6 +48,10 @@ void fatal_error(int error_flag)
 	case ERROR_POINTER_NULL:
 		fputs("ERROR:Pointer is NULL.\n", stderr);
 		break;
+	case ERROR_NONE_ACSII:
+		fputs("ERROR:Does Not Support Unicode characters.\n", stderr);
+		return;
+		break;
 	default:
 		fputs("An error has occurred!\n", stderr);
 	}
