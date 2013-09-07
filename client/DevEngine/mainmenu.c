@@ -60,9 +60,9 @@ void main_menu(void)
 void init_main_menu(void)
 {
 	create_window(&window1, NULL, 0, 0, 600, 800, 600, 800, "image\\main.png");
-	create_label(&label1,&window1,85,300,100,32,0,0,0,255,FALSE,1,TRUE,"input text in text box then press the button");
-	create_textbox(&textbox1,&window1,500,300,100,32,2,2,100,32,0,255,0,255,15,1,FALSE,FALSE,"image\\textbox.png");
-	create_button(&button1,&window1,520,350,60,100,60,100,"image\\button.png");
+	create_label(&label1,&window1,60,95,120,200,0,0,0,255,FALSE,1,10,TRUE,"input text in text box then press the button");
+	create_mtextbox(&textbox1,&window1,260,195,100,32,2,2,100,200,0,255,0,255,0,7,1,"image\\textbox.png");
+	create_button(&button1,&window1,380,220,60,100,60,100,"image\\button.png");
 	button1.mousepress = button1_press;
 	textbox1.action |= WIDGET_CAN_FOCUS;
 	window1.action |= WIDGET_CAN_FOCUS;
