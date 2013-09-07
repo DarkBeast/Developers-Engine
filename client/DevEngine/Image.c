@@ -85,12 +85,22 @@ void load_png(const char *name, image *image)
 	pixelz = (png_byte*)malloc(numbytes);
 	row_ptrs = (png_byte**)malloc((image->height) * sizeof(png_byte*));
 
+	if(row_ptrs == NULL || pixelz == NULL){
+		fatal_error(ERROR_POINTER_NULL);
+		return;
+	}
+
 	for (i=0; i<((uint32)image->height); i++)
 		row_ptrs[i] = pixelz + ((image->height) - 1 - i)*rowbytes;
 
 	png_read_image(png_ptr, row_ptrs);
 
 	image->pixels = (unsigned char *)calloc(1, numbytes);
+
+	if(image->pixels == NULL){
+		fatal_error(ERROR_POINTER_NULL);
+		return;
+	}
 
 	memcpy(image->pixels, pixelz, image->width * image->height * 4);
 
