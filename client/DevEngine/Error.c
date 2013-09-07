@@ -14,6 +14,7 @@
 
 void fatal_error(int error_flag)
 {
+	int i = 0;
 	switch(error_flag){
 	case ERROR_MISC_ERROR:
 		fputs("An error has occurred!\n", stderr);
@@ -56,12 +57,13 @@ void fatal_error(int error_flag)
 		fputs("An error has occurred!\n", stderr);
 	}
 	fputs("The Application will now close.", stderr);
-	getchar();
+	i = getchar();
 	shut_down();
 }
 
 void render_error(int error_flag)
 {
+	int i = 0;
 	switch(error_flag){
 	case ERROR_MISC_ERROR:
 		fputs("An error has occurred!\n", stderr);
@@ -100,7 +102,7 @@ void render_error(int error_flag)
 		fputs("An error has occurred!\n", stderr);
 	}
 	fputs("The Application will now close.", stderr);
-	getchar();
+	i = getchar();
 	shut_down();
 }
 
