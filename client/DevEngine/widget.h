@@ -62,7 +62,7 @@ struct widget
 	uint16 sizex;
 	uint16 sizey;
 	uint8 type; //control_types
-	int32 value;
+	uint16 value;
 	lbool action;//widget_flags_t
 	void *control; //special control data
 

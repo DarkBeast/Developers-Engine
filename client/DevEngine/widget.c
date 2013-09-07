@@ -8,6 +8,7 @@
 #include "function.h"
 #include "controls.h"
 #include "Render.h"
+#include "error.h"
 
 user_interface ui;
 widget *focused; //holds the widget currently focused on.
@@ -190,12 +191,16 @@ void widget_mouse_over(widget *control)
 void widget_position_update(widget *parent)//used to update the parent widgets position and its children's positions.
 {
 	widget *child;
-	uint16 *id;
+	uint16 *id = (uint16 *)calloc(1, 32 * sizeof(uint16));
 	uint16 index = 0;
 	uint16 idindex;
 	uint16 idsize;
 
-	id = (uint16 *)calloc(1, 32 * sizeof(uint16));
+	if(id == NULL){
+		fatal_error(ERROR_POINTER_NULL);
+		return;
+	}
+
 	idsize = 32;
 	idindex = 0;
 	id[idindex] = 0;
@@ -844,12 +849,16 @@ void widget_resize_id(uint16 **id, uint16 size)
 void widget_manager(void)//used to draw the widgets onto the screen.
 {
 	widget *child;
-	uint16 *id;
+	uint16 *id = (uint16 *)calloc(1, 32 * sizeof(uint16));
 	uint16 index = 0;
 	uint16 idindex;
 	uint16 idsize;
 
-	id = (uint16 *)calloc(1, 32 * sizeof(uint16));
+	if(id == NULL){
+		fatal_error(ERROR_POINTER_NULL);
+		return;
+	}
+
 	idsize = 32;
 	idindex = 0;
 	id[idindex] = 0;
