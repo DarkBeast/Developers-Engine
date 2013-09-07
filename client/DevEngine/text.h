@@ -55,24 +55,26 @@ struct text
 	uint16 height; //height of control.
 	uint16 lines; // amount of lines;
 	uint16 maxchars; //maximum amount of characters allowed per line.
+	uint16 maxcharspl; //maximum amount of characters per line.
 	uint8 offsetx; //rendering offset x.
 	uint8 offsety; //rendering offset y.
 	uint16 textheight; //text height.
 	uint16 textwidth; //text width.
 	uint16 displayoffset; //variable used to update drawable.
-	uint16 *tamount; //total number of character per line, used for multi-lined.
 	atlas *font; //font used for drawing.
 };
 
 void text_init_font(char *fontname);
-void text_init_atlas(void);
+void text_init_atlas(atlas *data, uint8 textsize);
 void text_draw(text *str);
-void text_set(text *data, uint16 x, uint16 y, uint16 width, uint16 height, uint8 offsetx, uint8 offsety, uint32 maxchars, uint8 fontid, uint8 red, uint8 blue, uint8 green, uint8 alpha, char *string);
+void text_set(text *data, uint16 x, uint16 y, uint16 width, uint16 height, uint8 offsetx, uint8 offsety, uint16 maxchars, uint16 maxcharspl, uint8 fontid, uint8 red, uint8 blue, uint8 green, uint8 alpha, char *string);
 atlas *get_atlas(uint8 fontid);
 
 void text_resize_buffer(vertex_array **buffer, size_t size);
 void create_text_vertex(text *str, widget *control);
-void text_position_update(text *str, widget *parent);
+void text_position_supdate(text *str, widget *parent);
+void text_position_mupdate(text *str, widget *parent);
 void string_resize(text *str, uint32 size);
-void textbox_text_update(text *str, widget *control);
+void stextbox_text_update(text *str, widget *control);
+void mtextbox_text_update(text *str, widget *control);
 #endif
