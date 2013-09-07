@@ -17,14 +17,26 @@ char* path;
 
 char* get_path(char* target)
 {
-	if(strlen(program_path)  + strlen(target) >= strlen(path))
-		path = (char *)realloc(path, next_power_of_two(strlen(program_path)  + strlen(target)));
+	char* temp;
+
+	if(strlen(program_path)  + strlen(target) >= strlen(path)){
+		temp = (char *)realloc(path, next_power_of_two(strlen(program_path)  + strlen(target)));
+
+		if(temp == NULL){
+			fatal_error(ERROR_POINTER_NULL);
+			return 0;
+		}
+
+		path = temp;
+	}
+
+	if(path == NULL){
+		fatal_error(ERROR_POINTER_NULL);
+		return 0;
+	}
 
 	strcpy(path ,program_path);
 	strcat(path ,target);
-
-	if(path == NULL)
-		fatal_error(ERROR_PATH_NULL);
 
 	return path;
 }
@@ -33,6 +45,7 @@ int get_program_directory(void)
 {//get program directory
 	char  *spath   = NULL;
 	char  *sresult = NULL;
+	char  *temp = NULL;
 
 	path = NULL;
 	path = (char *)malloc(1024);
@@ -52,7 +65,9 @@ int get_program_directory(void)
 	while (sresult == NULL){
 		isize *= 2;
 
-		spath = (char *)realloc(spath, isize);
+		temp = (char *)realloc(spath, isize);
+
+		spath = temp;
 
 		if (spath == NULL){
 			return FALSE;
