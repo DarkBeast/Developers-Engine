@@ -222,16 +222,16 @@ void widget_update_vector(widget *control)
 	control->actualpos.y = control->pos.y + control->parent->actualpos.y;
 
 	/*index 0*/
-	control->buf.data[0].x = control->actualpos.x; control->buf.data[0].y = control->actualpos.y;
+	control->buf.data[0].x = (float)control->actualpos.x; control->buf.data[0].y = (float)control->actualpos.y;
 
 	/*index 1*/
-	control->buf.data[1].x = control->actualpos.x + control->sizex; control->buf.data[1].y = control->actualpos.y;
+	control->buf.data[1].x = (float)control->actualpos.x + control->sizex; control->buf.data[1].y = (float)control->actualpos.y;
 
 	/*index 2*/
-	control->buf.data[2].x = control->actualpos.x + control->sizex; control->buf.data[2].y = control->actualpos.y + control->sizey;
+	control->buf.data[2].x = (float)control->actualpos.x + control->sizex; control->buf.data[2].y = (float)control->actualpos.y + control->sizey;
 
 	/*index 3*/
-	control->buf.data[3].x = control->actualpos.x; control->buf.data[3].y = control->actualpos.y + control->sizey;
+	control->buf.data[3].x = (float)control->actualpos.x; control->buf.data[3].y = (float)control->actualpos.y + control->sizey;
 
 	glBindBuffer(GL_ARRAY_BUFFER,control->buf.buffer);
 	glBufferSubData(GL_ARRAY_BUFFER, 0, 4 * sizeof(struct vertex_t), &control->buf.data[0]);
@@ -247,10 +247,10 @@ void widget_update_progressbars_vector(widget *control)
 
 	if(control->type == CONTROL_HPROGRESSBAR){
 		value = (float)(control->value / 100.f);
-		/*0*/control->buf.data[0].x = control->actualpos.x; control->buf.data[0].y = control->actualpos.y;
-		/*1*/control->buf.data[1].x = control->actualpos.x + (control->sizex * value); control->buf.data[1].y = control->actualpos.y;
-		/*2*/control->buf.data[2].x = control->actualpos.x + (control->sizex * value); control->buf.data[2].y = control->actualpos.y + control->sizey;
-		/*3*/control->buf.data[3].x = control->actualpos.x; control->buf.data[3].y = control->actualpos.y + control->sizey;
+		/*0*/control->buf.data[0].x = (float)control->actualpos.x; control->buf.data[0].y = (float)control->actualpos.y;
+		/*1*/control->buf.data[1].x = (float)control->actualpos.x + (control->sizex * value); control->buf.data[1].y = (float)control->actualpos.y;
+		/*2*/control->buf.data[2].x = (float)control->actualpos.x + (control->sizex * value); control->buf.data[2].y = (float)control->actualpos.y + control->sizey;
+		/*3*/control->buf.data[3].x = (float)control->actualpos.x; control->buf.data[3].y = (float)control->actualpos.y + control->sizey;
 	}
 	else{
 		value = (float)(control->value / -100.f);
@@ -259,10 +259,10 @@ void widget_update_progressbars_vector(widget *control)
 		}else{
 			x = -1;
 		}
-		/*0*/control->buf.data[0].x = control->actualpos.x; control->buf.data[0].y = control->actualpos.y + x;
-		/*1*/control->buf.data[1].x = control->actualpos.x + control->sizex ; control->buf.data[1].y = control->actualpos.y + x;
-		/*2*/control->buf.data[2].x = control->actualpos.x + control->sizex ; control->buf.data[2].y = control->actualpos.y + (control->sizey * value);
-		/*3*/control->buf.data[3].x = control->actualpos.x; control->buf.data[3].y = control->actualpos.y + (control->sizey * value);
+		/*0*/control->buf.data[0].x = (float)control->actualpos.x; control->buf.data[0].y = (float)control->actualpos.y + x;
+		/*1*/control->buf.data[1].x = (float)control->actualpos.x + control->sizex ; control->buf.data[1].y = (float)control->actualpos.y + x;
+		/*2*/control->buf.data[2].x = (float)control->actualpos.x + control->sizex ; control->buf.data[2].y = (float)control->actualpos.y + (control->sizey * value);
+		/*3*/control->buf.data[3].x = (float)control->actualpos.x; control->buf.data[3].y = (float)control->actualpos.y + (control->sizey * value);
 	}
 	glBindBuffer(GL_ARRAY_BUFFER,control->buf.buffer);
 	glBufferSubData(GL_ARRAY_BUFFER, 0, 4 * sizeof(struct vertex_t), &control->buf.data[0]);
