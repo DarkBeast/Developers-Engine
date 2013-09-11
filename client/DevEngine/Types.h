@@ -21,7 +21,9 @@ typedef struct cstring cstring;
 typedef struct color color;
 typedef struct void_array void_array;
 typedef struct vertex_t vertex_t;
+typedef struct line_vertex_t line_vertex_t;
 typedef struct sbuffer sbuffer;
+typedef struct line_buffer line_buffer;
 typedef struct vertex_array vertex_array;
 typedef struct mbuffer mbuffer;
 typedef struct vertex_array vertex_array;
@@ -48,13 +50,13 @@ struct cstring
 	size_t  size;
 };
 
-struct vector2i // the coords for placing on screen
+struct vector2i // the coordinates for placing on screen
 {
 	int16 x;
 	int16 y;
 };
 
-struct framei // the coords for placing on screen
+struct framei // the coordinates for placing on screen
 {
 	int16 x;
 	int16 y;
@@ -62,7 +64,7 @@ struct framei // the coords for placing on screen
 	int16 h;
 };
 
-struct vector2ui // the coords for placing on screen
+struct vector2ui // the coordinates for placing on screen
 {
 	uint16 x;
 	uint16 y;
@@ -74,14 +76,14 @@ struct vector2f
 	float y;
 };
 
-struct vector3i //for actual tile coords
+struct vector3i //for actual tile coordinates
 {
 	int16 y;
 	int16 x;
 	int16 z;
 };
 
-struct vector3ui //for actual tile coords
+struct vector3ui //for actual tile coordinates
 {
 	uint16 y;
 	uint16 x;
@@ -102,7 +104,7 @@ struct vertex{
 
 struct image{
 	GLuint texid; //image ID in opengl
-	int32 width; // le Width
+	int32 width; //le Width
 	int32 height; //le height
 	uint16 format; // the format of the image.
 	uint16 bpp; //how many bytes per pixel are in the image
@@ -110,13 +112,18 @@ struct image{
 };
 
 struct vertex_t {
-	float x, y;
-	float u, v;
-	float r, g, b, a;
+	float x, y; //screen location.
+	float u, v; //textures U axis and V axis
+	float r, g, b, a; //red, green,blue and alpha.
+};
+
+struct line_vertex_t {
+	float x, y; //screen location.
+	float r, g, b, a; //red, green,blue and alpha.
 };
 
 struct vertex_array {
-	vertex_t vertex[4];
+	vertex_t vertex[4]; //array of 4 vertex's
 };
 
 struct sbuffer{
@@ -125,7 +132,16 @@ struct sbuffer{
 	uint16 count; //buffer count.
 	GLuint index; //index buffer.
 	uint16 isize; //index size.
-	vertex_t data[4];
+	vertex_t data[4]; //array of 4 vertex's.
+};
+
+struct line_buffer{
+	GLuint buffer; //texture vertex buffer.
+	uint16 size;  //buffer size.
+	uint16 count; //buffer count.
+	GLuint index; //index buffer.
+	uint16 isize; //index size.
+	line_vertex_t data[2]; //array of 2 vertex's.
 };
 
 struct mbuffer{
@@ -134,7 +150,7 @@ struct mbuffer{
 	uint16 count; //buffer count.
 	GLuint index; //index buffer.
 	uint16 isize; //index size.
-	vertex_array *data;
+	vertex_array *data; //array of vertex's.
 };
 
 #endif
