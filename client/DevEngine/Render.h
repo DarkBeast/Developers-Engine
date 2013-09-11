@@ -40,4 +40,7 @@ void widget_update_vector(widget *control);
 void widget_update_texture_vector(widget *control);
 void widget_update_progressbars_vector(widget *control);
 void update_widget_vertex_buffer(widget *control);
+
+void create_cursor_vertex(widget *control);
+void draw_cursor(widget *control);
 #endif

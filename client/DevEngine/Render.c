@@ -66,11 +66,16 @@ void draw_state_reset(void)
 	glDisable(GL_DEPTH_TEST);
 	glEnable(GL_ALPHA_TEST);// transparency
 	glEnable(GL_TEXTURE_2D);
-	//glEnable(GL_SMOOTH);
+	//glShadeModel(GL_SMOOTH);
+	glEnable(GL_SMOOTH);
 	glEnable(GL_BLEND); //Enable alpha blending for better image quality, turn off for better performance.
 	glAlphaFunc ( GL_GREATER, (GLclampf)0.2);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-
+	glHint(GL_PERSPECTIVE_CORRECTION_HINT,GL_FASTEST);           // Fastest
+	glHint(GL_POINT_SMOOTH_HINT, GL_FASTEST); //Fastest
+	//glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST); //nicest
+	//glHint(GL_POINT_SMOOTH_HINT,GL_NICEST); //nicest
+	//TODO: add in option handler to switch looks around.
 	glMatrixMode(GL_MODELVIEW);
 }
 
@@ -164,14 +169,16 @@ void load_image(char *name, image *img)
 
 	glGenTextures( 1, &img->texid);
 	glBindTexture( GL_TEXTURE_2D, img ->texid);
-	glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
+	glPixelStoref(GL_UNPACK_ALIGNMENT, (GLfloat)1);
 
 	glTexImage2D( GL_TEXTURE_2D, 0, img ->format,
 		img ->width, img ->height, 0, img ->format,
 		GL_UNSIGNED_BYTE, (void*) img->pixels);
 
-	glTexParameterf(GL_TEXTURE_2D,GL_TEXTURE_MIN_FILTER,GL_LINEAR);
-	glTexParameterf(GL_TEXTURE_2D,GL_TEXTURE_MAG_FILTER,GL_LINEAR);
+	//glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+	//glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 
 	free(img->pixels);
 }
@@ -191,12 +198,14 @@ void draw_primitive(image *img, vector2i vecpos, vector2i imgpos,int width, int 
 
 	glBegin (GL_QUADS); //draw SQ
 
-	glTexCoord2f (x1, y2);	glVertex2i (vecpos.x, vecpos.y);
-	glTexCoord2f (x2, y2);	glVertex2i (vecpos.x + width, vecpos.y);
-	glTexCoord2f (x2, y1);	glVertex2i (vecpos.x + width, vecpos.y +height);
-	glTexCoord2f (x1, y1);	glVertex2i (vecpos.x, vecpos.y +height);
+	glTexCoord2f (x1, y2);	glVertex2f (vecpos.x, vecpos.y);
+	glTexCoord2f (x2, y2);	glVertex2f (vecpos.x + width, vecpos.y);
+	glTexCoord2f (x2, y1);	glVertex2f (vecpos.x + width, vecpos.y +height);
+	glTexCoord2f (x1, y1);	glVertex2f (vecpos.x, vecpos.y +height);
 
 	glEnd ();//stop drawing to the new frame buffer.
+
+	glBindTexture(GL_TEXTURE_2D, 0);
 }
 
 void create_widget_vertex_buffer(widget *control)
@@ -222,16 +231,16 @@ void widget_update_vector(widget *control)
 	control->actualpos.y = control->pos.y + control->parent->actualpos.y;
 
 	/*index 0*/
-	control->buf.data[0].x = (float)control->actualpos.x; control->buf.data[0].y = (float)control->actualpos.y;
+	control->buf.data[0].x = control->actualpos.x; control->buf.data[0].y = control->actualpos.y;
 
 	/*index 1*/
-	control->buf.data[1].x = (float)control->actualpos.x + control->sizex; control->buf.data[1].y = (float)control->actualpos.y;
+	control->buf.data[1].x = control->actualpos.x + control->sizex; control->buf.data[1].y = control->actualpos.y;
 
 	/*index 2*/
-	control->buf.data[2].x = (float)control->actualpos.x + control->sizex; control->buf.data[2].y = (float)control->actualpos.y + control->sizey;
+	control->buf.data[2].x = control->actualpos.x + control->sizex; control->buf.data[2].y = control->actualpos.y + control->sizey;
 
 	/*index 3*/
-	control->buf.data[3].x = (float)control->actualpos.x; control->buf.data[3].y = (float)control->actualpos.y + control->sizey;
+	control->buf.data[3].x = control->actualpos.x; control->buf.data[3].y = control->actualpos.y + control->sizey;
 
 	glBindBuffer(GL_ARRAY_BUFFER,control->buf.buffer);
 	glBufferSubData(GL_ARRAY_BUFFER, 0, 4 * sizeof(struct vertex_t), &control->buf.data[0]);
@@ -240,29 +249,26 @@ void widget_update_vector(widget *control)
 
 void widget_update_progressbars_vector(widget *control)
 {
-	float value,x;
-
-	control->actualpos.x = control->pos.x + control->parent->actualpos.x;
-	control->actualpos.y = control->pos.y + control->parent->actualpos.y;
+	float value;
 
 	if(control->type == CONTROL_HPROGRESSBAR){
-		value = (float)(control->value / 100.f);
-		/*0*/control->buf.data[0].x = (float)control->actualpos.x; control->buf.data[0].y = (float)control->actualpos.y;
-		/*1*/control->buf.data[1].x = (float)control->actualpos.x + (control->sizex * value); control->buf.data[1].y = (float)control->actualpos.y;
-		/*2*/control->buf.data[2].x = (float)control->actualpos.x + (control->sizex * value); control->buf.data[2].y = (float)control->actualpos.y + control->sizey;
-		/*3*/control->buf.data[3].x = (float)control->actualpos.x; control->buf.data[3].y = (float)control->actualpos.y + control->sizey;
+		value = (control->parent->value / 100.f);
+		control->actualpos.x = control->parent->actualpos.x;
+		control->actualpos.y = control->parent->actualpos.y;
+		/*0*/control->buf.data[0].x = control->actualpos.x; control->buf.data[0].y = control->actualpos.y;
+		/*1*/control->buf.data[1].x = control->actualpos.x + (control->sizex * value); control->buf.data[1].y = control->actualpos.y;
+		/*2*/control->buf.data[2].x = control->actualpos.x + (control->sizex * value); control->buf.data[2].y = control->actualpos.y + control->sizey;
+		/*3*/control->buf.data[3].x = control->actualpos.x; control->buf.data[3].y = control->actualpos.y + control->sizey;
 	}
 	else{
-		value = (float)(control->value / -100.f);
-		if(value == -1){
-			x = 0;
-		}else{
-			x = -1;
-		}
-		/*0*/control->buf.data[0].x = (float)control->actualpos.x; control->buf.data[0].y = (float)control->actualpos.y + x;
-		/*1*/control->buf.data[1].x = (float)control->actualpos.x + control->sizex ; control->buf.data[1].y = (float)control->actualpos.y + x;
-		/*2*/control->buf.data[2].x = (float)control->actualpos.x + control->sizex ; control->buf.data[2].y = (float)control->actualpos.y + (control->sizey * value);
-		/*3*/control->buf.data[3].x = (float)control->actualpos.x; control->buf.data[3].y = (float)control->actualpos.y + (control->sizey * value);
+		value = (control->parent->value / -100.f);
+
+		control->actualpos.x = control->parent->actualpos.x;
+		control->actualpos.y = control->height + control->parent->actualpos.y;
+		/*0*/control->buf.data[0].x = control->actualpos.x; control->buf.data[0].y = control->actualpos.y ;
+		/*1*/control->buf.data[1].x = control->actualpos.x + control->sizex ; control->buf.data[1].y = control->actualpos.y ;
+		/*2*/control->buf.data[2].x = control->actualpos.x + control->sizex ; control->buf.data[2].y = control->actualpos.y + (control->sizey * value);
+		/*3*/control->buf.data[3].x = control->actualpos.x; control->buf.data[3].y = control->actualpos.y + (control->sizey * value);
 	}
 	glBindBuffer(GL_ARRAY_BUFFER,control->buf.buffer);
 	glBufferSubData(GL_ARRAY_BUFFER, 0, 4 * sizeof(struct vertex_t), &control->buf.data[0]);
@@ -334,7 +340,7 @@ void update_widget_vertex_buffer(widget *control)
 	create_widget_vertex(control);
 
 	glBindBuffer(GL_ARRAY_BUFFER,control->buf.buffer);
-	glBufferData(GL_ARRAY_BUFFER,sizeof(control->buf.data),control->buf.data,GL_STREAM_DRAW);//fill up the array with vertex and color-data
+	glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(control->buf.data), &control->buf.data[0]);
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 }
 
@@ -356,9 +362,63 @@ void draw_widget(widget *control)
 
 	glDrawElements(GL_QUADS,4,GL_UNSIGNED_INT,0); //GL_TRIANGLE_STRIP
 
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+	glBindTexture(GL_TEXTURE_2D, 0);
 	glDisableClientState(GL_COLOR_ARRAY);
 	glDisableClientState(GL_TEXTURE_COORD_ARRAY);
 	glDisableClientState(GL_VERTEX_ARRAY);
+}
+
+void create_cursor_vertex(widget *control)
+{
+	GLuint index[2] = {0,1};
+	textbox *text = (textbox *)control->control;
+
+	text->cursorpos.x = control->pos.x + control->parent->actualpos.x + text->string->offsetx;
+	text->cursorpos.y = control->pos.y + control->parent->actualpos.y + text->string->offsety;
+
+	/*index 0*/
+	text->cursorbuffer.data[0].x = text->cursorpos.x + text->string->offsetx; text->cursorbuffer.data[0].y = text->cursorpos.y + text->string->font->h;
+	text->cursorbuffer.data[0].r = text->string->col.r; text->cursorbuffer.data[0].b = text->string->col.b; text->cursorbuffer.data[0].g = text->string->col.g; text->cursorbuffer.data[0].a = text->string->col.a;
+
+	/*index 1*/
+	text->cursorbuffer.data[1].x = text->cursorpos.x + text->string->offsetx; text->cursorbuffer.data[1].y = text->cursorpos.y + text->string->font->h - text->cursorheight + 2;
+	text->cursorbuffer.data[1].r = text->string->col.r; text->cursorbuffer.data[1].b = text->string->col.b; text->cursorbuffer.data[1].g = text->string->col.g; text->cursorbuffer.data[1].a = text->string->col.a;
+
+	glGenBuffers(1,&text->cursorbuffer.buffer);
+	glGenBuffers(1,&text->cursorbuffer.index);
+
+	glBindBuffer(GL_ARRAY_BUFFER,text->cursorbuffer.buffer);
+	glBufferData(GL_ARRAY_BUFFER,sizeof(text->cursorbuffer.data),text->cursorbuffer.data,GL_STREAM_DRAW);//fill up the array with vertex and color-data
+
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER,text->cursorbuffer.index);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER,2 * sizeof(GLuint),index,GL_STATIC_DRAW);
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+}
+
+void draw_cursor(widget *control)
+{
+	textbox *text = (textbox *)control->control;
+
+	glEnableClientState(GL_VERTEX_ARRAY);
+	glEnableClientState(GL_COLOR_ARRAY);
+
+	glLineWidth(text->cursorwidth);
+
+	glBindBuffer(GL_ARRAY_BUFFER, text->cursorbuffer.buffer);
+	glVertexPointer(2, GL_FLOAT, sizeof(struct line_vertex_t), 0);
+	glColorPointer(4, GL_FLOAT, sizeof(struct line_vertex_t), (GLvoid *)offsetof(struct line_vertex_t, r));
+
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, text->cursorbuffer.index);
+	glIndexPointer(GL_UNSIGNED_INT,sizeof(GLuint),0);
+
+	glDrawElements(GL_LINES,2,GL_UNSIGNED_INT,0); //GL_TRIANGLE_STRIP
 
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+
+	glDisableClientState(GL_COLOR_ARRAY);
+	glDisableClientState(GL_VERTEX_ARRAY);
 }
