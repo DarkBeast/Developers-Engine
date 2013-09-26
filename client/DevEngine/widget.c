@@ -504,6 +504,7 @@ void widget_init(widget *wgt)//initializes a widget.
 
 	wgt->parent = NULL;
 	wgt->control = NULL;
+	wgt->data = NULL;
 	wgt->shown.data  = NULL;
 	wgt->shown.count = 0;
 	wgt->shown.size = 0;
@@ -571,7 +572,7 @@ void widget_shown_resize(widget *parent, uint16 size)
 {
 	widget **data;
 
-	data = (widget **)realloc(parent->shown.data, size * sizeof(widget*));
+	data = (widget **)realloc(parent->shown.data, size * sizeof(widget));
 
 	if (data == NULL)
 		return;
@@ -585,7 +586,7 @@ void widget_hidden_resize(widget *parent, uint16 size)
 {
 	widget **data;
 
-	data = (widget **)realloc(parent->hidden.data, size * sizeof(widget*));
+	data = (widget **)realloc(parent->hidden.data, size * sizeof(widget));
 
 	if (data == NULL)
 		return;
@@ -996,7 +997,7 @@ sbool widget_has_mouse_over(widget *control)
 	if(!(control->action & WIDGET_IS_FOCUSED)){
 		while(i){
 			if(parent != ui.root){
-				if(parent->action & WIDGET_CAN_FOCUS && parent->action & WIDGET_IS_FOCUSED){
+				if(parent->action & WIDGET_CAN_FOCUS && parent->action & WIDGET_IS_FOCUSED || parent->action & WIDGET_ALWAYS_USEABLE){
 					i = FALSE;
 					return TRUE;
 				}
@@ -1036,7 +1037,7 @@ sbool widget_usable(widget *control)
 	if(!(control->action & WIDGET_IS_FOCUSED)){
 		while(i){
 			if(parent != ui.root){
-				if(parent->action & WIDGET_CAN_FOCUS && parent->action & WIDGET_IS_FOCUSED){
+				if(parent->action & WIDGET_CAN_FOCUS && parent->action & WIDGET_IS_FOCUSED || parent->action & WIDGET_ALWAYS_USEABLE){
 					i = FALSE;
 					return TRUE;
 				}

@@ -52,19 +52,20 @@ struct widget
 	widget *parent;
 	widget_array shown; //widgets drawn
 	widget_array hidden; //widgets not drawn.
-	vector2ui pos;//default position.
-	vector2ui actualpos;//offset position
-	vector2i imgpos;//texture position
+	vector2f pos;//default position.
+	vector2f actualpos;//offset position
+	vector2f imgpos;//texture position
 	image *img; //image data
 	sbuffer buf;// opengl buffer
 	uint16 width;
 	uint16 height;
-	uint16 sizex;
-	uint16 sizey;
+	float sizex;
+	float sizey;
 	uint8 type; //control_types
-	uint16 value;
+	uint32 value;
 	lbool action;//widget_flags_t
 	void *control; //special control data
+	void *data; //holding unique data.
 
 	//User Events
 	void(*draw)(widget *);
