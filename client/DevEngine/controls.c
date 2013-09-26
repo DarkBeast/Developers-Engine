@@ -345,7 +345,7 @@ void create_radio(widget *control, widget *parent, uint16 x, uint16 y, uint16 he
 		control->action |= WIDGET_CHECKED;
 		control->imgpos.y = 0;
 	}
-	init_radio->ammount = 0;
+	init_radio->amount = 0;
 	init_radio->count = 0;
 	init_radio->main = NULL;
 	init_radio->list = NULL;
@@ -394,16 +394,16 @@ void link_radio(widget *main, widget *control)
 			return;
 		}
 
-		data->ammount = 4;
+		data->amount = 4;
 		data->list[0]= control;
 		data->count = 1;
 	}
 	else{
-		for( i = 0; i <= data->ammount; i++){
-			if( i >= data->ammount)
+		for( i = 0; i <= data->amount; i++){
+			if( i >= data->amount)
 			{
-				data->ammount = (uint8)next_power_of_two(data->ammount);
-				resize_radio_list(data,data->ammount);
+				data->amount = (uint8)next_power_of_two(data->amount);
+				resize_radio_list(data,data->amount);
 			}
 
 			if(data->list[i] == NULL){
@@ -538,10 +538,11 @@ void create_hprogressbar(widget *control, widget *parent, uint16 x, uint16 y, ui
 
 	control->value = value;
 
-	bar->pos.x = x;
-	bar->pos.y = y;
-	bar->height = height;
-	bar->width = width;
+	set_control_image(bar, hbar);
+	bar->pos.x = 0;
+	bar->pos.y = 0;
+	bar->height = bar->img->height;
+	bar->width = bar->img->width;
 	bar->sizey = sizey;
 	bar->sizex = sizex;
 	bar->imgpos.x = 0;
@@ -550,7 +551,6 @@ void create_hprogressbar(widget *control, widget *parent, uint16 x, uint16 y, ui
 	bar->draw = &draw_hprogressbar;
 	bar->controlmousepress = &handle_hprogressbar_click;
 	bar->controlupdatepos = &handle_hprogressbars_move;
-	set_control_image(bar, hbar);
 
 	widget_add(parent,control);
 	widget_add(control, bar);
@@ -668,44 +668,48 @@ void create_hscrollbar(widget *control, widget *parent, uint16 x, uint16 y, uint
 	set_control_image(control, background);
 	control->value = value;
 
+	set_control_image(button_left, buttonleft);
 	button_left->pos.x = 0;
 	button_left->pos.y = 0;
-	button_left->height = 22;
-	button_left->width = 20;
-	button_left->sizex = ( sizex / button_left->width) + 20;
+	button_left->height = button_left->img->height;
+	button_left->width = button_left->img->width;
+	button_left->sizex = button_left->img->width;
 	button_left->sizey = sizey;
 	button_left->controlmousepress = &handle_harrowleft_click;
 	button_left->controlupdatepos = &handle_hscrollbar_move;
-	set_control_image(button_left, buttonleft);
 
-	button_right->height = 22;
-	button_right->width = 20;
-	button_right->sizex = (sizex / button_right->width) + 20;
+	set_control_image(button_right, buttonright);
+	button_right->height = button_right->img->height;
+	button_right->width = button_right->img->width;
+	button_right->sizex = button_right->img->width;
 	button_right->sizey = sizey;
 	button_right->pos.x = sizex - button_right->sizex;
 	button_right->pos.y = 0;
 	button_right->controlmousepress = &handle_harrowright_click;
 	button_right->controlupdatepos = &handle_hscrollbar_move;
-	set_control_image(button_right, buttonright);
 
-	bar->height = 22;
-	bar->width = 8;
-	bar->sizex = (sizex - button_right->sizex) / max_value;
+	set_control_image(bar, scrollbar);
+	bar->height = bar->img->height;
+	bar->width = bar->img->width;
+	bar->imgpos.x = 0;
+	bar->imgpos.y = 0;
+	bar->sizex = (sizex + button_right->sizex  + button_left->sizex) / max_value;
 	bar->sizey = sizey;
-	if(bar->sizex < 3)
-		bar->sizex = 3;
 
-	bar->pos.x = (button_left->pos.x + button_left->sizex) + (value *(sizex - (button_left->sizex * 2) ) / max_value);
+	if(bar->sizex < 8)
+		bar->sizex = 8;
+
+	bar->pos.x = (button_left->pos.x + button_left->sizex) + (value *(sizex - (button_left->sizex) - 1 ) / max_value);
 
 	bar->value = max_value;
 	bar->pos.y = 0;
-	set_control_image(bar, scrollbar);
 
 	if(bar->pos.x < button_left->pos.x)
-		bar->pos.x = button_left->pos.x;
+		bar->pos.x = button_left->pos.x + button_left->sizex;
 
 	if(bar->pos.x > button_right->pos.x)
 		bar->pos.x = button_right->pos.x;
+
 	bar->controlupdatepos = &handle_hscrollbar_move;
 
 	widget_add(parent,control);
@@ -743,13 +747,15 @@ void handle_hscrollbar_click(widget *control, int button, int pressed)
 
 void handle_harrowleft_click(widget *control, int button, int pressed)
 {
-	--control->parent->value;
-
-	if(control->parent->value < 0)
-		control->parent->value = 0;
+	if(control->parent->value > 0)
+		--control->parent->value;
 
 	control->parent->shown.data[2]->pos.x = (control->pos.x + control->sizex) +
-		(control->parent->value *(control->parent->sizex - (control->sizex * 2) ) / control->parent->shown.data[2]->value);
+		(control->parent->value *(control->parent->sizex - (control->parent->shown.data[1]->pos.y + (control->parent->shown.data[1]->sizex * 2)+ control->parent->shown.data[2]->sizex - 1)) / control->parent->shown.data[2]->value);
+
+	if(control->parent->shown.data[2]->pos.x < control->parent->shown.data[0]->pos.x + control->parent->shown.data[0]->sizex - 1)
+		control->parent->shown.data[2]->pos.x = control->parent->shown.data[0]->pos.x + control->parent->shown.data[0]->sizex;
+
 	widget_update_vector(control->parent->shown.data[2]);
 
 	control->mousepress(control,button,pressed);
@@ -757,13 +763,11 @@ void handle_harrowleft_click(widget *control, int button, int pressed)
 
 void handle_harrowright_click(widget *control, int button, int pressed)
 {
-	++control->parent->value;
-
-	if(control->parent->value > control->parent->shown.data[2]->value)
-		control->parent->value = control->parent->shown.data[2]->value;
+	if(control->parent->value + 1 <= control->parent->shown.data[2]->value)
+		++control->parent->value;
 
 	control->parent->shown.data[2]->pos.x = (control->parent->shown.data[0]->pos.x + control->parent->shown.data[0]->sizex) +
-		(control->parent->value *(control->parent->sizex - (control->parent->shown.data[0]->sizex * 2)) / control->parent->shown.data[2]->value);
+		(control->parent->value *(control->parent->sizex - (control->parent->shown.data[1]->pos.y + (control->parent->shown.data[1]->sizex * 2) + control->parent->shown.data[2]->sizex - 1)) / control->parent->shown.data[2]->value);
 	widget_update_vector(control->parent->shown.data[2]);
 	control->mousepress(control,button,pressed);
 }
@@ -810,44 +814,46 @@ void create_vscrollbar(widget *control, widget *parent, uint16 x, uint16 y, uint
 	set_control_image(control, background);
 	control->value = value;
 
+	set_control_image(button_top, buttontop);
 	button_top->pos.x = 0;
 	button_top->pos.y = 0;
-	button_top->height = 20;
-	button_top->width = 22;
+	button_top->height = button_top->img->height;
+	button_top->width = button_top->img->width;
 	button_top->sizex = sizex;
-	button_top->sizey = (sizey / button_top->height) + 20;
+	button_top->sizey = button_top->img->height;
 	button_top->controlmousepress = &handle_varrowtop_click;
 	button_top->controlupdatepos = &handle_vscrollbar_move;
-	set_control_image(button_top, buttontop);
 
-	button_bottom->height = 20;
-	button_bottom->width = 22;
+	set_control_image(button_bottom, buttonbottom);
+	button_bottom->height = button_bottom->img->height;
+	button_bottom->width = button_bottom->img->width;
 	button_bottom->sizex = sizex;
-	button_bottom->sizey = (sizey / button_bottom->height) + 20;
+	button_bottom->sizey = button_bottom->img->height;
 	button_bottom->pos.x = 0;
 	button_bottom->pos.y = sizey - button_bottom->sizey;
 	button_bottom->controlmousepress = &handle_varrowbottom_click;
 	button_bottom->controlupdatepos = &handle_vscrollbar_move;
 	set_control_image(button_bottom, buttonbottom);
 
-	bar->height = 8;
-	bar->width = 22;
+	set_control_image(bar, scrollbar);
+	bar->height = bar->img->height;
+	bar->width = bar->img->width;
 	bar->sizex = sizex;
-	bar->sizey = (sizey - button_bottom->sizey) / max_value;
-	if(bar->sizey < 3)
-		bar->sizey = 3;
+	//bar->sizey = (sizey + button_top->sizey  + button_bottom->sizey - bar->img->height) / max_value;
+	//if(bar->sizey < 8)
+	bar->sizey = bar->img->height;
 
-	bar->pos.y = (button_top->pos.y + button_top->sizey) + (value *(sizey - (button_top->sizey * 2) ) / max_value);
+	bar->pos.y = (button_top->pos.y + button_top->sizey) + (value *(sizey - (button_top->sizey * 2) - 1 ) / max_value);
 
 	bar->value = max_value;
 	bar->pos.x = 0;
-	set_control_image(bar, scrollbar);
 
 	if(bar->pos.y < button_top->pos.y)
 		bar->pos.y = button_top->pos.y;
 
 	if(bar->pos.y > button_bottom->pos.y)
 		bar->pos.y = button_bottom->pos.y;
+
 	bar->controlupdatepos = &handle_vscrollbar_move;
 
 	widget_add(parent,control);
@@ -879,26 +885,22 @@ void handle_vscrollbar_click(widget *control, int button, int pressed)
 
 void handle_varrowtop_click(widget *control, int button, int pressed)
 {
-	--control->parent->value;
-
-	if(control->parent->value < 0)
-		control->parent->value = 0;
+	if(control->parent->value > 0)
+		--control->parent->value;
 
 	control->parent->shown.data[2]->pos.y = (control->pos.y + control->sizey) +
-		(control->parent->value *(control->parent->sizey - (control->sizey * 2) ) / control->parent->shown.data[2]->value);
+		(control->parent->value *(control->parent->sizey - (control->sizey * 2) - control->parent->shown.data[2]->sizey - 1 ) / control->parent->shown.data[2]->value);
 	widget_update_vector(control->parent->shown.data[2]);
 	control->mousepress(control,button,pressed);
 }
 
 void handle_varrowbottom_click(widget *control, int button, int pressed)
 {
-	++control->parent->value;
-
-	if(control->parent->value > control->parent->shown.data[2]->value)
-		control->parent->value = control->parent->shown.data[2]->value;
+	if(control->parent->value + 1 <= control->parent->shown.data[2]->value)
+		++control->parent->value;
 
 	control->parent->shown.data[2]->pos.y = (control->parent->shown.data[0]->pos.y + control->parent->shown.data[0]->sizey) +
-		(control->parent->value *(control->parent->sizey - (control->parent->shown.data[0]->sizey * 2)) / control->parent->shown.data[2]->value);
+		(control->parent->value *(control->parent->sizey - (control->parent->shown.data[0]->sizey * 2) - control->parent->shown.data[2]->sizey) / control->parent->shown.data[2]->value);
 	widget_update_vector(control->parent->shown.data[2]);
 	control->mousepress(control,button,pressed);
 }
@@ -939,11 +941,12 @@ void create_vprogressbar(widget *control, widget *parent, uint16 x, uint16 y, ui
 	control->value = value;
 
 	widget_init(bar);
-	bar->pos.x = x;
-	bar->pos.y = y;
-	bar->height = height;
-	bar->width = width;
-	bar->sizey = sizey;
+	set_control_image(bar, vbar);
+	bar->pos.x = 0;
+	bar->pos.y = 0;
+	bar->height = bar->img->height - 1;
+	bar->width = bar->img->width;
+	bar->sizey = sizey - 1;
 	bar->sizex = sizex;
 	bar->imgpos.x = 0;
 	bar->imgpos.y = 0;
@@ -951,7 +954,6 @@ void create_vprogressbar(widget *control, widget *parent, uint16 x, uint16 y, ui
 	bar->draw = &draw_vprogressbar;
 	bar->controlmousepress = &handle_vprogressbar_click;
 	bar->controlupdatepos = &handle_vprogressbars_move;
-	set_control_image(bar, vbar);
 
 	widget_add(parent,control);
 	widget_add(control,bar);
@@ -1386,4 +1388,330 @@ void handle_mtextbox_input(widget *control, int key)
 			}
 		}
 	}
+}
+
+void create_listbox(widget *control, widget *parent, uint16 x, uint16 y, uint16 height, uint16 width, uint16 sizey, uint16 sizex, uint8 offsetx, uint8 offsety, uint32 amount, uint8 maxchars, uint8 fontid, uint8 red, uint8 green, uint8 blue, uint8 alpha, char *imglistbg, char *imgbg, char *imgup, char *imgdown, char *bar, char *select, char *mouseover)
+{
+	listbox *list = (listbox *)calloc(1,sizeof(listbox));
+	uint32 i = 0;
+	atlas *prefont = get_atlas(fontid);
+
+	list->list = (widget **)calloc(1, amount * sizeof(widget));
+	list->control = (widget *)calloc(1,sizeof(widget));
+	list->select = (widget *)calloc(1,sizeof(widget));
+	list->selectover = (widget *)calloc(1,sizeof(widget));
+
+	if(list == NULL || list->list == NULL || list->control == NULL || list->select == NULL || list->selectover == NULL){
+		fatal_error(ERROR_POINTER_NULL);
+		return;
+	}
+
+	widget_init(control);
+	set_control_image(control, imglistbg);
+	control->pos.x = x;
+	control->pos.y = y;
+	control->height = control->img->height;
+	control->width = control->img->width;
+	control->sizey = sizey;
+	control->sizex = sizex;
+	control->imgpos.x = 0;
+	control->imgpos.y = 0;
+	control->controlmousepress = &handle_listbox_click;
+	control->controlmouserelease = &handle_listbox_release;
+	control->controlmouseover = &handle_listbox_mouse_over;
+	control->controlmouseexit = &handle_listbox_mouse_exit;
+	control->type = CONTROL_LISTBOX;
+	control->draw = &draw_listbox;
+
+	widget_init(list->select);
+	set_control_image(list->select, select);
+	list->select->pos.x = offsetx;
+	list->select->pos.y = offsety;
+	list->select->height = list->select->img->height;
+	list->select->width = list->select->img->width;
+	list->select->sizey = prefont->h;
+	list->select->sizex = sizex  - 22;
+	list->select->imgpos.x = 0;
+	list->select->imgpos.y = 0;
+	list->select->type = CONTROL_PICTUREBOX;
+	list->select->parent = control;
+
+	widget_init(list->selectover);
+	set_control_image(list->selectover, mouseover);
+	list->selectover->pos.x = offsetx;
+	list->selectover->pos.y = offsety;
+	list->selectover->height = list->selectover->img->height;
+	list->selectover->width = list->selectover->img->width;
+	list->selectover->sizey = prefont->h;
+	list->selectover->sizex = sizex  - 22;
+	list->selectover->imgpos.x = 0;
+	list->selectover->imgpos.y = 0;
+	list->selectover->type = CONTROL_PICTUREBOX;
+	list->selectover->parent = control;
+
+	list->offsetx = offsetx;
+	list->offsety = offsety;
+	list->voffset = 0;
+
+	widget_add(parent,control);
+	create_widget_vertex_buffer(control);
+	create_widget_vertex_buffer(list->selectover);
+	create_widget_vertex_buffer(list->select);
+
+	for(i = 0; i < amount; i++){
+		label *init_text = (label *)calloc(1,sizeof(label));
+
+		list->list[i] = (widget *)calloc(1,sizeof(widget));
+
+		if(init_text == NULL || list->list[i] == NULL){
+			fatal_error(ERROR_POINTER_NULL);
+			return;
+		}
+
+		widget_init(list->list[i]);
+
+		list->list[i]->imgpos.x = 0;
+		list->list[i]->imgpos.y = 0;
+		list->list[i]->type = CONTROL_LABEL;
+		list->list[i]->draw = &draw_label;
+		list->list[i]->controlmousepress = &handle_listbox_label_click;
+		list->list[i]->controlmouseover = &handle_listbox_label_mouse_over;
+		list->list[i]->controlmouseexit = &handle_listbox_label_mouse_exit;
+		list->list[i]->controlupdatepos = &handle_slabel_move;
+		list->list[i]->action |= WIDGET_CAN_USE_EVENT;
+		list->list[i]->parent = control;
+
+		init_text->string = (text *)calloc(1,sizeof(text));
+
+		if(init_text->string == NULL){
+			fatal_error(ERROR_POINTER_NULL);
+			return;
+		}
+
+		text_set(init_text->string,0,0,width - 22,prefont->h,offsetx,offsety,maxchars,0,fontid,red,blue,green,alpha,int_to_string(i + 1));
+
+		list->list[i]->height = prefont->h;
+		list->list[i]->sizey = prefont->h;
+		list->list[i]->width = width - 22;
+		list->list[i]->sizex = width - 22;
+		list->list[i]->control = init_text;
+		list->list[i]->value = i;
+
+		create_text_vertex(init_text->string, list->list[i]);
+	}
+
+	list->max = height/(prefont->h + offsety);
+
+	for(i = 0; i < list->max; i++){
+		label *lbl = (label *)list->list[i]->control;
+
+		if( i == 0){
+			list->list[i]->pos.x = offsetx;
+			list->list[i]->pos.y = offsety ;
+			text_position_supdate(lbl->string, list->list[i]);
+		}
+		else{
+			list->list[i]->pos.x = offsetx;
+			list->list[i]->pos.y = offsety + ( i * prefont->h );
+			text_position_supdate(lbl->string, list->list[i]);
+		}
+	}
+
+	list->count = amount;
+	list->size = amount;
+
+	control->control = list;
+	create_vscrollbar(&list->vbar,control,width - 22,0,height,22,sizey,22,0,amount - list->max,imgbg,imgup,imgdown,bar);
+	set_scrollbar_buttons(&list->vbar, &handle_listbox_scroll);
+}
+
+void draw_listbox(widget *control)
+{
+	listbox *list = (listbox *)control->control;
+	uint32 i = 0;
+
+	draw_widget(control);
+
+	if(list->select->value)
+		draw_widget(list->select);
+
+	if(list->selectover->value)
+		draw_widget(list->selectover);
+
+	for(i = list->voffset; i < list->voffset + list->max; i++){
+		list->list[i]->draw(list->list[i]);
+	}
+}
+
+void handle_listbox_release(widget *control, int button, int pressed)
+{
+	listbox *list = (listbox *)control->control;
+	uint32 i = 0;
+
+	for(i = list->voffset; i < list->voffset + list->max; i++){
+		if(widget_rect_contains(list->list[i], control)){
+			if(list->list[i]->action & WIDGET_CLICKED){
+				list->list[i]->action &= ~(WIDGET_CLICKED);
+				list->list[i]->controlmousepress(list->list[i],button,pressed);
+			}
+		}
+	}
+}
+
+void handle_listbox_click(widget *control, int button, int pressed)
+{
+	listbox *list = (listbox *)control->control;
+	uint32 i = 0;
+
+	if(list->control && widget_rect_contains(list->control, control)){
+		list->select->value = FALSE;
+		list->control = NULL;
+	}
+	else{
+		for(i = list->voffset; i < list->voffset + list->max; i++){
+			if(widget_rect_contains(list->list[i], control)){
+				list->list[i]->action |= WIDGET_CLICKED;
+				list->list[i]->controlmousepress(list->list[i],button,pressed);
+			}
+		}
+	}
+}
+
+void handle_listbox_mouse_over(widget *control)
+{
+	listbox *list = (listbox *)control->control;
+	uint32 i = 0;
+
+	for(i = list->voffset; i < list->voffset + list->max; i++){
+		if(widget_rect_contains(list->list[i], control)){
+			list->list[i]->action |= WIDGET_MOUSE_OVER;
+			list->list[i]->controlmouseover(list->list[i]);
+		}
+		else{
+			if(list->list[i]->action & WIDGET_MOUSE_OVER){
+				list->list[i]->action &= ~(WIDGET_AVOID_BUFFER_UPDATE);
+				list->list[i]->action &= ~(WIDGET_MOUSE_OVER);
+				list->list[i]->controlmouseexit(list->list[i]);
+			}
+		}
+	}
+}
+
+void handle_listbox_mouse_exit(widget *control)
+{
+	listbox *list = (listbox *)control->control;
+	uint32 i = 0;
+
+	//clear all if mouse was still preset to over after moving off the list box.
+	for(i = list->voffset; i < list->voffset + list->max; i++){
+		if(list->list[i]->action & WIDGET_MOUSE_OVER){
+			list->list[i]->action &= ~(WIDGET_AVOID_BUFFER_UPDATE);
+			list->list[i]->action &= ~(WIDGET_MOUSE_OVER);
+			list->list[i]->controlmouseexit(list->list[i]);
+		}
+	}
+}
+
+void handle_listbox_label_click(widget *control, int button, int pressed)
+{
+	listbox *list = (listbox *)control->parent->control;
+
+	if (widget_usable(control)){
+		if (control->action & WIDGET_CLICKED){
+			list->select->parent = control;
+			list->select->value = TRUE;
+			widget_update_vector(list->select);
+			list->control = control;
+		}
+	}
+
+	control->mousepress(control,button,pressed);
+}
+
+void handle_listbox_label_mouse_over(widget *control)
+{
+	listbox *list = (listbox *)control->parent->control;
+
+	if(!(control->action & WIDGET_AVOID_BUFFER_UPDATE)){
+		if (control->action & WIDGET_MOUSE_OVER){
+			list->selectover->parent = control;
+			list->selectover->value = TRUE;
+			widget_update_vector(list->selectover);
+			control->action |= WIDGET_AVOID_BUFFER_UPDATE;
+		}
+	}
+
+	control->mouseover(control);
+}
+
+void handle_listbox_label_mouse_exit(widget *control)
+{
+	listbox *list = (listbox *)control->parent->control;
+	uint32 i = 0;
+	sbool isover = FALSE;
+
+	for(i = list->voffset; i < list->voffset + list->max; i++){
+		if(list->list[i]->action & WIDGET_MOUSE_OVER){
+			isover = TRUE;
+		}
+	}
+
+	if(!isover)
+		list->selectover->value = FALSE;
+
+	control->mouseexit(control);
+}
+
+void handle_listbox_scroll(widget *control, int button, int pressed)
+{
+	listbox *list = (listbox *)control->parent->parent->control;
+	uint32 i = 0;
+	sbool isonlist = FALSE;
+
+	list->voffset = control->parent->value;
+
+	for(i = list->voffset; i < list->voffset + list->max; i++){
+		label *lbl = (label *)list->list[i]->control;
+
+		if(list->control && list->control == list->list[i])
+			isonlist = TRUE;
+
+		if( i == 0 + list->voffset){
+			list->list[i]->pos.x =  list->offsetx;
+			list->list[i]->pos.y = list->offsety;
+			text_position_supdate(lbl->string, list->list[i]);
+		}
+		else{
+			list->list[i]->pos.x = list->offsetx;
+			list->list[i]->pos.y = list->offsety + ( (i - list->voffset) * lbl->string->font->h);
+			text_position_supdate(lbl->string, list->list[i]);
+		}
+	}
+
+	if(isonlist){
+		list->select->value = TRUE;
+		widget_update_vector(list->select);
+	}
+	else{
+		list->select->value = FALSE;
+	}
+}
+
+void handle_listbox_move(widget *control)
+{
+	listbox *list = (listbox *)control->control;
+	uint32 i = 0;
+
+	widget_update_vector(control);
+
+	//clear all if mouse was still preset to over after moving off the list box.
+	for(i = list->voffset; i < list->voffset + list->max; i++){
+		list->list[i]->controlupdatepos(list->list[i]);
+	}
+}
+
+void * get_list_data(widget *control)
+{
+	listbox * list = (listbox *)control->control;
+	return list->control->data;
 }

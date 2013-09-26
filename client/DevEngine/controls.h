@@ -15,6 +15,7 @@ typedef struct window window;
 typedef struct radio radio;
 typedef struct scrollbar scrollbar;
 typedef struct textbox textbox;
+typedef struct listbox listbox;
 
 enum control_types
 {
@@ -29,9 +30,7 @@ enum control_types
 	CONTROL_VSCROLL_BAR,
 	CONTROL_HPROGRESSBAR,
 	CONTROL_VPROGRESSBAR,
-	CONTROL_SPINNER,
 	CONTROL_LISTBOX,
-	CONTROL_TABBOX,
 	CONTROL_TEXTBOX
 };
 
@@ -47,7 +46,7 @@ struct window{
 struct radio{
 	widget *main;
 	widget **list;
-	uint8 ammount;
+	uint8 amount;
 	uint8 count;
 };
 
@@ -64,6 +63,20 @@ struct textbox{
 	uint16 cursorwidth;
 	vector2i cursorpos;
 	line_buffer cursorbuffer;
+};
+
+struct listbox{
+	widget *control;
+	widget **list;
+	widget vbar;
+	widget *select;
+	widget *selectover;
+	uint16 offsetx;
+	uint16 offsety;
+	uint16 size;
+	uint16 count;
+	uint16 voffset;
+	uint16 max;
 };
 
 void set_control_image(widget *control, char *path);
@@ -153,4 +166,18 @@ void handle_mtextbox_move(widget *control);
 void draw_mtextbox_text(widget *control);
 void handle_mtextbox_input(widget *control, int key);
 void handle_mtextbox_text_move(widget *control);
+
+void create_listbox(widget *control, widget *parent, uint16 x, uint16 y, uint16 height, uint16 width, uint16 sizey, uint16 sizex, uint8 offsetx, uint8 offsety, uint32 amount, uint8 maxchars, uint8 fontid, uint8 red, uint8 green, uint8 blue, uint8 alpha, char *imglistbg, char *imgbg, char *imgup, char *imgdown, char *bar, char *select, char *mouseover);
+void draw_listbox(widget *control);
+void handle_listbox_release(widget *control, int button, int pressed);
+void handle_listbox_click(widget *control, int button, int pressed);
+void handle_listbox_mouse_over(widget *control);
+void handle_listbox_mouse_exit(widget *control);
+void handle_listbox_label_click(widget *control, int button, int pressed);
+void handle_listbox_label_mouse_over(widget *control);
+void handle_listbox_label_mouse_exit(widget *control);
+void handle_listbox_label_move(widget *control);
+void handle_listbox_scroll(widget *control, int button, int pressed);
+void * get_list_data(widget *control);
+
 #endif
