@@ -22,6 +22,7 @@ widget vprogressbar1;
 widget checkbox1;
 widget radio1[2];
 widget pic1;
+widget listbox1;
 
 void main_menu(void)
 {
@@ -35,7 +36,7 @@ void main_menu(void)
 	while(running){
 		time = (uint32 )glfwGetTime();
 
-		clear_screen(255,255,255,255);
+		clear_screen(0,0,0,255);
 
 		widget_manager();
 
@@ -79,6 +80,7 @@ void init_main_menu(void)
 	create_radio(&radio1[0],&window1,700,200,16,16,32,32,TRUE,"image\\radio.png");
 	create_radio(&radio1[1],&window1,700,234,16,16,32,32,FALSE,"image\\radio.png");
 	create_picturebox(&pic1,&window1,32,32,50,50,50,50,"image\\pictest.png");
+	create_listbox(&listbox1,&window1,400,400,100,124,100,124,2,2,10,15,1,255,0,0,255,"image\\listbox.png","image\\vscrollbar.png","image\\arrowtop.png","image\\arrowbottom.png", "image\\Vbar.png","image\\listselected.png", "image\\listselect.png");
 	link_radio(&radio1[0], &radio1[1]);
 	button1.mousepress = &button1_press;
 	set_scrollbar_buttons(&vscrollbar1,&vscrollbar1_press);
