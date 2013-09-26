@@ -175,8 +175,6 @@ void load_image(char *name, image *img)
 		img ->width, img ->height, 0, img ->format,
 		GL_UNSIGNED_BYTE, (void*) img->pixels);
 
-	//glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-	//glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 
@@ -253,19 +251,19 @@ void widget_update_progressbars_vector(widget *control)
 
 	if(control->type == CONTROL_HPROGRESSBAR){
 		value = (control->parent->value / 100.f);
-		control->actualpos.x = control->parent->actualpos.x;
-		control->actualpos.y = control->parent->actualpos.y;
-		/*0*/control->buf.data[0].x = control->actualpos.x; control->buf.data[0].y = control->actualpos.y;
+		control->actualpos.x = control->pos.x + control->parent->actualpos.x;
+		control->actualpos.y = control->pos.y + control->parent->actualpos.y;
+		/*0*/control->buf.data[0].x = control->actualpos.x + .1; control->buf.data[0].y = control->actualpos.y;
 		/*1*/control->buf.data[1].x = control->actualpos.x + (control->sizex * value); control->buf.data[1].y = control->actualpos.y;
 		/*2*/control->buf.data[2].x = control->actualpos.x + (control->sizex * value); control->buf.data[2].y = control->actualpos.y + control->sizey;
-		/*3*/control->buf.data[3].x = control->actualpos.x; control->buf.data[3].y = control->actualpos.y + control->sizey;
+		/*3*/control->buf.data[3].x = control->actualpos.x + .1; control->buf.data[3].y = control->actualpos.y + control->sizey;
 	}
 	else{
 		value = (control->parent->value / -100.f);
 
-		control->actualpos.x = control->parent->actualpos.x;
-		control->actualpos.y = control->height + control->parent->actualpos.y;
-		/*0*/control->buf.data[0].x = control->actualpos.x; control->buf.data[0].y = control->actualpos.y ;
+		control->actualpos.x = control->pos.x + control->parent->actualpos.x;
+		control->actualpos.y = control->pos.y + control->height + control->parent->actualpos.y;
+		/*0*/control->buf.data[0].x = control->actualpos.x; control->buf.data[0].y = control->actualpos.y;
 		/*1*/control->buf.data[1].x = control->actualpos.x + control->sizex ; control->buf.data[1].y = control->actualpos.y ;
 		/*2*/control->buf.data[2].x = control->actualpos.x + control->sizex ; control->buf.data[2].y = control->actualpos.y + (control->sizey * value);
 		/*3*/control->buf.data[3].x = control->actualpos.x; control->buf.data[3].y = control->actualpos.y + (control->sizey * value);
@@ -280,10 +278,10 @@ void widget_update_texture_vector(widget *control)
 	float x2,x1;
 	float y2,y1;
 
-	x1 = (float)control->imgpos.x  / control->img->width;
-	x2 = (float)(control->imgpos.x + control->width) / control->img->width;
-	y1 = (float)control->imgpos.y / control->img->height;
-	y2 = (float)(control->imgpos.y + control->height) /control->img->height;
+	x1 = control->imgpos.x  / control->img->width;
+	x2 = (control->imgpos.x + control->width) / control->img->width;
+	y1 = control->imgpos.y / control->img->height;
+	y2 = (control->imgpos.y + control->height) /control->img->height;
 
 	control->buf.data[0].u = x1; control->buf.data[0].v = y2;
 
@@ -309,10 +307,10 @@ void create_widget_vertex(widget *control)
 	control->actualpos.x = control->pos.x + control->parent->actualpos.x;
 	control->actualpos.y = control->pos.y + control->parent->actualpos.y;
 
-	x1 = (float)control->imgpos.x  / control->img->width;
-	x2 = (float)(control->imgpos.x + control->width) / control->img->width;
-	y1 = (float)control->imgpos.y / control->img->height;
-	y2 = (float)(control->imgpos.y + control->height) / control->img->height;
+	x1 = control->imgpos.x  / control->img->width;
+	x2 = (control->imgpos.x + control->width) / control->img->width;
+	y1 = control->imgpos.y / control->img->height;
+	y2 = (control->imgpos.y + control->height) / control->img->height;
 
 	/*index 0*/
 	control->buf.data[0].u = x1; control->buf.data[0].v = y2;
