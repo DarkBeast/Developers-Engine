@@ -6,9 +6,15 @@
 #define DE_FUNCTION_H
 
 #include <stdlib.h>
+#include "integer.h"
+#include "text.h"
 
+//gets the next power of 2.
 size_t next_power_of_two(size_t input);
-//TODO:  redo max and min using functions instead of defines.
+
+//integer to string.
+char* int_to_string(int64 number);
+
 #ifndef max
 #define max( a, b) ( ((a) > (b)) ? (a) : (b))
 #endif
