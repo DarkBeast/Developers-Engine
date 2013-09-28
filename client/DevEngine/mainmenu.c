@@ -73,7 +73,7 @@ void init_main_menu(void)
 	create_stextbox(&textbox3,&window1,140,335,100,32,2,2,100,32,0,255,0,255,0,1,TRUE,"image\\textbox.png");
 	create_button(&button1,&window1,380,220,60,100,60,100,"image\\button.png");
 	create_hscrollbar(&hscrollbar1, &window1,500,200,22,10,22,100,2,100,"image\\scrollbar.png","image\\arrowleft.png","image\\arrowright.png", "image\\bar.png");
-	create_vscrollbar(&vscrollbar1, &window1,500,300,10,22,100,22,2,100,"image\\vscrollbar.png","image\\arrowtop.png","image\\arrowbottom.png", "image\\Vbar.png");
+	create_vscrollbar(&vscrollbar1, &window1,500,300,10,22,100,22,0,100,"image\\vscrollbar.png","image\\arrowtop.png","image\\arrowbottom.png", "image\\Vbar.png");
 	create_hprogressbar(&hprogressbar1,&window1,500,240,24,150,24,150,50,"image\\progress.png", "image\\progressbar.png");
 	create_vprogressbar(&vprogressbar1,&window1,530,300,150,24,150,24,50,"image\\vprogress.png", "image\\vprogressbar.png");
 	create_checkbox(&checkbox1,&window1,300,400,16,16,32,32,"image\\check.png");
