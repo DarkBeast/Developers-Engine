@@ -57,8 +57,8 @@ struct widget
 	vector2f imgpos;//texture position
 	image *img; //image data
 	sbuffer buf;// opengl buffer
-	uint16 width;
-	uint16 height;
+	float width;
+	float height;
 	float sizex;
 	float sizey;
 	uint8 type; //control_types
@@ -93,6 +93,7 @@ struct canvas
 	uint8 button;
 	vector2ui mouseclick;
 	vector2i mousepos;
+	vector2i newmousepos;
 };
 
 //the UI system Structure.
@@ -104,6 +105,7 @@ struct user_interface
 
 //used to Obtain the UI system.
 user_interface widget_get_ui(void);
+user_interface *widget_get_uip(void);
 
 widget *widget_get_focused(void);
 //checks if mouse is in the set move frame.
@@ -114,6 +116,7 @@ void widget_move(int16 x, int16 y);
 void widget_mouse_over(widget *control);
 void widget_position_update(widget *parent);
 sbool widget_usable(widget *control);
+void widget_has_exited(widget *control);
 
 //checks if the parent is focused to do click events.
 sbool widget_is_parent_focused(widget *control);

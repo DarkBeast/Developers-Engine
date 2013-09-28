@@ -12,11 +12,17 @@
 
 user_interface ui;
 widget *focused; //holds the widget currently focused on.
+widget *lastmouseover; //holds data for proper mouse exit sequences.
 
 //default get Main ui, probably never needed but there if someone needs everything.
 user_interface widget_get_ui(void)
 {
 	return ui;
+}
+
+user_interface *widget_get_uip(void)
+{
+	return &ui;
 }
 
 widget *widget_get_focused(void)
@@ -53,11 +59,12 @@ sbool widget_frame_contains(widget *control, widget *parent)
 
 void widget_move(int16 x, int16 y)
 {
+	ui.screen.newmousepos.x = x;
+	ui.screen.newmousepos.y = y;
+
 	if(focused && focused->action & WIDGET_MOVING){
-		int16 tempx;
-		int16 tempy;
-		tempx = x - ui.screen.mousepos.x ;
-		tempy = y - ui.screen.mousepos.y ;
+		int16 tempx = x - ui.screen.mousepos.x ;
+		int16 tempy = y - ui.screen.mousepos.y ;
 
 		if(focused->pos.x + tempx <= 0 || focused->pos.y + tempy <= 0){
 			return;
@@ -80,6 +87,24 @@ void widget_move(int16 x, int16 y)
 		if(ui.root){
 			widget_mouse_over(ui.root);
 		}
+	}
+}
+
+void widget_has_exited(widget *control)
+{
+	if(!lastmouseover){
+		lastmouseover = control;
+		return;
+	}
+
+	if(control != lastmouseover){
+		if(lastmouseover->action & WIDGET_MOUSE_OVER){
+			lastmouseover->action &= ~(WIDGET_AVOID_BUFFER_UPDATE);
+			lastmouseover->action &= ~(WIDGET_MOUSE_OVER);
+			lastmouseover->controlmouseexit(lastmouseover);
+		}
+
+		lastmouseover = control;
 	}
 }
 
@@ -107,7 +132,8 @@ void widget_mouse_over(widget *control)
 
 							if(widget_rect_contains(child2, child2->parent)){
 								if(child2->shown.data == NULL && widget_usable(child2)){//if in range check if widget array is null or not.
-									child->action |= WIDGET_MOUSE_OVER;
+									widget_has_exited(child2);
+									child2->action |= WIDGET_MOUSE_OVER;
 									child2->controlmouseover(child2);
 									return;
 								}
@@ -126,6 +152,7 @@ void widget_mouse_over(widget *control)
 								}
 								else{
 									if(widget_rect_contains(child, child->parent) && widget_usable(child)){
+										widget_has_exited(child);
 										child->action |= WIDGET_MOUSE_OVER;
 										child->controlmouseover(child);
 										return;
@@ -151,6 +178,7 @@ void widget_mouse_over(widget *control)
 
 							if(index2 == -1){
 								if(widget_usable(child)){
+									widget_has_exited(child);
 									child->action |= WIDGET_MOUSE_OVER;
 									child->controlmouseover(child);
 								}
@@ -159,6 +187,7 @@ void widget_mouse_over(widget *control)
 						}
 
 						if(widget_usable(child)){
+							widget_has_exited(child);
 							child->action |= WIDGET_MOUSE_OVER;
 							child->controlmouseover(child);
 						}
@@ -174,16 +203,13 @@ void widget_mouse_over(widget *control)
 				}
 			}
 			else{
-				if(child->action & WIDGET_MOUSE_OVER){
-					child->action &= ~(WIDGET_AVOID_BUFFER_UPDATE);
-					child->action &= ~(WIDGET_MOUSE_OVER);
-					child->controlmouseexit(child);
-				}
+				widget_has_exited(child);
 			}
 		}
 	}
 
 	if(widget_usable(control)){
+		widget_has_exited(control);
 		control->controlmouseover(control);
 	}
 }
@@ -308,6 +334,10 @@ void widget_init_system(void)
 	//creates the focused items to contain widgets that are focused.
 	focused = (widget *)calloc(1, sizeof (widget));
 	focused = NULL;
+
+	lastmouseover = (widget *)calloc(1, sizeof (widget));
+	lastmouseover = NULL;
+
 	ui.screen.clicked = 0;
 
 	//create an initialize the ROOT which is the main screens hidden widget control.
