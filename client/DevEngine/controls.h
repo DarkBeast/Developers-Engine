@@ -130,20 +130,43 @@ void handle_picturebox_move(widget *control);
 
 void create_hscrollbar(widget *control, widget *parent, uint16 x, uint16 y, uint16 height, uint16 width, uint16 sizey, uint16 sizex, uint16 value, uint16 max_value, char *background,char *buttonleft, char *buttonright,char *scrollbar);
 void draw_hscrollbar(widget *control);
+void handle_hbar_slide(widget *control);
 void handle_hscrollbar_click(widget *control, int button, int pressed);
 void handle_harrowleft_click(widget *control, int button, int pressed);
 void handle_harrowright_click(widget *control, int button, int pressed);
 void handle_hbar_click(widget *control, int button, int pressed);
 void handle_hscrollbar_move(widget *control);
 void set_scrollbar_buttons(widget *control,void(*mousepress)(widget *,int,int));
+void handle_hbar_release(widget *control, int button, int pressed);
+void handle_hscrollbar_move(widget *control);
+void handle_hscrollbar_release(widget *control, int button, int pressed);
+void handle_harrowleft_over(widget *control);
+void handle_harrowright_over(widget *control);
+void handle_harrowleft_release(widget *control, int button, int pressed);
+void handle_harrowright_release(widget *control, int button, int pressed);
+void handle_harrowright_exit(widget *control);
+void handle_harrowleft_exit(widget *control);
+void handle_hbar_exit(widget *control);
+void handle_hbar_over(widget *control);
 
 void create_vscrollbar(widget *control, widget *parent, uint16 x, uint16 y, uint16 height, uint16 width, uint16 sizey, uint16 sizex, uint16 value, uint16 max_value, char *background,char *buttontop, char *buttonbottom,char *scrollbar);
 void draw_vscrollbar(widget *control);
+void handle_vbar_slide(widget *control);
 void handle_vscrollbar_click(widget *control, int button, int pressed);
 void handle_varrowtop_click(widget *control, int button, int pressed);
 void handle_varrowbottom_click(widget *control, int button, int pressed);
 void handle_vbar_click(widget *control, int button, int pressed);
+void handle_vbar_release(widget *control, int button, int pressed);
 void handle_vscrollbar_move(widget *control);
+void handle_vscrollbar_release(widget *control, int button, int pressed);
+void handle_varrowtop_over(widget *control);
+void handle_varrowbottom_over(widget *control);
+void handle_varrowtop_release(widget *control, int button, int pressed);
+void handle_varrowbottom_release(widget *control, int button, int pressed);
+void handle_varrowtop_exit(widget *control);
+void handle_varrowbottom_exit(widget *control);
+void handle_vbar_exit(widget *control);
+void handle_vbar_over(widget *control);
 
 void create_vprogressbar(widget *control, widget *parent, uint16 x, uint16 y, uint16 height, uint16 width, uint16 sizey, uint16 sizex, uint8 value, char *background, char *vbar);
 void draw_vprogressbar(widget *control);
@@ -179,5 +202,6 @@ void handle_listbox_label_mouse_exit(widget *control);
 void handle_listbox_label_move(widget *control);
 void handle_listbox_scroll(widget *control, int button, int pressed);
 void * get_list_data(widget *control);
+listbox *get_list(widget *control);
 
 #endif

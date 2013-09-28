@@ -61,7 +61,6 @@ void handle_button_click(widget *control, int button, int pressed)
 	if (widget_has_mouse_over(control)){
 		if (control->action & WIDGET_CLICKED){
 			control->imgpos.x = control->width;
-			control->imgpos.y = 0;
 			widget_update_texture_vector(control);
 		}
 	}
@@ -73,7 +72,6 @@ void handle_button_mouse_over(widget *control)
 {
 	if(!(control->action & WIDGET_AVOID_BUFFER_UPDATE)){
 		if (control->action & WIDGET_MOUSE_OVER){
-			control->imgpos.y = 0;
 			control->imgpos.x = 2 * control->width;
 			control->action |= WIDGET_AVOID_BUFFER_UPDATE;
 			widget_update_texture_vector(control);
@@ -85,7 +83,6 @@ void handle_button_mouse_over(widget *control)
 
 void handle_button_mouse_exit(widget *control)
 {
-	control->imgpos.y = 0;
 	control->imgpos.x = 0;
 
 	widget_update_texture_vector(control);
@@ -653,6 +650,7 @@ void create_hscrollbar(widget *control, widget *parent, uint16 x, uint16 y, uint
 	widget_init(button_left);//left
 	widget_init(button_right);//right
 
+	set_control_image(control, background);
 	control->pos.x = x;
 	control->pos.y = y;
 	control->height = height;
@@ -665,39 +663,49 @@ void create_hscrollbar(widget *control, widget *parent, uint16 x, uint16 y, uint
 	control->draw = &draw_hscrollbar;
 	control->controlmousepress = &handle_hscrollbar_click;
 	control->controlupdatepos = &handle_hscrollbar_move;
-	set_control_image(control, background);
+	control->controlmouseover = &handle_hbar_slide;
+	control->controlmouserelease = &handle_hscrollbar_release;
+
 	control->value = value;
 
 	set_control_image(button_left, buttonleft);
 	button_left->pos.x = 0;
 	button_left->pos.y = 0;
 	button_left->height = button_left->img->height;
-	button_left->width = button_left->img->width;
-	button_left->sizex = button_left->img->width;
+	button_left->width = button_left->img->width / 3;
+	button_left->sizex = button_left->img->width / 3;
 	button_left->sizey = sizey;
 	button_left->controlmousepress = &handle_harrowleft_click;
 	button_left->controlupdatepos = &handle_hscrollbar_move;
+	button_left->controlmouseover = &handle_harrowleft_over;
+	button_left->controlmouserelease = &handle_harrowleft_release;
+	button_left->controlmouseexit = &handle_harrowleft_exit;
+	button_left->draw = &draw_hscrollbar;
 
 	set_control_image(button_right, buttonright);
 	button_right->height = button_right->img->height;
-	button_right->width = button_right->img->width;
-	button_right->sizex = button_right->img->width;
+	button_right->width = button_right->img->width / 3;
+	button_right->sizex = button_right->img->width / 3;
 	button_right->sizey = sizey;
 	button_right->pos.x = sizex - button_right->sizex;
 	button_right->pos.y = 0;
 	button_right->controlmousepress = &handle_harrowright_click;
 	button_right->controlupdatepos = &handle_hscrollbar_move;
+	button_right->controlmouseover = &handle_harrowright_over;
+	button_right->controlmouserelease = &handle_harrowright_release;
+	button_right->controlmouseexit = &handle_harrowright_exit;
+	button_right->draw = &draw_hscrollbar;
 
 	set_control_image(bar, scrollbar);
 	bar->height = bar->img->height;
-	bar->width = bar->img->width;
+	bar->width = bar->img->width / 3;
 	bar->imgpos.x = 0;
 	bar->imgpos.y = 0;
 	bar->sizex = (sizex + button_right->sizex  + button_left->sizex) / max_value;
 	bar->sizey = sizey;
 
-	if(bar->sizex < 8)
-		bar->sizex = 8;
+	if(bar->sizex < 2)
+		bar->sizex = 2;
 
 	bar->pos.x = (button_left->pos.x + button_left->sizex) + (value *(sizex - (button_left->sizex) - 1 ) / max_value);
 
@@ -711,6 +719,11 @@ void create_hscrollbar(widget *control, widget *parent, uint16 x, uint16 y, uint
 		bar->pos.x = button_right->pos.x;
 
 	bar->controlupdatepos = &handle_hscrollbar_move;
+	bar->controlmousepress = &handle_hbar_click;
+	bar->controlmouserelease = &handle_hbar_release;
+	bar->controlmouseover = &handle_hbar_over;
+	bar->controlmouseexit = &handle_hbar_exit;
+	bar->draw = &draw_hscrollbar;
 
 	widget_add(parent,control);
 	widget_add(control,button_left);
@@ -726,12 +739,28 @@ void create_hscrollbar(widget *control, widget *parent, uint16 x, uint16 y, uint
 void draw_hscrollbar(widget *control)
 {
 	draw_widget(control);
+}
 
-	draw_widget(control->shown.data[0]);
+void handle_hbar_over(widget *control)
+{
+	if(!(control->action & WIDGET_AVOID_BUFFER_UPDATE)){
+		if (control->action & WIDGET_MOUSE_OVER){
+			control->imgpos.y = 0;
+			control->imgpos.x = 2 * control->width;
+			control->action |= WIDGET_AVOID_BUFFER_UPDATE;
+			widget_update_texture_vector(control);
+		}
+	}
+}
 
-	draw_widget(control->shown.data[1]);
+void handle_hbar_exit(widget *control)
+{
+	control->imgpos.y = 0;
+	control->imgpos.x = 0;
 
-	draw_widget(control->shown.data[2]);
+	widget_update_texture_vector(control);
+
+	control->mouseexit(control);
 }
 
 void set_scrollbar_buttons(widget *control,void(*mousepress)(widget *,int,int))
@@ -740,13 +769,16 @@ void set_scrollbar_buttons(widget *control,void(*mousepress)(widget *,int,int))
 	control->shown.data[1]->mousepress = mousepress;
 }
 
-void handle_hscrollbar_click(widget *control, int button, int pressed)
-{
-	control->mousepress(control,button,pressed);
-}
-
 void handle_harrowleft_click(widget *control, int button, int pressed)
 {
+	if (widget_has_mouse_over(control)){
+		if (control->action & WIDGET_CLICKED){
+			control->imgpos.x = control->width;
+			control->imgpos.y = 0;
+			widget_update_texture_vector(control);
+		}
+	}
+
 	if(control->parent->value > 0)
 		--control->parent->value;
 
@@ -763,23 +795,226 @@ void handle_harrowleft_click(widget *control, int button, int pressed)
 
 void handle_harrowright_click(widget *control, int button, int pressed)
 {
+	if (widget_has_mouse_over(control)){
+		if (control->action & WIDGET_CLICKED){
+			control->imgpos.x = control->width;
+			control->imgpos.y = 0;
+			widget_update_texture_vector(control);
+		}
+	}
+
 	if(control->parent->value + 1 <= control->parent->shown.data[2]->value)
 		++control->parent->value;
 
 	control->parent->shown.data[2]->pos.x = (control->parent->shown.data[0]->pos.x + control->parent->shown.data[0]->sizex) +
-		(control->parent->value *(control->parent->sizex - (control->parent->shown.data[1]->pos.y + (control->parent->shown.data[1]->sizex * 2) + control->parent->shown.data[2]->sizex - 1)) / control->parent->shown.data[2]->value);
+		(control->parent->value *(control->parent->sizex - (control->parent->shown.data[1]->pos.y + (control->parent->shown.data[1]->sizex * 2) + control->parent->shown.data[2]->sizex )) / control->parent->shown.data[2]->value);
 	widget_update_vector(control->parent->shown.data[2]);
-	control->mousepress(control,button,pressed);
-}
-
-void handle_hbar_click(widget *control, int button, int pressed)
-{
 	control->mousepress(control,button,pressed);
 }
 
 void handle_hscrollbar_move(widget *control)
 {
 	widget_update_vector(control);
+}
+
+void handle_harrowleft_over(widget *control)
+{
+	if(!(control->action & WIDGET_AVOID_BUFFER_UPDATE)){
+		if (control->action & WIDGET_MOUSE_OVER){
+			control->imgpos.y = 0;
+			control->imgpos.x = 2 * control->width;
+			control->action |= WIDGET_AVOID_BUFFER_UPDATE;
+			widget_update_texture_vector(control);
+		}
+	}
+
+	if(control->parent->shown.data[2]->action & WIDGET_MOVING){
+		control->parent->value = 0;
+
+		control->parent->shown.data[2]->pos.x = (control->pos.x + control->sizex) +
+			(control->parent->value *(control->parent->sizex - (control->sizex * 2) - control->parent->shown.data[2]->sizex) / control->parent->shown.data[2]->value);
+
+		widget_update_vector(control->parent->shown.data[2]);
+
+		control->mousepress(control,0,1);
+	}
+}
+
+void handle_harrowright_over(widget *control)
+{
+	if(!(control->action & WIDGET_AVOID_BUFFER_UPDATE)){
+		if (control->action & WIDGET_MOUSE_OVER){
+			control->imgpos.y = 0;
+			control->imgpos.x = 2 * control->width;
+			control->action |= WIDGET_AVOID_BUFFER_UPDATE;
+			widget_update_texture_vector(control);
+		}
+	}
+
+	if(control->parent->shown.data[2]->action & WIDGET_MOVING){
+		control->parent->value =control->parent->shown.data[2]->value;
+
+		control->parent->shown.data[2]->pos.x = (control->parent->shown.data[0]->pos.x + control->parent->shown.data[0]->sizex) +
+			(control->parent->value *(control->parent->sizex - (control->parent->shown.data[0]->sizex * 2) - control->parent->shown.data[2]->sizex) / control->parent->shown.data[2]->value);
+
+		widget_update_vector(control->parent->shown.data[2]);
+
+		control->parent->shown.data[0]->mousepress(control->parent->shown.data[0],0,1);
+	}
+}
+
+void handle_hbar_slide(widget *control)
+{
+	if(control->shown.data[2]->action & WIDGET_MOVING){
+		user_interface *ui = widget_get_uip();
+		float temppos = (ui->screen.newmousepos.x - control->actualpos.x - control->shown.data[0]->sizex - (control->shown.data[2]->sizex /2));
+		float tempsize = ( control->sizex - (control->shown.data[0]->sizex * 2) - (control->shown.data[2]->sizex));
+
+		if(temppos < 0)
+			temppos = 0;
+
+		if(temppos > tempsize)
+			temppos = tempsize;
+
+		control->value = (temppos / tempsize * control->shown.data[2]->value);
+
+		if (control->value > control->shown.data[2]->value)
+			control->value = control->shown.data[2]->value;
+
+		if (control->value < 0)
+			control->value = 0;
+
+		control->shown.data[2]->pos.x = (control->shown.data[0]->pos.x + control->shown.data[0]->sizex) +
+			(control->value *(control->sizex - (control->shown.data[0]->sizex * 2) - control->shown.data[2]->sizex - 1) / control->shown.data[2]->value);
+
+		if(control->value == control->shown.data[2]->value)
+			control->shown.data[2]->pos.x += 1;
+
+		widget_update_vector(control->shown.data[2]);
+
+		control->shown.data[0]->mousepress(control->shown.data[0],0,1);
+	}
+}
+
+void handle_hscrollbar_click(widget *control, int button, int pressed)
+{
+	if(button == 0){
+		user_interface *ui = widget_get_uip();
+		float temppos = (ui->screen.newmousepos.x - control->actualpos.x - control->shown.data[0]->sizex - (control->shown.data[2]->sizex /2));
+		float tempsize = ( control->sizex - (control->shown.data[0]->sizex * 2) - (control->shown.data[2]->sizex));
+
+		if(temppos < 0)
+			temppos = 0;
+
+		if(temppos > tempsize)
+			temppos = tempsize;
+
+		control->value = (temppos / tempsize * control->shown.data[2]->value);
+
+		if (control->value > control->shown.data[2]->value)
+			control->value = control->shown.data[2]->value;
+
+		if (control->value < 0)
+			control->value = 0;
+
+		control->shown.data[2]->pos.x = (control->shown.data[0]->pos.x + control->shown.data[0]->sizex) +
+			(control->value *(control->sizex - (control->shown.data[0]->sizex * 2) - control->shown.data[2]->sizex - 1) / control->shown.data[2]->value);
+
+		if(control->value == control->shown.data[2]->value)
+			control->shown.data[2]->pos.x += 1;
+
+		widget_update_vector(control->shown.data[2]);
+
+		control->shown.data[0]->mousepress(control->shown.data[0],0,1);
+	}
+}
+
+void handle_harrowright_exit(widget *control)
+{
+	control->imgpos.y = 0;
+	control->imgpos.x = 0;
+
+	widget_update_texture_vector(control);
+
+	control->mouseexit(control);
+}
+
+void handle_harrowleft_exit(widget *control)
+{
+	control->imgpos.y = 0;
+	control->imgpos.x = 0;
+
+	widget_update_texture_vector(control);
+
+	control->mouseexit(control);
+}
+
+void handle_hscrollbar_release(widget *control, int button, int pressed)
+{
+	if(control->shown.data[2]->action & WIDGET_MOVING){
+		control->shown.data[2]->action &= ~(WIDGET_MOVING);
+	}
+}
+
+void handle_hbar_release(widget *control, int button, int pressed)
+{
+	if(control->action & WIDGET_MOVING){
+		control->action &= ~(WIDGET_MOVING);
+	}
+
+	if (widget_has_mouse_over(control)){
+		control->imgpos.y = 0;
+		control->imgpos.x = 2 * control->width;
+		control->action |= WIDGET_AVOID_BUFFER_UPDATE;
+		widget_update_texture_vector(control);
+	}
+}
+
+void handle_hbar_click(widget *control, int button, int pressed)
+{
+	if(!(control->action & WIDGET_MOVING)){
+		control->action |= WIDGET_MOVING;
+	}
+
+	if (widget_has_mouse_over(control)){
+		if (control->action & WIDGET_CLICKED){
+			control->imgpos.x = control->width;
+			control->imgpos.y = 0;
+			widget_update_texture_vector(control);
+		}
+	}
+}
+
+void handle_harrowleft_release(widget *control, int button, int pressed)
+{
+	if(control->parent->shown.data[2]->action & WIDGET_MOVING){
+		control->parent->shown.data[2]->action &= ~(WIDGET_MOVING);
+	}
+
+	if (widget_has_mouse_over(control)){
+		control->imgpos.y = 0;
+		control->imgpos.x = 2 * control->width;
+		control->action |= WIDGET_AVOID_BUFFER_UPDATE;
+		widget_update_texture_vector(control);
+	}
+
+	control->mouserelease(control,button,pressed);
+}
+
+void handle_harrowright_release(widget *control, int button, int pressed)
+{
+	if(control->parent->shown.data[2]->action & WIDGET_MOVING){
+		control->parent->shown.data[2]->action &= ~(WIDGET_MOVING);
+	}
+
+	if (widget_has_mouse_over(control)){
+		control->imgpos.y = 0;
+		control->imgpos.x = 2 * control->width;
+		control->action |= WIDGET_AVOID_BUFFER_UPDATE;
+		widget_update_texture_vector(control);
+	}
+
+	control->mouserelease(control,button,pressed);
 }
 
 //Vertical scrollbar testing
@@ -799,6 +1034,7 @@ void create_vscrollbar(widget *control, widget *parent, uint16 x, uint16 y, uint
 	widget_init(button_top);//top
 	widget_init(button_bottom);//bottom
 
+	set_control_image(control, background);
 	control->pos.x = x;
 	control->pos.y = y;
 	control->height = height;
@@ -811,37 +1047,51 @@ void create_vscrollbar(widget *control, widget *parent, uint16 x, uint16 y, uint
 	control->draw = &draw_vscrollbar;
 	control->controlmousepress = &handle_vscrollbar_click;
 	control->controlupdatepos = &handle_vscrollbar_move;
-	set_control_image(control, background);
+	control->controlmouseover = &handle_vbar_slide;
+	control->controlmouserelease = &handle_vscrollbar_release;
+
 	control->value = value;
 
 	set_control_image(button_top, buttontop);
 	button_top->pos.x = 0;
 	button_top->pos.y = 0;
+	button_top->imgpos.x = 0;
 	button_top->height = button_top->img->height;
-	button_top->width = button_top->img->width;
+	button_top->width = button_top->img->width  / 3;
 	button_top->sizex = sizex;
 	button_top->sizey = button_top->img->height;
+	button_top->type = CONTROL_BUTTON;
+	button_top->draw = &draw_vscrollbar;
 	button_top->controlmousepress = &handle_varrowtop_click;
 	button_top->controlupdatepos = &handle_vscrollbar_move;
+	button_top->controlmouseover = &handle_varrowtop_over;
+	button_top->controlmouserelease = &handle_varrowtop_release;
+	button_top->controlmouseexit = &handle_varrowtop_exit;
 
 	set_control_image(button_bottom, buttonbottom);
-	button_bottom->height = button_bottom->img->height;
-	button_bottom->width = button_bottom->img->width;
+	button_bottom->height = button_bottom->img->height ;
+	button_bottom->width = button_bottom->img->width / 3;
 	button_bottom->sizex = sizex;
-	button_bottom->sizey = button_bottom->img->height;
+	button_bottom->sizey = button_bottom->img->height ;
 	button_bottom->pos.x = 0;
 	button_bottom->pos.y = sizey - button_bottom->sizey;
+	button_bottom->imgpos.x = 0;
+	button_bottom->type = CONTROL_BUTTON;
+	button_bottom->draw = &draw_vscrollbar;
 	button_bottom->controlmousepress = &handle_varrowbottom_click;
 	button_bottom->controlupdatepos = &handle_vscrollbar_move;
-	set_control_image(button_bottom, buttonbottom);
+	button_bottom->controlmouseover = &handle_varrowbottom_over;
+	button_bottom->controlmouserelease = &handle_varrowbottom_release;
+	button_bottom->controlmouseexit = &handle_varrowbottom_exit;
 
 	set_control_image(bar, scrollbar);
 	bar->height = bar->img->height;
-	bar->width = bar->img->width;
+	bar->width = bar->img->width / 3;
 	bar->sizex = sizex;
-	//bar->sizey = (sizey + button_top->sizey  + button_bottom->sizey - bar->img->height) / max_value;
-	//if(bar->sizey < 8)
-	bar->sizey = bar->img->height;
+
+	bar->sizey = (sizey + button_top->sizey  + button_bottom->sizey - bar->img->height) / max_value;
+	if(bar->sizey < 2)
+		bar->sizey = 2;
 
 	bar->pos.y = (button_top->pos.y + button_top->sizey) + (value *(sizey - (button_top->sizey * 2) - 1 ) / max_value);
 
@@ -855,6 +1105,11 @@ void create_vscrollbar(widget *control, widget *parent, uint16 x, uint16 y, uint
 		bar->pos.y = button_bottom->pos.y;
 
 	bar->controlupdatepos = &handle_vscrollbar_move;
+	bar->controlmousepress = &handle_vbar_click;
+	bar->controlmouserelease = &handle_vbar_release;
+	bar->controlmouseexit = &handle_vbar_exit;
+	bar->controlmouseover = &handle_vbar_over;
+	bar->draw = &draw_vscrollbar;
 
 	widget_add(parent,control);
 	widget_add(control,button_top);
@@ -870,21 +1125,242 @@ void create_vscrollbar(widget *control, widget *parent, uint16 x, uint16 y, uint
 void draw_vscrollbar(widget *control)
 {
 	draw_widget(control);
+}
 
-	draw_widget(control->shown.data[0]);
+void handle_vbar_over(widget *control)
+{
+	if(!(control->action & WIDGET_AVOID_BUFFER_UPDATE)){
+		if (control->action & WIDGET_MOUSE_OVER){
+			control->imgpos.y = 0;
+			control->imgpos.x = 2 * control->width;
+			control->action |= WIDGET_AVOID_BUFFER_UPDATE;
+			widget_update_texture_vector(control);
+		}
+	}
+}
 
-	draw_widget(control->shown.data[1]);
+void handle_vbar_exit(widget *control)
+{
+	control->imgpos.y = 0;
+	control->imgpos.x = 0;
 
-	draw_widget(control->shown.data[2]);
+	widget_update_texture_vector(control);
+
+	control->mouseexit(control);
+}
+
+void handle_varrowtop_over(widget *control)
+{
+	if(!(control->action & WIDGET_AVOID_BUFFER_UPDATE)){
+		if (control->action & WIDGET_MOUSE_OVER){
+			control->imgpos.y = 0;
+			control->imgpos.x = 2 * control->width;
+			control->action |= WIDGET_AVOID_BUFFER_UPDATE;
+			widget_update_texture_vector(control);
+		}
+	}
+
+	if(control->parent->shown.data[2]->action & WIDGET_MOVING){
+		control->parent->value = 0;
+
+		control->parent->shown.data[2]->pos.y = (control->pos.y + control->sizey) +
+			(control->parent->value *(control->parent->sizey - (control->sizey * 2) - control->parent->shown.data[2]->sizey) / control->parent->shown.data[2]->value);
+
+		widget_update_vector(control->parent->shown.data[2]);
+
+		control->mousepress(control,0,1);
+	}
+}
+
+void handle_varrowtop_exit(widget *control)
+{
+	control->imgpos.y = 0;
+	control->imgpos.x = 0;
+
+	widget_update_texture_vector(control);
+
+	control->mouseexit(control);
+}
+
+void handle_varrowbottom_exit(widget *control)
+{
+	control->imgpos.y = 0;
+	control->imgpos.x = 0;
+
+	widget_update_texture_vector(control);
+
+	control->mouseexit(control);
+}
+
+void handle_varrowbottom_over(widget *control)
+{
+	if(!(control->action & WIDGET_AVOID_BUFFER_UPDATE)){
+		if (control->action & WIDGET_MOUSE_OVER){
+			control->imgpos.y = 0;
+			control->imgpos.x = 2 * control->width;
+			control->action |= WIDGET_AVOID_BUFFER_UPDATE;
+			widget_update_texture_vector(control);
+		}
+	}
+
+	if(control->parent->shown.data[2]->action & WIDGET_MOVING){
+		control->parent->value =control->parent->shown.data[2]->value;
+
+		control->parent->shown.data[2]->pos.y = (control->parent->shown.data[0]->pos.y + control->parent->shown.data[0]->sizey) +
+			(control->parent->value *(control->parent->sizey - (control->parent->shown.data[0]->sizey * 2) - control->parent->shown.data[2]->sizey) / control->parent->shown.data[2]->value);
+
+		widget_update_vector(control->parent->shown.data[2]);
+
+		control->parent->shown.data[0]->mousepress(control->parent->shown.data[0],0,1);
+	}
+}
+
+void handle_vbar_slide(widget *control)
+{
+	if(control->shown.data[2]->action & WIDGET_MOVING){
+		user_interface *ui = widget_get_uip();
+		float temppos = (ui->screen.newmousepos.y - control->actualpos.y - control->shown.data[0]->sizey - (control->shown.data[2]->sizey /2));
+		float tempsize = ( control->sizey - (control->shown.data[0]->sizey * 2) - (control->shown.data[2]->sizey));
+
+		if(temppos < 0)
+			temppos = 0;
+
+		if(temppos > tempsize)
+			temppos = tempsize;
+
+		control->value = (temppos / tempsize * control->shown.data[2]->value);
+
+		if (control->value > control->shown.data[2]->value)
+			control->value = control->shown.data[2]->value;
+
+		if (control->value < 0)
+			control->value = 0;
+
+		control->shown.data[2]->pos.y = (control->shown.data[0]->pos.y + control->shown.data[0]->sizey) +
+			(control->value *(control->sizey - (control->shown.data[0]->sizey * 2) - control->shown.data[2]->sizey - 1) / control->shown.data[2]->value);
+
+		if(control->value == control->shown.data[2]->value)
+			control->shown.data[2]->pos.y += 1;
+
+		widget_update_vector(control->shown.data[2]);
+
+		control->shown.data[0]->mousepress(control->shown.data[0],0,1);
+	}
 }
 
 void handle_vscrollbar_click(widget *control, int button, int pressed)
 {
-	control->mousepress(control,button,pressed);
+	if(button == 0){
+		user_interface *ui = widget_get_uip();
+		float temppos = (ui->screen.newmousepos.y - control->actualpos.y - control->shown.data[0]->sizey - (control->shown.data[2]->sizey /2));
+		float tempsize = ( control->sizey - (control->shown.data[0]->sizey * 2) - (control->shown.data[2]->sizey));
+
+		if(temppos < 0)
+			temppos = 0;
+
+		if(temppos > tempsize)
+			temppos = tempsize;
+
+		control->value = (temppos / tempsize * control->shown.data[2]->value);
+
+		if (control->value > control->shown.data[2]->value)
+			control->value = control->shown.data[2]->value;
+
+		if (control->value < 0)
+			control->value = 0;
+
+		control->shown.data[2]->pos.y = (control->shown.data[0]->pos.y + control->shown.data[0]->sizey) +
+			(control->value *(control->sizey - (control->shown.data[0]->sizey * 2) - control->shown.data[2]->sizey - 1) / control->shown.data[2]->value);
+
+		if(control->value == control->shown.data[2]->value)
+			control->shown.data[2]->pos.y += 1;
+
+		widget_update_vector(control->shown.data[2]);
+
+		control->shown.data[0]->mousepress(control->shown.data[0],0,1);
+	}
+}
+
+void handle_vscrollbar_release(widget *control, int button, int pressed)
+{
+	if(control->shown.data[2]->action & WIDGET_MOVING){
+		control->shown.data[2]->action &= ~(WIDGET_MOVING);
+	}
+}
+
+void handle_vbar_release(widget *control, int button, int pressed)
+{
+	if(control->action & WIDGET_MOVING){
+		control->action &= ~(WIDGET_MOVING);
+	}
+
+	if (widget_has_mouse_over(control)){
+		control->imgpos.y = 0;
+		control->imgpos.x = 2 * control->width;
+		control->action |= WIDGET_AVOID_BUFFER_UPDATE;
+		widget_update_texture_vector(control);
+	}
+}
+
+void handle_vbar_click(widget *control, int button, int pressed)
+{
+	if(!(control->action & WIDGET_MOVING)){
+		control->action |= WIDGET_MOVING;
+	}
+
+	if (widget_has_mouse_over(control)){
+		if (control->action & WIDGET_CLICKED){
+			control->imgpos.x = control->width;
+			control->imgpos.y = 0;
+			widget_update_texture_vector(control);
+		}
+	}
+}
+
+void handle_varrowtop_release(widget *control, int button, int pressed)
+{
+	if(control->parent->shown.data[2]->action & WIDGET_MOVING){
+		control->parent->shown.data[2]->action &= ~(WIDGET_MOVING);
+	}
+
+	if (widget_has_mouse_over(control)){
+		control->imgpos.y = 0;
+		control->imgpos.x = 2 * control->width;
+		control->action |= WIDGET_AVOID_BUFFER_UPDATE;
+		widget_update_texture_vector(control);
+	}
+	control->mouserelease(control,button,pressed);
+}
+
+void handle_varrowbottom_release(widget *control, int button, int pressed)
+{
+	if(control->parent->shown.data[2]->action & WIDGET_MOVING){
+		control->parent->shown.data[2]->action &= ~(WIDGET_MOVING);
+	}
+
+	if (widget_has_mouse_over(control)){
+		control->imgpos.y = 0;
+		control->imgpos.x = 2 * control->width;
+		control->action |= WIDGET_AVOID_BUFFER_UPDATE;
+		widget_update_texture_vector(control);
+	}
+	control->mouserelease(control,button,pressed);
 }
 
 void handle_varrowtop_click(widget *control, int button, int pressed)
 {
+	if (widget_has_mouse_over(control)){
+		if (control->action & WIDGET_CLICKED){
+			control->imgpos.x = control->width;
+			control->imgpos.y = 0;
+			widget_update_texture_vector(control);
+		}
+	}
+
+	if(control->parent->shown.data[2]->action & WIDGET_MOVING){
+		control->parent->shown.data[2]->action &= ~(WIDGET_MOVING);
+	}
+
 	if(control->parent->value > 0)
 		--control->parent->value;
 
@@ -896,17 +1372,24 @@ void handle_varrowtop_click(widget *control, int button, int pressed)
 
 void handle_varrowbottom_click(widget *control, int button, int pressed)
 {
+	if (widget_has_mouse_over(control)){
+		if (control->action & WIDGET_CLICKED){
+			control->imgpos.x = control->width;
+			control->imgpos.y = 0;
+			widget_update_texture_vector(control);
+		}
+	}
+
+	if(control->parent->shown.data[2]->action & WIDGET_MOVING){
+		control->parent->shown.data[2]->action &= ~(WIDGET_MOVING);
+	}
+
 	if(control->parent->value + 1 <= control->parent->shown.data[2]->value)
 		++control->parent->value;
 
 	control->parent->shown.data[2]->pos.y = (control->parent->shown.data[0]->pos.y + control->parent->shown.data[0]->sizey) +
 		(control->parent->value *(control->parent->sizey - (control->parent->shown.data[0]->sizey * 2) - control->parent->shown.data[2]->sizey) / control->parent->shown.data[2]->value);
 	widget_update_vector(control->parent->shown.data[2]);
-	control->mousepress(control,button,pressed);
-}
-
-void handle_vbar_click(widget *control, int button, int pressed)
-{
 	control->mousepress(control,button,pressed);
 }
 
@@ -1710,8 +2193,14 @@ void handle_listbox_move(widget *control)
 	}
 }
 
-void * get_list_data(widget *control)
+void *get_list_data(widget *control)
 {
 	listbox * list = (listbox *)control->control;
 	return list->control->data;
+}
+
+listbox *get_list(widget *control)
+{
+	listbox * list = (listbox *)control->control;
+	return list;
 }
