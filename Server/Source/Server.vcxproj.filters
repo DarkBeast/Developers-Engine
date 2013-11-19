@@ -1,0 +1,148 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="core">
+      <UniqueIdentifier>{670fb80d-5e85-4006-87ef-036af556f31e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="network">
+      <UniqueIdentifier>{818ae544-5a71-4c22-8b5a-15ebf4a74b36}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="network\socket">
+      <UniqueIdentifier>{36e9487b-3589-45fb-a1aa-8c00d01f0c5c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="game logic">
+      <UniqueIdentifier>{eb0be0fa-461f-4868-a475-1d4fac3363df}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="general">
+      <UniqueIdentifier>{5093b55f-b36e-44ec-8f56-255fb65e1bfd}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="main.c" />
+    <ClCompile Include="error.c">
+      <Filter>core</Filter>
+    </ClCompile>
+    <ClCompile Include="function.c">
+      <Filter>core</Filter>
+    </ClCompile>
+    <ClCompile Include="handlepackets.c">
+      <Filter>network</Filter>
+    </ClCompile>
+    <ClCompile Include="buffer.c">
+      <Filter>network</Filter>
+    </ClCompile>
+    <ClCompile Include="tinycthread.c">
+      <Filter>core</Filter>
+    </ClCompile>
+    <ClCompile Include="winsocket.c">
+      <Filter>network\socket</Filter>
+    </ClCompile>
+    <ClCompile Include="socket.c">
+      <Filter>network\socket</Filter>
+    </ClCompile>
+    <ClCompile Include="servertcp.c">
+      <Filter>network</Filter>
+    </ClCompile>
+    <ClCompile Include="items.c">
+      <Filter>general</Filter>
+    </ClCompile>
+    <ClCompile Include="maps.c">
+      <Filter>general</Filter>
+    </ClCompile>
+    <ClCompile Include="npcs.c">
+      <Filter>general</Filter>
+    </ClCompile>
+    <ClCompile Include="shops.c">
+      <Filter>general</Filter>
+    </ClCompile>
+    <ClCompile Include="spells.c">
+      <Filter>general</Filter>
+    </ClCompile>
+    <ClCompile Include="path.c">
+      <Filter>core</Filter>
+    </ClCompile>
+    <ClCompile Include="general.c">
+      <Filter>general</Filter>
+    </ClCompile>
+    <ClCompile Include="players.c">
+      <Filter>general</Filter>
+    </ClCompile>
+    <ClCompile Include="serverloop.c">
+      <Filter>game logic</Filter>
+    </ClCompile>
+    <ClCompile Include="gamelogic.c">
+      <Filter>game logic</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="error.h">
+      <Filter>core</Filter>
+    </ClInclude>
+    <ClInclude Include="function.h">
+      <Filter>core</Filter>
+    </ClInclude>
+    <ClInclude Include="integer.h">
+      <Filter>core</Filter>
+    </ClInclude>
+    <ClInclude Include="handlepackets.h">
+      <Filter>network</Filter>
+    </ClInclude>
+    <ClInclude Include="packetenum.h">
+      <Filter>network</Filter>
+    </ClInclude>
+    <ClInclude Include="buffer.h">
+      <Filter>network</Filter>
+    </ClInclude>
+    <ClInclude Include="bool.h">
+      <Filter>core</Filter>
+    </ClInclude>
+    <ClInclude Include="types.h">
+      <Filter>core</Filter>
+    </ClInclude>
+    <ClInclude Include="tinycthread.h">
+      <Filter>core</Filter>
+    </ClInclude>
+    <ClInclude Include="globals.h">
+      <Filter>core</Filter>
+    </ClInclude>
+    <ClInclude Include="winsocket.h">
+      <Filter>network\socket</Filter>
+    </ClInclude>
+    <ClInclude Include="socket.h">
+      <Filter>network\socket</Filter>
+    </ClInclude>
+    <ClInclude Include="servertcp.h">
+      <Filter>network</Filter>
+    </ClInclude>
+    <ClInclude Include="maps.h">
+      <Filter>general</Filter>
+    </ClInclude>
+    <ClInclude Include="npcs.h">
+      <Filter>general</Filter>
+    </ClInclude>
+    <ClInclude Include="items.h">
+      <Filter>general</Filter>
+    </ClInclude>
+    <ClInclude Include="shops.h">
+      <Filter>general</Filter>
+    </ClInclude>
+    <ClInclude Include="spells.h">
+      <Filter>general</Filter>
+    </ClInclude>
+    <ClInclude Include="path.h">
+      <Filter>core</Filter>
+    </ClInclude>
+    <ClInclude Include="general.h">
+      <Filter>general</Filter>
+    </ClInclude>
+    <ClInclude Include="players.h">
+      <Filter>general</Filter>
+    </ClInclude>
+    <ClInclude Include="serverloop.h">
+      <Filter>game logic</Filter>
+    </ClInclude>
+    <ClInclude Include="gamelogic.h">
+      <Filter>game logic</Filter>
+    </ClInclude>
+  </ItemGroup>
+</Project>
