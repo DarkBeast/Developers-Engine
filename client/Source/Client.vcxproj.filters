@@ -1,0 +1,148 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="main.c" />
+    <ClCompile Include="widget.c">
+      <Filter>graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="text.c">
+      <Filter>graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="image.c">
+      <Filter>graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="controls.c">
+      <Filter>graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="program_path.c">
+      <Filter>core</Filter>
+    </ClCompile>
+    <ClCompile Include="input.c">
+      <Filter>core</Filter>
+    </ClCompile>
+    <ClCompile Include="globals.c">
+      <Filter>core</Filter>
+    </ClCompile>
+    <ClCompile Include="function.c">
+      <Filter>core</Filter>
+    </ClCompile>
+    <ClCompile Include="error.c">
+      <Filter>core</Filter>
+    </ClCompile>
+    <ClCompile Include="cstring.c">
+      <Filter>core</Filter>
+    </ClCompile>
+    <ClCompile Include="mainmenu.c">
+      <Filter>ui</Filter>
+    </ClCompile>
+    <ClCompile Include="render.c">
+      <Filter>graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="handlepackets.c">
+      <Filter>network</Filter>
+    </ClCompile>
+    <ClCompile Include="buffer.c">
+      <Filter>network</Filter>
+    </ClCompile>
+    <ClCompile Include="tinycthread.c">
+      <Filter>core</Filter>
+    </ClCompile>
+    <ClCompile Include="winsocket.c">
+      <Filter>network\socket</Filter>
+    </ClCompile>
+    <ClCompile Include="linsocket.c">
+      <Filter>network\socket</Filter>
+    </ClCompile>
+    <ClCompile Include="clienttcp.c">
+      <Filter>network</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="widget.h">
+      <Filter>graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="text.h">
+      <Filter>graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="image.h">
+      <Filter>graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="controls.h">
+      <Filter>graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="types.h">
+      <Filter>core</Filter>
+    </ClInclude>
+    <ClInclude Include="program_path.h">
+      <Filter>core</Filter>
+    </ClInclude>
+    <ClInclude Include="integer.h">
+      <Filter>core</Filter>
+    </ClInclude>
+    <ClInclude Include="input.h">
+      <Filter>core</Filter>
+    </ClInclude>
+    <ClInclude Include="globals.h">
+      <Filter>core</Filter>
+    </ClInclude>
+    <ClInclude Include="function.h">
+      <Filter>core</Filter>
+    </ClInclude>
+    <ClInclude Include="error.h">
+      <Filter>core</Filter>
+    </ClInclude>
+    <ClInclude Include="cstring.h">
+      <Filter>core</Filter>
+    </ClInclude>
+    <ClInclude Include="mainmenu.h">
+      <Filter>ui</Filter>
+    </ClInclude>
+    <ClInclude Include="bool.h">
+      <Filter>core</Filter>
+    </ClInclude>
+    <ClInclude Include="render.h">
+      <Filter>graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="handlepackets.h">
+      <Filter>network</Filter>
+    </ClInclude>
+    <ClInclude Include="packetenum.h">
+      <Filter>network</Filter>
+    </ClInclude>
+    <ClInclude Include="buffer.h">
+      <Filter>network</Filter>
+    </ClInclude>
+    <ClInclude Include="tinycthread.h">
+      <Filter>core</Filter>
+    </ClInclude>
+    <ClInclude Include="winsocket.h">
+      <Filter>network\socket</Filter>
+    </ClInclude>
+    <ClInclude Include="linsocket.h">
+      <Filter>network\socket</Filter>
+    </ClInclude>
+    <ClInclude Include="socket.h">
+      <Filter>network\socket</Filter>
+    </ClInclude>
+    <ClInclude Include="clienttcp.h">
+      <Filter>network</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="ui">
+      <UniqueIdentifier>{b121daa5-117b-4284-ac9b-d1c29eff6814}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="core">
+      <UniqueIdentifier>{07d9d1a4-91cf-4a72-8ba1-da2efd46a304}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="graphics">
+      <UniqueIdentifier>{bb0ef258-16b2-4e31-98fa-cce5c1b9c57f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="network">
+      <UniqueIdentifier>{7b9fbffd-802c-44d3-8d56-329c36da02cc}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="network\socket">
+      <UniqueIdentifier>{09f836e7-6f45-4830-9d4a-a6e78eee02cf}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>
