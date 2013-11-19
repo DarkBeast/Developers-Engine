@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2012
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "DevEngine", "DevEngine\DevEngine.vcxproj", "{EB6D4ED7-ED94-4AE0-BBE6-21E3EAD637F8}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Client", "Source\Client.vcxproj", "{EB6D4ED7-ED94-4AE0-BBE6-21E3EAD637F8}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
