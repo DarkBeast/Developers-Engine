@@ -54,6 +54,7 @@ void server_loop(void)
 			lastupdatesaveplayers = gettickcount() + 60;
 		}
 	}
+	return;
 }
 
 void update_map_spawn_items(void)
@@ -294,7 +295,7 @@ void update_save_players(void)
 	uint32 i = 0;
 
 	if(total_players_online()){
-		printf("Saving all online players.");
+		printf("Saving all online players.\n");
 		admin_msg("Saving all online players.",1); //pink
 		save_online_players();
 	}
@@ -311,12 +312,14 @@ void handle_shutdown(void)
 	if( (secs % 5) == 0 || secs <= 5){
 		string = comb_3str("Server Shutdown in ", int_to_string(secs)," seconds.");
 		global_msg(string, 1); //bright blue
-		printf("Automated Server Shutdown in  %i seconds.", secs);
+		printf("Automated Server Shutdown in  %i seconds. \n", secs);
 	}
 	secs--;
 
 	if(secs <= 0){
-		global_msg("Server Shutting down.", 1); //bright red
+		global_msg("Server Shutting down. \n", 1); //bright red
+		server_is_online = FALSE;
 		destroy_server();
+		exit(TRUE);
 	}
 }

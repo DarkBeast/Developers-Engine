@@ -100,7 +100,7 @@ void error_handler(int error_flag)
 	default:
 		printf("ERROR: Unknown Error!\n");
 	}
-	printf("The Application will now close.");
+	printf("The Application will now close.\n");
 	i = getchar();
 	shut_down();
 }

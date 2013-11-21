@@ -463,7 +463,7 @@ void left_game(int16 index)
 			global_msg(string,1); //white
 		}
 
-		printf("%s has disconnected from %s", player(index)->charname, GAME_NAME);
+		printf("%s has disconnected from %s \n", player(index)->charname, GAME_NAME);
 
 		send_left_game(index);
 

@@ -78,13 +78,13 @@ void destroy_server(void)
 {
 	uint32 i = 0;
 
-	printf("Saving online players.");
+	printf("Saving online players.\n");
 
 	for(i = 0; i < total_players_online(); i++){
 		left_game(player_online(i));
 	}
 
-	printf("Clearing Data.");
+	printf("Clearing Data.\n");
 	unload_shops();
 	unload_spells();
 	unload_items();
