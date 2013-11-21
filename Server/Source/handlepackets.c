@@ -85,7 +85,7 @@ void handle_data(buffer_t *data, uint64 socket_id)
 	{
 		index = get_temp_player_index(socket_id);
 
-		if(index >= 0){
+		if(index != TEMP_NO_MATCH){
 			packets[id](data, index);
 		}
 	}
@@ -127,14 +127,16 @@ void handle_login(buffer_t *data, uint64 socket_id)
 		return;
 	}
 
-	if(index = get_temp_player_index(socket_id)){
-		if(index == -1){
-			index = set_temp_player_index(socket_id);
+	index = get_temp_player_index(socket_id);
+
+	if(index == TEMP_NO_MATCH){
+		if((index = set_temp_player_index(socket_id)) == TEMP_FULL){
+			alert_msg_socket(index, "Server is full.");
 		}
-		else{
-			if(temp_player(index)->loggedin)
-				return;
-		}
+	}
+	else{
+		if(temp_player(index)->loggedin)
+			return;
 	}
 
 	if(strlen(name) < 3 || strlen(password) < 3){
@@ -146,10 +148,6 @@ void handle_login(buffer_t *data, uint64 socket_id)
 		if(is_multi_accounts(name)){
 			alert_msg(index, "Multiple account logins is not authorized.");
 			return;
-		}
-
-		if((index = set_temp_player_index(socket_id)) == TEMP_FULL){
-			alert_msg(index, "Server is full.");
 		}
 
 		path = get_path_name(PLAYER_PATH, name, FILE_ENDING);
@@ -165,7 +163,7 @@ void handle_login(buffer_t *data, uint64 socket_id)
 		string = comb_2str(player(index)->charname, " has logged in.");
 
 		add_log(string, PLAYER_LOG);
-		printf("%s", string);
+		printf("%s \n", string);
 
 		join_game(index);
 	}
@@ -208,7 +206,7 @@ void handle_new_account(buffer_t *data, uint64 socket_id)
 		if(!file_exists(path)){
 			char *string = NULL;
 			add_account(name,password,charname,sex,type);
-			printf("Account %s has been created", name);
+			printf("Account %s has been created \n", name);
 			string = comb_3str("Account ", name, " has been created.");
 			add_log(string, PLAYER_LOG);
 			alert_msg_socket(socket_id, "Your account has been created!");
