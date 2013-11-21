@@ -116,7 +116,7 @@ void unload_maps(void)
 	uint32 n = 0;
 
 	for( i = 0; i < MAX_MAPS; i++){
-		for( n = 0; n < MAX_MAP_NPCS; i++){
+		for( n = 0; n < MAX_MAP_NPCS; n++){
 			free(map_array[i].npc[n].vitals);
 		}
 		free(map_array[i].name);
