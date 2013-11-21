@@ -321,7 +321,7 @@ void unload_players(void)
 	}
 
 	for(i = 0; i < used_name.size; i++){
-		free(used_name.charname->name);
+		free(used_name.charname[i].name);
 	}
 
 	for( i = 0; i < MAX_PLAYERS; i++){
@@ -354,7 +354,7 @@ void save_online_players(void)
 		}
 	}
 
-	printf("Online Players Saved");
+	printf("Online Players Saved.\n");
 }
 
 sbool isnamelegal(char c)
