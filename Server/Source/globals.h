@@ -84,6 +84,5 @@
 /*to use debug commands set debug to TRUE to turn off set debug to FALSE
 then compile the Program for it to go into Debug mode*/
 #define DEBUG 0
-
 /* Always the end nothing past this point. */
 #endif
