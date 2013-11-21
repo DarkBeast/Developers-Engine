@@ -320,6 +320,5 @@ void handle_shutdown(void)
 		global_msg("Server Shutting down. \n", 1); //bright red
 		server_is_online = FALSE;
 		destroy_server();
-		exit(TRUE);
 	}
 }
