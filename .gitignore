@@ -11,5 +11,5 @@
 *.pdb
 *.lastbuildstate
 *.ipch
-*.idb
-*.pdb
+*.sbr
+*.bsc
