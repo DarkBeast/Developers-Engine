@@ -463,3 +463,53 @@ char* int_to_string(int64 number)
 
 	return number_string;
 }
+
+char *trim_string(char *str)
+{
+	uint16 first_nonspace = 0;  // First non-space character
+	uint16 last_nonspace = 0;   // Last non-space character
+	int i;
+
+	if(str == NULL)
+		return NULL;
+
+	for(i = 0; is_space(str[i]) == 1; i++)
+		;
+
+	first_nonspace = i;
+
+	for( ; str[i] != '\0'; i++)
+		;
+
+	for(i--; is_space(str[i]) == 1; i--)
+		;
+
+	last_nonspace = i;
+
+	if(first_nonspace != 0) {
+		for(i = 0; i != last_nonspace - first_nonspace + 1; i++) {
+			str[i] = str[i + first_nonspace];
+		}
+
+		str[i] = '\0';
+	} else {
+		str[last_nonspace + 1] = '\0';
+	}
+
+	return str;
+}
+
+sbool is_space(char c)
+{
+	switch(c){
+	case ' ':
+	case '\n':
+	case '\t':
+	case '\v':
+	case '\f':
+	case '\r':
+		return TRUE;
+	default:
+		return FALSE;
+	}
+}
