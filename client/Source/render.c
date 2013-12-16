@@ -103,7 +103,7 @@ void init_screen(int swidth, int sheight, GLFWmonitor *monitor, GLFWwindow *shar
 		error_handler(DE_ERROR_GLFWINIT_ERROR);
 
 	// Finally we can Open an OpenGL window
-
+	glfwWindowHint(GLFW_DECORATED, GL_FALSE);
 	the_window = glfwCreateWindow( swidth, sheight, TITLE, monitor, shared);
 
 	if(the_window == NULL)
@@ -162,10 +162,10 @@ void init_image(image* img)
 	}
 }
 
-void load_image(char *name, image *img)
+void load_image(char *path, image *img)
 {
 	init_image(img);
-	load_png( name, img);
+	load_png( path, img);
 
 	glGenTextures( 1, &img->texid);
 	glBindTexture( GL_TEXTURE_2D, img ->texid);
@@ -179,6 +179,7 @@ void load_image(char *name, image *img)
 	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 
 	free(img->pixels);
+	img->pixels = NULL;
 }
 
 void draw_primitive(image *img, vector2i vecpos, vector2i imgpos,int width, int height)
