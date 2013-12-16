@@ -43,7 +43,9 @@ enum widget_flags_t
 	WIDGET_IS_PASSWORD = (1 << 14),
 	WIDGET_AVOID_BUFFER_UPDATE = (1 << 15),
 	WIDGET_BUFFER_RESIZE = (1 << 16),
-	WIDGET_IS_MULTI_LINED = (1 << 17)
+	WIDGET_IS_MULTI_LINED = (1 << 17),
+	WIDGET_WINDOW_MOVEABLE = (1 << 18),
+	WIDGET_USED_CLONE = (1 << 19)
 };
 
 //A UI control structure.
@@ -101,15 +103,18 @@ struct user_interface
 {
 	widget *root;
 	canvas screen;
+	sbool moving;
 };
+
+void set_gui(void *ui);
+
+void *get_gui(void);
 
 //used to Obtain the UI system.
 user_interface widget_get_ui(void);
-user_interface *widget_get_uip(void);
+user_interface widget_get_uip(void);
 
 widget *widget_get_focused(void);
-//checks if mouse is in the set move frame.
-sbool widget_frame_contains(widget *control, widget *parent);
 
 //changes the moving widgets position via mouse position.
 void widget_move(int16 x, int16 y);
@@ -171,13 +176,13 @@ void widget_hidden_resize(widget *parent, uint16 size);//for dynamic widget arra
 
 void widget_shown_resize(widget *parent, uint16 size);//for dynamic widget arrays up to 65,535, the system currently uses static.
 // clears the widgets arrays
-sbool widget_clear_arrays(widget *parent);
+sbool widget_clear_parent(widget *parent);
 
 //clears the hidden array
-sbool widget_clear_hidden(widget *parent);
+void widget_clear_hidden(widget *parent);
 
 //clears the shown array
-sbool widget_clear_shown(widget *parent);
+void widget_clear_shown(widget *parent);
 
 //resizes the ID for more Z depth of Deep user interface systems for widget manager.
 void widget_resize_id(uint16 **id, uint16 size);
@@ -186,7 +191,7 @@ void widget_resize_id(uint16 **id, uint16 size);
 void widget_manager(void);
 
 //checks if widget is in the mouse's location when click event happens
-sbool widget_rect_contains(widget *control, widget *parent);
+sbool widget_rect_contains(widget *control);
 
 //checks if the mouse is over a widget if so do event
 sbool widget_has_mouse_over(widget *control);

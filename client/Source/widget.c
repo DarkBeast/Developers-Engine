@@ -20,9 +20,9 @@ user_interface widget_get_ui(void)
 	return ui;
 }
 
-user_interface *widget_get_uip(void)
+user_interface widget_get_uip(void)
 {
-	return &ui;
+	return ui;
 }
 
 widget *widget_get_focused(void)
@@ -30,62 +30,44 @@ widget *widget_get_focused(void)
 	return focused;
 }
 
-sbool widget_frame_contains(widget *control, widget *parent)
-{
-	switch(control->type){
-	case CONTROL_BUTTON:
-	case CONTROL_LABEL:
-
-		if(ui.screen.mousepos.x < control->actualpos.x) {return FALSE; break;}
-		if(ui.screen.mousepos.x > control->actualpos.x + control->width) {return FALSE; break;}
-		if(ui.screen.mousepos.y < control->actualpos.y) {return FALSE; break;}
-		if(ui.screen.mousepos.y > control->actualpos.y + control->height) {return FALSE; break;}
-		return TRUE;
-		break;
-	case CONTROL_WINDOW:{
-		window *data = (window *)control->control;
-
-		if(ui.screen.mousepos.x < control->actualpos.x + data->frame.x) {return FALSE; break;}
-		if(ui.screen.mousepos.x > control->actualpos.x + data->frame.w) {return FALSE; break;}
-		if(ui.screen.mousepos.y < control->actualpos.y + data->frame.y) {return FALSE; break;}
-		if(ui.screen.mousepos.y > control->actualpos.y + data->frame.h) {return FALSE; break;}
-		return TRUE;
-						}
-						break;
-
-	default: return FALSE; break;
-	}
-}
-
 void widget_move(int16 x, int16 y)
 {
 	ui.screen.newmousepos.x = x;
 	ui.screen.newmousepos.y = y;
 
-	if(focused && focused->action & WIDGET_MOVING){
-		int16 tempx = x - ui.screen.mousepos.x ;
-		int16 tempy = y - ui.screen.mousepos.y ;
+	if(ui.moving){
+		int windowx, windowy;
 
-		if(focused->pos.x + tempx <= 0 || focused->pos.y + tempy <= 0){
-			return;
-		}
-
-		if(focused->pos.x + focused->width + tempx>= get_screen_width() || focused->pos.y + focused->height + tempy >= get_screen_height()){
-			return;
-		}
-
-		focused->pos.x = focused->pos.x + tempx ;
-
-		focused->pos.y = focused->pos.y + tempy ;
-		widget_position_update(focused);
-	}
-
-	if(focused && widget_rect_contains(focused, focused->parent)){
-		widget_mouse_over(focused);
+		glfwGetWindowPos(get_the_window(),&windowx, &windowy);
+		glfwSetWindowPos(get_the_window(),x + windowx - ui.screen.mouseclick.x, y + windowy - ui.screen.mouseclick.y);
 	}
 	else{
-		if(ui.root){
-			widget_mouse_over(ui.root);
+		if(focused){
+			if(focused->action & WIDGET_MOVING){
+				int16 tempx = x - ui.screen.mousepos.x ;
+				int16 tempy = y - ui.screen.mousepos.y ;
+
+				if(focused->pos.x + tempx <= 0 || focused->pos.y + tempy <= 0){
+					return;
+				}
+
+				if(focused->pos.x + focused->width + tempx>= get_screen_width() || focused->pos.y + focused->height + tempy >= get_screen_height()){
+					return;
+				}
+
+				focused->pos.x = focused->pos.x + tempx ;
+
+				focused->pos.y = focused->pos.y + tempy ;
+				widget_position_update(focused);
+			}
+
+			if(widget_rect_contains(focused))
+				widget_mouse_over(focused);
+		}
+		else{
+			if(ui.root){
+				widget_mouse_over(ui.root);
+			}
 		}
 	}
 }
@@ -121,7 +103,7 @@ void widget_mouse_over(widget *control)
 		for( index = control->shown.count -1; index >= 0; --index){
 			child = control->shown.data[index];
 
-			if(widget_rect_contains(child, child->parent)){// if focusable check if in range
+			if(widget_rect_contains(child)){// if focusable check if in range
 				if(child->shown.data){
 					index2 = child->shown.count -1;
 					last = index2;
@@ -130,7 +112,7 @@ void widget_mouse_over(widget *control)
 						while(index2 >= 0){
 							child2 = child->shown.data[index2];
 
-							if(widget_rect_contains(child2, child2->parent)){
+							if(widget_rect_contains(child2)){
 								if(child2->shown.data == NULL && widget_usable(child2)){//if in range check if widget array is null or not.
 									widget_has_exited(child2);
 									child2->action |= WIDGET_MOUSE_OVER;
@@ -151,7 +133,7 @@ void widget_mouse_over(widget *control)
 									index2 = child->shown.count -1;
 								}
 								else{
-									if(widget_rect_contains(child, child->parent) && widget_usable(child)){
+									if(widget_rect_contains(child) && widget_usable(child)){
 										widget_has_exited(child);
 										child->action |= WIDGET_MOUSE_OVER;
 										child->controlmouseover(child);
@@ -292,7 +274,7 @@ sbool widget_check_focus(void)
 			focused->action &= ~(WIDGET_MOVING);
 		}
 
-		if(widget_rect_contains(focused, focused->parent)){
+		if(widget_rect_contains(focused)){
 			return TRUE;
 		}
 	}
@@ -353,6 +335,7 @@ void widget_init_system(void)
 	ui.root->hidden.data  = (widget **)calloc(1, WIDGET_MAX * sizeof (widget)); //set the size of the widget array
 	ui.root->hidden.count = (ui.root->hidden.count > WIDGET_MAX) ? WIDGET_MAX : ui.root->hidden.count;
 	ui.root->hidden.size = WIDGET_MAX;
+	ui.root->type = CONTROL_ROOT;
 }
 
 //switches widgets around in an array.
@@ -578,7 +561,7 @@ void widget_init(widget *wgt)//initializes a widget.
 //unloads a widget from memory
 void widget_unload(widget *parent)
 {
-	if(!widget_clear_arrays(parent))
+	if(!widget_clear_parent(parent))
 		return;// add error message
 }
 
@@ -626,235 +609,450 @@ void widget_hidden_resize(widget *parent, uint16 size)
 	parent->hidden.size =  size;
 }
 
+//frees just the widgets in the shown array under the parent.
+void widget_clear_shown(widget *parent)//used to draw the widgets onto the screen.
+{
+	widget *child;
+	uint16 *id = (uint16 *)calloc(1, 32 * sizeof(uint16));
+	uint16 index = 0;
+	uint16 idindex;
+	uint16 idsize;
+
+	if(id == NULL){
+		error_handler(DE_ERROR_POINTER_NULL);
+		return;
+	}
+
+	idsize = 32;
+	idindex = 0;
+	id[idindex] = 0;
+
+	for( index = 0; index < parent->shown.count; ++index){
+		child =  parent->shown.data[index];
+
+		if(child->shown.data){
+			id[idindex] = 0;
+			while(id[idindex] <= child->shown.count){
+				if(child->shown.data){
+					if(id[idindex]  >= child->shown.count && idindex != 0){
+						id[idindex] = 0;
+						--idindex;
+
+						switch(child->type){
+						case CONTROL_LISTBOX: unload_list_elements(child); break;
+						case CONTROL_LABEL: unload_label_elements(child); break;
+						case CONTROL_TEXTBOX: unload_textbox_elements(child); break;
+						case CONTROL_RADIO: unload_radio_elements(child); break;
+						}
+						free(child->data);
+						free(child->control);
+
+						if(!(child->action & WIDGET_USED_CLONE))
+							free(child->img);
+
+						free(child->shown.data);
+						if(child->hidden.data){
+							widget_clear_hidden(child);
+						}
+						free(child->hidden.data);
+						child->hidden.data = NULL;
+						child->data = NULL;
+						child->control = NULL;
+						child->img = NULL;
+						child->shown.data = NULL;
+
+						child = child->parent;
+						if(idindex != 0){
+							free(child->shown.data[id[idindex]]);
+							child->shown.data[id[idindex]] = NULL;
+						}
+					}
+					else{
+						if(id[idindex] < child->shown.count){
+							if (child->shown.data[id[idindex]]){
+								child = child->shown.data[id[idindex]];
+
+								++id[idindex];
+								++idindex;//we set the z buffer index to know which layer we are in
+
+								if(idindex + 1 >= idsize){//make sure there is not too many layers for the id array.
+									idsize = (uint16)next_power_of_two(idsize);
+									widget_resize_id(&id,idsize);
+								}
+								id[idindex] = 0;//set the new ID index to 0
+							}
+							else{
+								if(idindex != 0){
+									switch(child->type){
+									case CONTROL_LISTBOX: unload_list_elements(child); break;
+									case CONTROL_LABEL: unload_label_elements(child); break;
+									case CONTROL_TEXTBOX: unload_textbox_elements(child); break;
+									case CONTROL_RADIO: unload_radio_elements(child); break;
+									}
+									free(child->data);
+									free(child->control);
+									free(child->shown.data);
+									if(!(child->action & WIDGET_USED_CLONE))
+										free(child->img);
+
+									if(child->hidden.data)
+										widget_clear_hidden(child);
+
+									free(child->hidden.data);
+
+									child->hidden.data = NULL;
+									child->data = NULL;
+									child->control = NULL;
+									child->img = NULL;
+									child->shown.data = NULL;
+
+									child = child->parent;
+
+									free(child->parent->shown.data[id[idindex]]);
+									child->parent->shown.data[id[idindex]] = NULL;
+								}
+								++id[idindex];
+							}
+						}
+						else{
+							switch(child->type){
+							case CONTROL_LISTBOX: unload_list_elements(child); break;
+							case CONTROL_LABEL: unload_label_elements(child); break;
+							case CONTROL_TEXTBOX: unload_textbox_elements(child); break;
+							case CONTROL_RADIO: unload_radio_elements(child); break;
+							}
+							free(child->data);
+							free(child->control);
+							free(child->shown.data);
+							if(!(child->action & WIDGET_USED_CLONE))
+								free(child->img);
+
+							if(child->hidden.data)
+								widget_clear_hidden(child);
+
+							free(child->hidden.data);
+
+							child->hidden.data = NULL;
+							child->data = NULL;
+							child->control = NULL;
+							child->img = NULL;
+							child->shown.data = NULL;
+
+							free(child->parent->shown.data[id[idindex]]);
+							child->parent->shown.data[id[idindex]] = NULL;
+							++id[idindex];
+						}
+					}
+				}
+				else{
+					if(idindex != 0){
+						id[idindex] = 0;
+						--idindex;
+						switch(child->type){
+						case CONTROL_LISTBOX: unload_list_elements(child); break;
+						case CONTROL_LABEL: unload_label_elements(child); break;
+						case CONTROL_TEXTBOX: unload_textbox_elements(child); break;
+						case CONTROL_RADIO: unload_radio_elements(child); break;
+						}
+						free(child->data);
+						free(child->control);
+						if(!(child->action & WIDGET_USED_CLONE))
+							free(child->img);
+						free(child->shown.data);
+
+						if(child->hidden.data)
+							widget_clear_hidden(child);
+
+						free(child->hidden.data);
+						child->hidden.data = NULL;
+						child->data = NULL;
+						child->control = NULL;
+						child->img = NULL;
+						child->shown.data = NULL;
+						child = child->parent;
+						if(id[idindex] < child->shown.count){
+							free(child->shown.data[id[idindex]]);
+							child->shown.data[id[idindex]] = NULL;
+						}
+						else{
+							++id[idindex];
+						}
+					}
+					else{
+						switch(child->type){
+						case CONTROL_LISTBOX: unload_list_elements(child); break;
+						case CONTROL_LABEL: unload_label_elements(child); break;
+						case CONTROL_TEXTBOX: unload_textbox_elements(child); break;
+						case CONTROL_RADIO: unload_radio_elements(child); break;
+						}
+						free(child->data);
+						free(child->control);
+						if(!(child->action & WIDGET_USED_CLONE))
+							free(child->img);
+						free(child->shown.data);
+
+						if(child->hidden.data)
+							widget_clear_hidden(child);
+
+						free(child->hidden.data);
+						child->hidden.data = NULL;
+						child->data = NULL;
+						child->control = NULL;
+						child->img = NULL;
+						child->shown.data = NULL;
+						child = child->parent;
+						free(child->shown.data[id[idindex]]);
+						child->shown.data[id[idindex]] = NULL;
+						break;
+					}
+				}
+			}
+			switch(child->type){
+			case CONTROL_LISTBOX: unload_list_elements(child); break;
+			case CONTROL_LABEL: unload_label_elements(child); break;
+			case CONTROL_TEXTBOX: unload_textbox_elements(child); break;
+			case CONTROL_RADIO: unload_radio_elements(child); break;
+			}
+			free(child->data);
+			free(child->control);
+			if(!(child->action & WIDGET_USED_CLONE))
+				free(child->img);
+
+			free(child->shown.data);
+			if(child->hidden.data)
+				widget_clear_hidden(child);
+
+			free(child->hidden.data);
+			child->hidden.data = NULL;
+			child->data = NULL;
+			child->control = NULL;
+			child->img = NULL;
+			child->shown.data = NULL;
+		}
+	}
+	free(id);
+}
+
+//frees just the widgets in the hidden array under the parent.
+void widget_clear_hidden(widget *parent)//used to draw the widgets onto the screen.
+{
+	widget *child;
+	uint16 *id = (uint16 *)calloc(1, 32 * sizeof(uint16));
+	uint16 index = 0;
+	uint16 idindex;
+	uint16 idsize;
+
+	if(id == NULL){
+		error_handler(DE_ERROR_POINTER_NULL);
+		return;
+	}
+
+	idsize = 32;
+	idindex = 0;
+	id[idindex] = 0;
+
+	for( index = 0; index < parent->hidden.count; ++index){
+		child =  parent->hidden.data[index];
+
+		if(child->hidden.data){
+			id[idindex] = 0;
+			while(id[idindex] <= child->hidden.count){
+				if(child->hidden.data){
+					if(id[idindex]  >= child->hidden.count && idindex != 0){
+						id[idindex] = 0;
+						--idindex;
+						switch(child->type){
+						case CONTROL_LISTBOX: unload_list_elements(child); break;
+						case CONTROL_LABEL: unload_label_elements(child); break;
+						case CONTROL_TEXTBOX: unload_textbox_elements(child); break;
+						case CONTROL_RADIO: unload_radio_elements(child); break;
+						}
+						free(child->data);
+						free(child->control);
+						if(!(child->action & WIDGET_USED_CLONE))
+							free(child->img);
+
+						free(child->hidden.data);
+						if(child->shown.data)
+							widget_clear_shown(child);
+
+						free(child->shown.data);
+						child->data = NULL;
+						child->control = NULL;
+						child->img = NULL;
+						child->hidden.data = NULL;
+						child->shown.data = NULL;
+						child = child->parent;
+						if(idindex != 0){
+							free(child->hidden.data[id[idindex]]);
+							child->hidden.data[id[idindex]] = NULL;
+						}
+					}
+					else{
+						if(id[idindex] < child->hidden.count){
+							if (child->hidden.data[id[idindex]]){
+								child = child->hidden.data[id[idindex]];
+
+								++id[idindex];
+								++idindex;//we set the z buffer index to know which layer we are in
+
+								if(idindex + 1 >= idsize){//make sure there is not too many layers for the id array.
+									idsize = (uint16)next_power_of_two(idsize);
+									widget_resize_id(&id,idsize);
+								}
+								id[idindex] = 0;//set the new ID index to 0
+							}
+							else{
+								if(idindex != 0){
+									switch(child->type){
+									case CONTROL_LISTBOX: unload_list_elements(child); break;
+									case CONTROL_LABEL: unload_label_elements(child); break;
+									case CONTROL_TEXTBOX: unload_textbox_elements(child); break;
+									case CONTROL_RADIO: unload_radio_elements(child); break;
+									}
+									free(child->data);
+									free(child->control);
+									free(child->hidden.data);
+									if(!(child->action & WIDGET_USED_CLONE))
+										free(child->img);
+
+									if(child->shown.data)
+										widget_clear_shown(child);
+
+									free(child->shown.data);
+
+									child->hidden.data = NULL;
+									child->data = NULL;
+									child->control = NULL;
+									child->img = NULL;
+									child->shown.data = NULL;
+								}
+								++id[idindex];
+							}
+						}
+						else{
+							++id[idindex];
+						}
+					}
+				}
+				else{
+					if(idindex != 0){
+						id[idindex] = 0;
+						--idindex;
+						switch(child->type){
+						case CONTROL_LISTBOX: unload_list_elements(child); break;
+						case CONTROL_LABEL: unload_label_elements(child); break;
+						case CONTROL_TEXTBOX: unload_textbox_elements(child); break;
+						case CONTROL_RADIO: unload_radio_elements(child); break;
+						}
+						free(child->data);
+						free(child->control);
+						if(!(child->action & WIDGET_USED_CLONE))
+							free(child->img);
+
+						free(child->hidden.data);
+						if(child->shown.data)
+							widget_clear_shown(child);
+
+						free(child->shown.data);
+						child->data = NULL;
+						child->control = NULL;
+						child->img = NULL;
+						child->hidden.data = NULL;
+						child->shown.data = NULL;
+						child = child->parent;
+						if(idindex != 0){
+							free(child->hidden.data[id[idindex]]);
+							child->hidden.data[id[idindex]] = NULL;
+						}
+					}
+					else{
+						switch(child->type){
+						case CONTROL_LISTBOX: unload_list_elements(child); break;
+						case CONTROL_LABEL: unload_label_elements(child); break;
+						case CONTROL_TEXTBOX: unload_textbox_elements(child); break;
+						case CONTROL_RADIO: unload_radio_elements(child); break;
+						}
+						free(child->data);
+						free(child->control);
+						if(!(child->action & WIDGET_USED_CLONE))
+							free(child->img);
+
+						free(child->hidden.data);
+						if(child->shown.data)
+							widget_clear_shown(child);
+
+						free(child->shown.data);
+						child->data = NULL;
+						child->control = NULL;
+						child->img = NULL;
+						child->hidden.data = NULL;
+						child->shown.data = NULL;
+						child = child->parent;
+						free(child->hidden.data[id[idindex]]);
+						child->hidden.data[id[idindex]] = NULL;
+						break;
+					}
+				}
+			}
+			switch(child->type){
+			case CONTROL_LISTBOX: unload_list_elements(child); break;
+			case CONTROL_LABEL: unload_label_elements(child); break;
+			case CONTROL_TEXTBOX: unload_textbox_elements(child); break;
+			case CONTROL_RADIO: unload_radio_elements(child); break;
+			}
+			free(child->data);
+			free(child->control);
+			if(!(child->action & WIDGET_USED_CLONE))
+				free(child->img);
+
+			free(child->hidden.data);
+			if(child->shown.data)
+				widget_clear_shown(child);
+
+			free(child->shown.data);
+			child->data = NULL;
+			child->control = NULL;
+			child->img = NULL;
+			child->hidden.data = NULL;
+			child->shown.data = NULL;
+			child = child->parent;
+			free(child->hidden.data[id[idindex]]);
+			child->hidden.data[id[idindex]] = NULL;
+		}
+	}
+
+	free(id);
+}
+
 //Frees all the widgets in the widget arrays shown/hidden so we can free the parent.
-sbool widget_clear_arrays(widget *parent)
+sbool widget_clear_parent(widget *parent)
 {
-	//will clear all widgets within the widget and the widgets of widgets. clear them in reverse
-	widget *child;
-	uint16 z = 0;
-
 	if (parent == NULL) {return FALSE;}
 
 	if (parent->hidden.data){
-		uint16 index = 0;
-		uint16 index2 = 0;
-
-		for (index = 0; index < parent->hidden.count; ++index){
-			if ( parent->hidden.data[index]){
-				child = parent->hidden.data[index];
-
-				for(index2 = 0; index2 < child->hidden.count; ++index2){
-					if(child ->hidden.data){
-						if( index2 + 1 == child->hidden.count){
-							free(child->hidden.data);
-							child->hidden.data = NULL;
-							child->hidden.count = 0;
-
-							if (child->parent && z != 0){
-								child = child->parent;
-								--z;
-								index2 = 0;
-							}
-						}
-						else{
-							if (child->hidden.data[index2]){
-								child = child->hidden.data[index2];
-								index2 = 0;
-								++z;
-							}
-						}
-					}
-					else{
-						free(child->hidden.data);
-						child->hidden.data = NULL;
-						child->hidden.count = 0;
-
-						if (child->parent && z != 0){
-							child = child->parent;
-							--z;
-							index2 = 0;
-						}
-					}
-				}
-			}
-		}
+		widget_clear_hidden(parent);
 	}
 
 	if (parent->shown.data){
-		uint16 index = 0;
-		uint16 index2 = 0;
-
-		for (index = 0; index < parent->shown.count; ++index){
-			if ( parent->shown.data[index]){
-				child = parent->shown.data[index];
-
-				for(index2 = 0; index2 < child->shown.count; ++index2){
-					if(child ->shown.data){
-						if( index2 + 1 == child->shown.count){
-							free(child->shown.data);
-							child->shown.data = NULL;
-							child->shown.count = 0;
-
-							if (child->parent && z != 0){
-								child = child->parent;
-								--z;
-								index2 = 0;
-							}
-						}
-						else{
-							if (child->shown.data[index2]){
-								child = child->shown.data[index2];
-								index2 = 0;
-								++z;
-							}
-						}
-					}
-					else{
-						free(child->shown.data);
-						child->shown.data = NULL;
-
-						if (child->parent && z != 0){
-							child = child->parent;
-							--z;
-							index2 = 0;
-						}
-					}
-				}
-			}
-		}
+		widget_clear_shown(parent);
 	}
 
-	free(parent->shown.data);
 	free(parent->hidden.data);
-
+	free(parent->shown.data);
+	free(parent->data);
+	free(parent->control);
+	free(parent->img);
+	focused = NULL;
+	lastmouseover = NULL;
+	parent->control = NULL;
+	parent->img = NULL;
+	parent->data = NULL;
 	parent->hidden.data = NULL;
 	parent->shown.data = NULL;
 	parent->hidden.size = 0;
 	parent->shown.size = 0;
 	parent->hidden.count = 0;
-	parent->shown.count = 0;
-
-	return TRUE;
-}
-
-//clears just the hidden array.
-sbool widget_clear_hidden(widget *parent)
-{
-	widget *child;
-	uint16 z = 0;
-
-	if (parent == NULL) {return FALSE;}
-
-	if (parent->hidden.data){
-		uint16 index = 0;
-		uint16 index2 = 0;
-
-		for (index = 0; index < parent->hidden.count; ++index){
-			if ( parent->hidden.data[index]){
-				child = parent->hidden.data[index];
-
-				for(index2 = 0; index2 < child->hidden.count; ++index2){
-					if(child ->hidden.data){
-						if( index2 + 1 == child->hidden.count){
-							free(child->hidden.data);
-							child->hidden.data = NULL;
-							child->hidden.count = 0;
-
-							if (child->parent && z != 0){
-								child = child->parent;
-								--z;
-								index2 = 0;
-							}
-						}
-						else{
-							if (child->hidden.data[index2]){
-								child = child->hidden.data[index2];
-								index2 = 0;
-								++z;
-							}
-						}
-					}
-					else{
-						free(child->hidden.data);
-						child->hidden.data = NULL;
-						child->hidden.count = 0;
-
-						if (child->parent && z != 0){
-							child = child->parent;
-							--z;
-							index2 = 0;
-						}
-					}
-				}
-			}
-		}
-	}
-
-	free(parent->hidden.data);
-
-	parent->hidden.data = NULL;
-	parent->hidden.size = 0;
-	parent->hidden.count = 0;
-
-	return TRUE;
-}
-
-//clears just the shown array.
-sbool widget_clear_shown(widget *parent)
-{
-	widget *child;
-	uint16 z = 0;
-
-	if (parent == NULL) {return FALSE;}
-
-	if (parent->shown.data){
-		uint16 index = 0;
-		uint16 index2 = 0;
-
-		for (index = 0; index < parent->shown.count; ++index){
-			if ( parent->shown.data[index]){
-				child = parent->shown.data[index];
-
-				for(index2 = 0; index2 < child->shown.count; ++index2){
-					if(child ->shown.data){
-						if( index2 + 1 == child->shown.count){
-							free(child->shown.data);
-							child->shown.data = NULL;
-							child->shown.count = 0;
-
-							if (child->parent && z != 0){
-								child = child->parent;
-								--z;
-								index2 = 0;
-							}
-						}
-						else{
-							if (child->shown.data[index2]){
-								child = child->shown.data[index2];
-								index2 = 0;
-								++z;
-							}
-						}
-					}
-					else{
-						free(child->shown.data);
-						child->shown.data = NULL;
-
-						if (child->parent && z != 0){
-							child = child->parent;
-							--z;
-							index2 = 0;
-						}
-					}
-				}
-			}
-		}
-	}
-
-	free(parent->shown.data);
-
-	parent->shown.data = NULL;
-	parent->shown.size = 0;
 	parent->shown.count = 0;
 
 	return TRUE;
@@ -946,13 +1144,22 @@ void widget_manager(void)//used to draw the widgets onto the screen.
 }
 
 //checks if the widget is in the area the mouse clicked.
-sbool widget_rect_contains(widget *control, widget *parent)
+sbool widget_rect_contains(widget *control)
 {
-	if(ui.screen.mousepos.x < control->actualpos.x ) {return FALSE;}
-	if(ui.screen.mousepos.x > control->actualpos.x + control->sizex) {return FALSE;}
-	if(ui.screen.mousepos.y < control->actualpos.y ) {return FALSE;}
-	if(ui.screen.mousepos.y > control->actualpos.y + control->sizey) {return FALSE;}
+	if(control->type == CONTROL_WINDOW){
+		window *data = (window *)control->control;
 
+		if(ui.screen.mousepos.x < control->actualpos.x + data->frame.x)return FALSE;
+		if(ui.screen.mousepos.x > control->actualpos.x + data->frame.w) return FALSE;
+		if(ui.screen.mousepos.y < control->actualpos.y + data->frame.y) return FALSE;
+		if(ui.screen.mousepos.y > control->actualpos.y + data->frame.h) return FALSE;
+		return TRUE;
+	}
+
+	if(ui.screen.mousepos.x < control->actualpos.x ) return FALSE;
+	if(ui.screen.mousepos.x > control->actualpos.x + control->sizex) return FALSE;
+	if(ui.screen.mousepos.y < control->actualpos.y ) return FALSE;
+	if(ui.screen.mousepos.y > control->actualpos.y + control->sizey) return FALSE;
 	return TRUE;
 }
 
@@ -1016,7 +1223,7 @@ sbool widget_has_mouse_over(widget *control)
 		return FALSE;
 	}
 
-	if(!widget_rect_contains(control,parent)){
+	if(!widget_rect_contains(control)){
 		return FALSE;
 	}
 
@@ -1147,7 +1354,7 @@ void widget_mouse_release(widget * control)
 		for( index = control->shown.count -1; index >= 0; --index){
 			child = control->shown.data[index];
 
-			if(widget_rect_contains(child, child->parent)){// if focusable check if in range
+			if(widget_rect_contains(child)){// if focusable check if in range
 				if(child->shown.data){
 					index2 = child->shown.count -1;
 					last = index2;
@@ -1155,7 +1362,7 @@ void widget_mouse_release(widget * control)
 					while(index2 >= 0){
 						child2 = child->shown.data[index2];
 
-						if(widget_rect_contains(child2, child2->parent)){
+						if(widget_rect_contains(child2)){
 							if(child2->shown.data == NULL){//if in range check if widget array is null or not.
 								widget_set_release(child2);
 								return;
@@ -1170,7 +1377,7 @@ void widget_mouse_release(widget * control)
 								index2 = child->shown.count -1;
 							}
 							else{
-								if(widget_rect_contains(child, child->parent)){
+								if(widget_rect_contains(child)){
 									widget_set_release(child);
 									return;
 								}
@@ -1221,7 +1428,7 @@ void widget_mouse_press(widget * control)
 		for( index = control->shown.count -1; index >= 0; --index){
 			child = control->shown.data[index];
 
-			if(widget_rect_contains(child, child->parent)){// if focusable check if in range
+			if(widget_rect_contains(child)){// if focusable check if in range
 				if(child->shown.data){
 					index2 = child->shown.count -1;
 					last = index2;
@@ -1229,7 +1436,7 @@ void widget_mouse_press(widget * control)
 					while(index2 >= 0){
 						child2 = child->shown.data[index2];
 
-						if(widget_rect_contains(child2, child2->parent)){
+						if(widget_rect_contains(child2)){
 							if(child2->shown.data == NULL){//if in range check if widget array is null or not.
 								set_widget_mouse_press_event(child2,index2);
 								return;
@@ -1244,7 +1451,7 @@ void widget_mouse_press(widget * control)
 								index2 = child->shown.count -1;
 							}
 							else{
-								if(widget_rect_contains(child, child->parent)){
+								if(widget_rect_contains(child)){
 									set_widget_mouse_press_event(child,index2);
 									return;
 								}
@@ -1278,7 +1485,7 @@ void widget_mouse_press(widget * control)
 		}
 	}
 	if(control->action & WIDGET_MOVEABLE){
-		if(widget_frame_contains(control,control->parent)){
+		if(widget_rect_contains(control)){
 			control->action |= WIDGET_MOVING;
 		}
 	}
@@ -1300,12 +1507,20 @@ void set_widget_mouse_press_event(widget *control,uint16 index)
 
 void widget_set_release(widget *control)
 {
+	if(control->action & WIDGET_WINDOW_MOVEABLE){
+		ui.moving = FALSE;
+	}
+
 	control->action &= ~(WIDGET_CLICKED);
 	control->controlmouserelease(control,ui.screen.button, ui.screen.clicked);
 }
 
 void widget_set_clicked(widget *control)
 {
+	if(control->action & WIDGET_WINDOW_MOVEABLE){
+		ui.moving = TRUE;
+	}
+
 	control->action |= WIDGET_CLICKED;
 	control->controlmousepress(control,ui.screen.button, ui.screen.clicked);
 }
@@ -1325,7 +1540,7 @@ void widget_set_focused(widget *control, uint32 index)
 	control->action |= WIDGET_CLICKED;
 
 	if(control->action & WIDGET_MOVEABLE){
-		if(widget_frame_contains(control,control->parent)){
+		if(widget_rect_contains(control)){
 			control->action |= WIDGET_MOVING;
 		}
 	}
