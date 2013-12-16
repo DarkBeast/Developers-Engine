@@ -13,4 +13,7 @@ void handle_mouse_pos(GLFWwindow * screen,double x,double y);
 void handle_mouse_press(GLFWwindow * screen, int button, int pressed, int mods);
 void handle_mouse_wheel(GLFWwindow * screen, double x, double y);
 void handle_window_close(GLFWwindow * screen);
+
+//game specific functions.
+void check_input_keys(int button, int action);
 #endif
