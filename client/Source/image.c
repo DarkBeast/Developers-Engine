@@ -12,7 +12,7 @@
 
 #define PNGSIGBYTES 8
 
-void load_png(const char *name, image *image)
+void load_png(const char *path, image *image)
 {
 	png_structp png_ptr;
 	png_infop info_ptr, end_info;
@@ -24,7 +24,7 @@ void load_png(const char *name, image *image)
 
 	unsigned char header[PNGSIGBYTES];
 
-	FILE *png_file = fopen(name, "rb");
+	FILE *png_file = fopen(path, "rb");
 
 	if (!png_file)
 		error_handler(DE_ERROR_FILE_ERROR);
@@ -106,7 +106,8 @@ void load_png(const char *name, image *image)
 
 	free(pixelz);
 	free(row_ptrs);
-
+	pixelz = NULL;
+	row_ptrs = NULL;
 	png_destroy_read_struct(&png_ptr, &info_ptr, &end_info);
 	fclose(png_file);
 }
