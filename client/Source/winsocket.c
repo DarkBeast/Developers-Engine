@@ -2,62 +2,95 @@
 #include "socket.h"
 #include "error.h"
 #include <stdio.h>
+#include "handlepackets.h"
 
 desocket *sock; //short for socket
+WSADATA wsadata;
+sbool isconnected_t;
+
+sbool isconnected(void)
+{
+	return isconnected_t;
+}
+
+void set_isconnected(sbool flag)
+{
+	isconnected_t = flag;
+}
 
 void initsocket(void)
 {
 	sock = (desocket *)calloc(1,sizeof(desocket));
 
-	if (WSAStartup(0x0202, &sock->wsadata) != 0) /* Load Winsock 2.0 DLL */
+	if (WSAStartup(0x0202, &wsadata) != 0) /* Load Winsock 2.0 DLL */
 		error_handler(DE_ERROR_SOCKET_WSASTARTUP);
 
 	/* Create a reliable, stream socket using TCP */
 	if ((sock->socket = socket(PF_INET, SOCK_STREAM, IPPROTO_TCP)) < 0)
 		error_handler(DE_ERROR_SOCKET_INIT);
-	sock->host_ip = SERVER_IP;
-	sock->host_port = CLIENT_PORT;
+
 	/* Construct the server address structure */
 	memset(&sock->host_address, 0, sizeof(struct sockaddr_in));     /* Zero out structure */
 	sock->host_address.sin_family      = AF_INET;             /* Internet address family */
-	sock->host_address.sin_addr.s_addr = inet_addr(sock->host_ip);   /* Server IP address */
-	sock->host_address.sin_port        = htons(sock->host_port); /* Server port */
+	sock->host_address.sin_addr.s_addr = inet_addr(SERVER_IP);   /* Server IP address */
+	sock->host_address.sin_port        = htons(CLIENT_PORT); /* Server port */
 }
 
-void socketlisten(void)
+int socketlisten(void *arg)
 {
 	sbool i = TRUE;
-	sock->total_bytes_read = 0;
+	int size;
+	buffer_t buffer;
 
 	while (i){
-		if ((sock->bytes_read = recv(sock->socket, sock->bufferin.buff, PACKET_SIZE, 0)) <= 0)
-			error_handler(DE_ERROR_SOCKET_CONNECTION_LOSS);
+		clear_buffer(&buffer);
 
-		sock->total_bytes_read += sock->bytes_read;   /* Keep tally of total bytes */
+		if (recv(sock->socket, buffer.buff, SIZE32, 0) <= 0){
+			puts("Connection to Server Lost");
+			isconnected_t = FALSE;
+			return FALSE;
+		}
+
+		take_buffer(&size,&buffer,SIZE32);
+
+		clear_buffer(&buffer);
+
+		if (recv(i, buffer.buff, size, 0) <= 0){
+			puts("Connection to Server Lost");
+			isconnected_t = FALSE;
+			return FALSE;
+		}
+
+		incomming_packets(&buffer);
 	}
+	return FALSE;
 }
 
 int socketconnect(void)
 {
-	if (connect(sock->socket, (SOCKADDR *)&sock->host_address, sizeof(struct sockaddr_in)) == SOCKET_ERROR)
+	if (connect(sock->socket, (SOCKADDR *)&sock->host_address, sizeof(struct sockaddr_in)) == SOCKET_ERROR){
+		isconnected_t = FALSE;
 		return FALSE;
-	else
+	}
+	else{
+		isconnected_t = TRUE;
 		return TRUE;
+	}
 }
 
 void socketsend(buffer_t *data)
 {
-	buffer_t buffer;
+	buffer_t buff;
 
-	clear_buffer(&buffer);
-	add_buffer(&buffer,&data->offset,SIZE32);
-	add_buffer(&buffer,&data->buff,data->offset);
+	clear_buffer(&buff);
+	add_buffer(&buff, &data->offset, SIZE32);
+	add_buffer(&buff, &data->buff, data->offset);
 
-	if (send(sock->socket, buffer.buff, buffer.offset, 0) != buffer.offset)
+	if (send(sock->socket, buff.buff, buff.offset, 0) != buff.offset)
 		error_handler(DE_ERROR_SOCKET_SEND_SIZE);
 }
 
-void removesocket(void)
+void unloadsocket(void)
 {
 	closesocket(sock->socket);
 	WSACleanup();
