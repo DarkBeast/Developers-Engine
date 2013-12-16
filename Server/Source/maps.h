@@ -17,8 +17,8 @@ typedef struct map_t map_t;
 typedef enum tile_type tile_type;
 typedef enum map_type map_type;
 
-#define GETXY_UNSAFE(x, y) ((y << 7) + x) /* GETXY_UNSAFE is faster, but may error */
-#define GETXY(x, y, max_x, max_y) ((x < max_x && y < max_y) ? ((y << 7) + x) : 0) /* Safe but slower */
+#define GETXY(x, y) ((y << 7) + x) /* GETXY is faster, but may error */
+#define GETXY_SAFE(x, y, max_x, max_y) ((x < max_x && y < max_y) ? ((y << 7) + x) : 0) /* Safe but slower */
 
 struct tile_data_t{
 	uint8 x;
