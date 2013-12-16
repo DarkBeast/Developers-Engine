@@ -7,14 +7,12 @@
 
 #include <stdlib.h>
 #include "integer.h"
-#include "text.h"
+
+double gettickcount(void);
 
 //gets the next power of 2.
 size_t next_power_of_two(size_t input);
-char *trim_string(char * str) ;
-sbool is_space(char c);
-//integer to string.
-char* int_to_string(int64 number);
+sbool comp_str(char *string1, char *string2);
 
 #ifndef max
 #define max( a, b) ( ((a) > (b)) ? (a) : (b))
