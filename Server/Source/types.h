@@ -38,6 +38,7 @@ enum equipment_t{
 };
 
 enum dir_t{
+	DIR_NONE,
 	DIR_UP,
 	DIR_DOWN,
 	DIR_LEFT,
@@ -46,6 +47,7 @@ enum dir_t{
 };
 
 enum movement_t{
+	MOVEMENT_NONE,
 	MOVEMENT_WALKING,
 	MOVEMENT_RUNNING,
 	MOVEMENT_COUNT
@@ -59,6 +61,7 @@ enum target_type{
 };
 
 enum editor_type{
+	EDITOR_NONE,
 	EDITOR_MAP,
 	EDITOR_ITEM,
 	EDITOR_NPC,

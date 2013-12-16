@@ -52,19 +52,19 @@ struct player_t{
 	uint8 x;
 	uint8 y;
 	uint8 dir;
-	uint8 *spells;
+	uint16 *spells;
 	uint8 *stat;
 	uint16 *vitals;
 	uint16 *equipment;
 	inventory_t *inv;
 	sbool banned;
-};
+};//553
 
 struct inventory_t{
 	uint16 id;
 	uint32 value;
 	uint16 dur;
-};
+};//8
 
 struct job_t{
 	char *name;

@@ -1,5 +1,6 @@
 /*******************************************************************************
 * Credits:  Andrew Wheeler/Genusis
+*           Jacob/Dugar
 ******************************************************************************/
 
 #ifndef DE_PACKETENUM_H
@@ -24,7 +25,6 @@ enum clientpackets{
 	CUSEITEM,
 	CATTACK,
 	CUSESTATPOINT,
-	CPLAYERINFOREQUEST,
 	CWARPMETO,
 	CWARPTOME,
 	CWARPTO,
@@ -103,7 +103,6 @@ enum serverpackets{
 	SNPCEDITOR,
 	SUPDATENPC,
 	SEDITNPC,
-	SMAPKEY,
 	SEDITMAP,
 	SSHOPEDITOR,
 	SUPDATESHOP,
@@ -115,7 +114,6 @@ enum serverpackets{
 	SSPELLS,
 	SLEFT,
 	SCASTSPELL,
-	SDOOR,
 	SHIGHINDEX,
 	SMSG_COUNT//always keep last
 };

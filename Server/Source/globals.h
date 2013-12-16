@@ -14,9 +14,9 @@
 */
 
 /* client defines*/
-#define TITLE     "DEV Engine Server"
-#define COMPANY   "GGS"
-#define COPYRIGHT "Copyright (C) Global Gamer Studios 2011"
+#define TITLE     "DEV Engine"
+#define COMPANY   "Spirean"
+#define COPYRIGHT "Copyright (C) MMORPG Creation 2013"
 #define GAME_NAME "Developers Engine"
 #define GAME_WEBSTIE "http://mmorpgcreation.com"
 #define MOTD "developers working hard for you!"
