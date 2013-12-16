@@ -4,21 +4,174 @@
 ******************************************************************************/
 
 #include "render.h"
-#include "program_path.h"
 #include "controls.h"
 #include "function.h"
 #include "error.h"
 #include <stdlib.h>
+#include "globals.h"
 
 void set_control_image(widget *control, char *path)
 {
 	control->img = (image *)calloc(1,sizeof(image));
+	load_image(path, control->img);
+}
 
-	load_image(get_path(path), control->img);
+void use_control_image(widget *control, widget *main, sbool freeit)
+{
+	if(control->img && freeit)
+		free(control->img);
+
+	control->action |= WIDGET_USED_CLONE;
+	control->img = main->img;
+	update_widget_vertex_buffer(control);
+
+	if(control->type == CONTROL_HPROGRESSBAR || control->type == CONTROL_VPROGRESSBAR)
+		widget_update_progressbars_vector(control->shown.data[0]);
+}
+
+void free_control_images(widget *control, widget *main)
+{
+	switch(control->type){
+	case CONTROL_HPROGRESSBAR:
+	case CONTROL_VPROGRESSBAR:
+		if(control->shown.data[0]->img)
+			free(control->shown.data[0]->img);
+		if(control->img)
+			free(control->img);
+		break;
+
+	case CONTROL_HSCROLL_BAR:
+	case CONTROL_VSCROLL_BAR:
+		if(control->shown.data[0]->img)
+			free(control->shown.data[0]->img);
+		if(control->shown.data[1]->img)
+			free(control->shown.data[0]->img);
+		if(control->shown.data[2]->img)
+			free(control->shown.data[0]->img);
+		if(control->img)
+			free(control->img);
+		break;
+
+	case CONTROL_LISTBOX:{
+		listbox *list = (listbox *)control->control;
+
+		if(control->img)
+			free(control->img);
+		if(list->vbar.img)
+			free(list->vbar.img);
+		if(list->vbar.shown.data[0]->img)
+			free(list->vbar.shown.data[0]->img);
+		if(list->vbar.shown.data[1]->img)
+			free(list->vbar.shown.data[1]->img);
+		if(list->vbar.shown.data[2]->img)
+			free(list->vbar.shown.data[2]->img);
+		if(list->selectover->img)
+			free(list->selectover->img);
+		if(list->select->img)
+			free(list->select->img);
+						 }
+						 break;
+
+	default:
+		if(control->img)
+			free(control->img);
+		break;
+	}
+}
+
+void clone_control_images(widget *control, widget *main, sbool freeit, sbool update)
+{
+	if(freeit)
+		free_control_images(control,main);
+
+	switch(control->type){
+	case CONTROL_HPROGRESSBAR:
+	case CONTROL_VPROGRESSBAR:
+		control->action |= WIDGET_USED_CLONE;
+		control->shown.data[0]->action |= WIDGET_USED_CLONE;
+		control->shown.data[0]->img = main->shown.data[0]->img;
+		control->img = main->img;
+
+		if(update){
+			update_widget_vertex_buffer(control);
+			update_widget_vertex_buffer(control->shown.data[0]);
+			widget_update_progressbars_vector(control->shown.data[0]);
+		}
+		break;
+
+	case CONTROL_HSCROLL_BAR:
+	case CONTROL_VSCROLL_BAR:
+		control->action |= WIDGET_USED_CLONE;
+		control->shown.data[0]->action |= WIDGET_USED_CLONE;
+		control->shown.data[1]->action |= WIDGET_USED_CLONE;
+		control->shown.data[2]->action |= WIDGET_USED_CLONE;
+		control->shown.data[0]->img = main->shown.data[0]->img;
+		control->shown.data[1]->img = main->shown.data[1]->img;
+		control->shown.data[2]->img = main->shown.data[2]->img;
+		control->img = main->img;
+
+		if(update){
+			update_widget_vertex_buffer(control);
+			update_widget_vertex_buffer(control->shown.data[0]);
+			update_widget_vertex_buffer(control->shown.data[1]);
+			update_widget_vertex_buffer(control->shown.data[2]);
+		}
+		break;
+
+	case CONTROL_LISTBOX:{
+		listbox *list = (listbox *)control->control;
+		listbox *list2 = (listbox *)main->control;
+
+		control->action |= WIDGET_USED_CLONE;
+		list->vbar.action |= WIDGET_USED_CLONE;
+		list->vbar.shown.data[0]->action |= WIDGET_USED_CLONE;
+		list->vbar.shown.data[1]->action |= WIDGET_USED_CLONE;
+		list->vbar.shown.data[2]->action |= WIDGET_USED_CLONE;
+		list->selectover->action |= WIDGET_USED_CLONE;
+		list->select->action |= WIDGET_USED_CLONE;
+
+		list->vbar.img = list2->vbar.img;
+		list->vbar.shown.data[0]->img = list2->vbar.shown.data[0]->img;
+		list->vbar.shown.data[1]->img = list2->vbar.shown.data[1]->img;
+		control->img = main->img;
+		list->vbar.shown.data[2]->img = list2->vbar.shown.data[2]->img;
+		list->selectover->img = list2->selectover->img;
+		list->select->img = list2->select->img;
+
+		if(update){
+			update_widget_vertex_buffer(control);
+			update_widget_vertex_buffer(&list->vbar);
+			update_widget_vertex_buffer(list->vbar.shown.data[0]);
+			update_widget_vertex_buffer(list->vbar.shown.data[1]);
+			update_widget_vertex_buffer(list->vbar.shown.data[2]);
+			update_widget_vertex_buffer(list->selectover);
+			update_widget_vertex_buffer(list->select);
+		}
+						 }
+						 break;
+
+	default:
+		control->action |= WIDGET_USED_CLONE;
+		control->img = main->img;
+		if(update){
+			update_widget_vertex_buffer(control);
+		}
+		break;
+	}
+}
+
+void set_control_alpha(widget *control, uint8 alpha)
+{
+	control->buf.data[0].a = (alpha / 255.f);
+	control->buf.data[1].a = (alpha / 255.f);
+	control->buf.data[2].a = (alpha / 255.f);
+	control->buf.data[3].a = (alpha / 255.f);
+
+	update_widget_vertex_buffer(control);
 }
 
 //Buttons
-void create_button(widget *control, widget *parent, uint16 x, uint16 y, uint16 height, uint16 width, uint16 sizey, uint16 sizex, char *path)
+void create_button(widget *control, widget *parent, uint16 x, uint16 y, uint16 height, uint16 width, uint16 sizey, uint16 sizex, char *path, widget *clone)
 {
 	widget_init(control);
 	control->pos.x = x;
@@ -36,7 +189,10 @@ void create_button(widget *control, widget *parent, uint16 x, uint16 y, uint16 h
 	control->controlupdatepos = &handle_button_move;
 	control->controlmouseover = &handle_button_mouse_over;
 	control->controlmouseexit = &handle_button_mouse_exit;
-	set_control_image(control, path);
+	if(clone)
+		clone_control_images(control, clone, FALSE, FALSE);
+	else
+		set_control_image(control, comb_2str(GUI_PATH, path));
 
 	widget_add(parent,control);
 	create_widget_vertex_buffer(control);
@@ -135,7 +291,7 @@ void create_label(widget *control, widget *parent, uint16 x, uint16 y, uint16 wi
 		return;
 	}
 
-	text_set(init_text->string,x,y,width,height,0,0,0,maxcharspl,fontid,red,blue,green,alpha,string);
+	text_set(init_text->string,0,0,width,height,0,0,0,maxcharspl,fontid,red,blue,green,alpha,string);
 
 	control->height = height;
 	control->width = width;
@@ -143,6 +299,16 @@ void create_label(widget *control, widget *parent, uint16 x, uint16 y, uint16 wi
 
 	widget_add(parent,control);
 	create_text_vertex(init_text->string, control);
+}
+
+void unload_label_elements(widget *control)
+{
+	label *init_text = (label *)control->control;
+
+	init_text->string->font = NULL;
+	init_text->string->data = NULL;
+	free(init_text->string->buf.data);
+	free(init_text->string);
 }
 
 void draw_label(widget *control)
@@ -178,7 +344,7 @@ void handle_mlabel_move(widget *control)
 	text_position_mupdate(data->string,control);
 }
 
-void create_window(widget *control, widget *parent, uint16 x, uint16 y, uint16 height, uint16 width, uint16 sizey, uint16 sizex, char * path)
+void create_window(widget *control, widget *parent, uint16 x, uint16 y, uint16 height, uint16 width, uint16 sizey, uint16 sizex, char * path, widget *clone)
 {
 	window *init_window = (window *)calloc(1,sizeof(window));
 
@@ -201,7 +367,10 @@ void create_window(widget *control, widget *parent, uint16 x, uint16 y, uint16 h
 	control->controlmousepress = &handle_window_click;
 	control->controlupdatepos = &handle_windows_move;
 
-	set_control_image(control,path);
+	if(clone)
+		clone_control_images(control, clone, FALSE, FALSE);
+	else
+		set_control_image(control,comb_2str(GUI_PATH, path));
 
 	init_window->frame.x = 0;
 	init_window->frame.y = 0;
@@ -209,11 +378,13 @@ void create_window(widget *control, widget *parent, uint16 x, uint16 y, uint16 h
 	init_window->frame.h = height;
 	control ->control = init_window;
 	control->action |= WIDGET_CAN_FOCUS;
+
 	widget_add(parent,control);
+
 	create_widget_vertex_buffer(control); // must be called after widget add to get the correct Parent.
 }
 
-void create_window_framed(widget *control, widget *parent, uint16 x, uint16 y, uint16 height, uint16 width, uint16 sizey, uint16 sizex, uint16 framex, uint16 framey,uint16 frameh, uint16 framew, char *path)
+void create_window_framed(widget *control, widget *parent, uint16 x, uint16 y, uint16 height, uint16 width, uint16 sizey, uint16 sizex, uint16 framex, uint16 framey,uint16 frameh, uint16 framew, char *path, widget *clone)
 {
 	window *init_window = (window *)calloc(1,sizeof(window));
 
@@ -235,15 +406,21 @@ void create_window_framed(widget *control, widget *parent, uint16 x, uint16 y, u
 	control->draw = &draw_windows;;
 	control->controlmousepress = &handle_window_click;
 	control->controlupdatepos = &handle_windows_move;
-	set_control_image(control, path);
+	if(clone)
+		clone_control_images(control, clone, FALSE, FALSE);
+	else
+		set_control_image(control, comb_2str(GUI_PATH, path));
 
 	init_window->frame.x = framex;
 	init_window->frame.y = framey;
 	init_window->frame.w = framew;
 	init_window->frame.h = frameh;
 	control->control = init_window;
+	control->action |= WIDGET_CAN_FOCUS;
 
 	widget_add(parent,control);
+
+	create_widget_vertex_buffer(control); // must be called after widget add to get the correct Parent.
 }
 
 void draw_windows(widget *control)
@@ -258,7 +435,7 @@ void handle_windows_move(widget *control)
 
 void handle_window_click(widget *control, int button, int pressed){}
 
-void create_checkbox(widget *control, widget *parent, uint16 x, uint16 y, uint16 height, uint16 width, uint16 sizey, uint16 sizex, char *path)
+void create_checkbox(widget *control, widget *parent, uint16 x, uint16 y, uint16 height, uint16 width, uint16 sizey, uint16 sizex, char *path, widget *clone)
 {
 	widget_init(control);
 	control->pos.x = x;
@@ -273,9 +450,13 @@ void create_checkbox(widget *control, widget *parent, uint16 x, uint16 y, uint16
 	control->draw = &draw_checkbox;
 	control->controlmousepress = handle_check_click;
 	control->controlupdatepos = &handle_check_move;
-	set_control_image(control, path);
+	if(clone)
+		clone_control_images(control, clone, FALSE, FALSE);
+	else
+		set_control_image(control, comb_2str(GUI_PATH, path));
 
 	widget_add(parent,control);
+
 	create_widget_vertex_buffer(control);
 }
 
@@ -314,7 +495,7 @@ void handle_check_move(widget *control)
 	widget_update_vector(control);
 }
 
-void create_radio(widget *control, widget *parent, uint16 x, uint16 y, uint16 height, uint16 width, uint16 sizey, uint16 sizex, sbool istrue, char *path)
+void create_radio(widget *control, widget *parent, uint16 x, uint16 y, uint16 height, uint16 width, uint16 sizey, uint16 sizex, sbool istrue, char *path,widget *linkparent, widget *clone)
 {
 	radio *init_radio = (radio *)calloc(1,sizeof(radio));
 
@@ -336,7 +517,10 @@ void create_radio(widget *control, widget *parent, uint16 x, uint16 y, uint16 he
 	control->draw = &draw_radio;
 	control->controlmousepress = &handle_radio_click;
 	control->controlupdatepos = &handle_radio_move;
-	set_control_image(control, path);
+	if(clone)
+		clone_control_images(control, clone, FALSE, FALSE);
+	else
+		set_control_image(control, comb_2str(GUI_PATH, path));
 
 	if(istrue){
 		control->action |= WIDGET_CHECKED;
@@ -350,6 +534,16 @@ void create_radio(widget *control, widget *parent, uint16 x, uint16 y, uint16 he
 
 	widget_add(parent,control);
 	create_widget_vertex_buffer(control);
+
+	if(linkparent)
+		link_radio(linkparent,control);
+}
+
+void unload_radio_elements(widget *control)
+{
+	radio *init_radio = (radio *)control->control;
+	init_radio->main = NULL;
+	free(init_radio->list);
 }
 
 void draw_radio(widget *control)
@@ -410,7 +604,7 @@ void link_radio(widget *main, widget *control)
 			}
 		}
 	}
-	controldata->main =(widget *)calloc(1,sizeof(widget));
+	//controldata->main =(widget *)calloc(1,sizeof(widget));
 	controldata->main = main;
 }
 
@@ -505,7 +699,7 @@ void update_progressbar_value(widget *control,uint32 value)
 	widget_update_progressbars_vector(control->shown.data[0]);
 }
 
-void create_hprogressbar(widget *control, widget *parent, uint16 x, uint16 y, uint16 height, uint16 width, uint16 sizey, uint16 sizex, uint8 value, char *background, char *hbar)
+void create_hprogressbar(widget *control, widget *parent, uint16 x, uint16 y, uint16 height, uint16 width, uint16 sizey, uint16 sizex, uint8 value, char *background, char *hbar, widget *clone)
 {
 	widget *bar = (widget *)calloc(1, sizeof(widget));
 
@@ -529,11 +723,17 @@ void create_hprogressbar(widget *control, widget *parent, uint16 x, uint16 y, ui
 	control->draw = &draw_hprogressbar;
 	control->controlmousepress = &handle_hprogressbar_click;
 	control->controlupdatepos = &handle_hprogressbar_move;
-	set_control_image(control, background);
+
+	if(clone)
+		clone_control_images(control, clone, FALSE, FALSE);
+	else
+		set_control_image(control, comb_2str(GUI_PATH, background));
 
 	control->value = value;
 
-	set_control_image(bar, hbar);
+	if(!clone)
+		set_control_image(bar, comb_2str(GUI_PATH, hbar));
+
 	bar->pos.x = 0;
 	bar->pos.y = 0;
 	bar->height = bar->img->height;
@@ -575,7 +775,7 @@ void handle_hprogressbars_move(widget *control)
 	widget_update_progressbars_vector(control);
 }
 
-void create_picturebox(widget *control, widget *parent, uint16 x, uint16 y, uint16 height, uint16 width, uint16 sizey, uint16 sizex, char *imagepath)
+void create_picturebox(widget *control, widget *parent, uint16 x, uint16 y, uint16 height, uint16 width, uint16 sizey, uint16 sizex, char *imagepath, widget *clone)
 {
 	widget_init(control);
 	control->pos.x = x;
@@ -592,18 +792,21 @@ void create_picturebox(widget *control, widget *parent, uint16 x, uint16 y, uint
 	control->controlupdatepos = &handle_picturebox_move;
 
 	control->img  = (image *)calloc(1,sizeof(image));
-	load_image(get_path(imagepath), control->img );
+	if(clone)
+		clone_control_images(control, clone, FALSE, FALSE);
+	else
+		load_image(imagepath, control->img );
 
 	widget_add(parent,control);
 	create_widget_vertex_buffer(control);
 }
 
-void update_picturebox(widget *control, uint16 x, uint16 y, uint16 imgposx, uint16 imgposy, uint16 height, uint16 width, uint16 sizex, uint16 sizey, char *imagepath)
+void update_picturebox(widget *control, uint16 x, uint16 y, uint16 imgposx, uint16 imgposy, uint16 height, uint16 width, uint16 sizex, uint16 sizey, char *imagepath, widget *clone)
 {
 	if(imagepath != NULL){
 		free(control->img);
 		control->img  = (image *)calloc(1,sizeof(image));
-		load_image(get_path(imagepath), control->img );
+		load_image(imagepath, control->img );
 	}
 	control->pos.x = x;
 	control->pos.y = y;
@@ -632,7 +835,7 @@ void handle_picturebox_move(widget *control)
 	widget_update_vector(control);
 }
 
-void create_hscrollbar(widget *control, widget *parent, uint16 x, uint16 y, uint16 height, uint16 width, uint16 sizey, uint16 sizex, uint16 value, uint16 max_value, char *background,char *buttonleft, char *buttonright,char *scrollbar)
+void create_hscrollbar(widget *control, widget *parent, uint16 x, uint16 y, uint16 height, uint16 width, uint16 buttonheight, uint16 buttonwidth, uint16 sizey, uint16 sizex, uint16 value, uint16 max_value, char *background,char *buttonleft, char *buttonright,char *scrollbar, widget *clone)
 {
 	widget *button_left = (widget *)calloc(1, sizeof(widget));
 	widget *button_right = (widget *)calloc(1, sizeof(widget));
@@ -648,7 +851,11 @@ void create_hscrollbar(widget *control, widget *parent, uint16 x, uint16 y, uint
 	widget_init(button_left);//left
 	widget_init(button_right);//right
 
-	set_control_image(control, background);
+	if(clone)
+		clone_control_images(control, clone, FALSE, FALSE);
+	else
+		set_control_image(control, comb_2str(GUI_PATH, background));
+
 	control->pos.x = x;
 	control->pos.y = y;
 	control->height = height;
@@ -666,12 +873,14 @@ void create_hscrollbar(widget *control, widget *parent, uint16 x, uint16 y, uint
 
 	control->value = value;
 
-	set_control_image(button_left, buttonleft);
+	if(!clone)
+		set_control_image(button_left, comb_2str(GUI_PATH, buttonleft));
+
 	button_left->pos.x = 0;
 	button_left->pos.y = 0;
-	button_left->height = button_left->img->height;
-	button_left->width = button_left->img->width / 3;
-	button_left->sizex = button_left->img->width / 3;
+	button_left->height = buttonheight;
+	button_left->width = buttonwidth;
+	button_left->sizex = buttonwidth;
 	button_left->sizey = sizey;
 	button_left->controlmousepress = &handle_harrowleft_click;
 	button_left->controlupdatepos = &handle_hscrollbar_move;
@@ -680,10 +889,12 @@ void create_hscrollbar(widget *control, widget *parent, uint16 x, uint16 y, uint
 	button_left->controlmouseexit = &handle_harrowleft_exit;
 	button_left->draw = &draw_hscrollbar;
 
-	set_control_image(button_right, buttonright);
-	button_right->height = button_right->img->height;
-	button_right->width = button_right->img->width / 3;
-	button_right->sizex = button_right->img->width / 3;
+	if(!clone)
+		set_control_image(button_right, comb_2str(GUI_PATH, buttonright));
+
+	button_right->height = buttonheight;
+	button_right->width = buttonwidth;
+	button_right->sizex = buttonwidth;
 	button_right->sizey = sizey;
 	button_right->pos.x = sizex - button_right->sizex;
 	button_right->pos.y = 0;
@@ -694,7 +905,9 @@ void create_hscrollbar(widget *control, widget *parent, uint16 x, uint16 y, uint
 	button_right->controlmouseexit = &handle_harrowright_exit;
 	button_right->draw = &draw_hscrollbar;
 
-	set_control_image(bar, scrollbar);
+	if(!clone)
+		set_control_image(bar, comb_2str(GUI_PATH, scrollbar));
+
 	bar->height = bar->img->height;
 	bar->width = bar->img->width / 3;
 	bar->imgpos.x = 0;
@@ -864,8 +1077,7 @@ void handle_harrowright_over(widget *control)
 void handle_hbar_slide(widget *control)
 {
 	if(control->shown.data[2]->action & WIDGET_MOVING){
-		user_interface *ui = widget_get_uip();
-		float temppos = (ui->screen.newmousepos.x - control->actualpos.x - control->shown.data[0]->sizex - (control->shown.data[2]->sizex /2));
+		float temppos = (widget_get_uip().screen.newmousepos.x - control->actualpos.x - control->shown.data[0]->sizex - (control->shown.data[2]->sizex /2));
 		float tempsize = ( control->sizex - (control->shown.data[0]->sizex * 2) - (control->shown.data[2]->sizex));
 
 		if(temppos < 0)
@@ -897,8 +1109,7 @@ void handle_hbar_slide(widget *control)
 void handle_hscrollbar_click(widget *control, int button, int pressed)
 {
 	if(button == 0){
-		user_interface *ui = widget_get_uip();
-		float temppos = (ui->screen.newmousepos.x - control->actualpos.x - control->shown.data[0]->sizex - (control->shown.data[2]->sizex /2));
+		float temppos = (widget_get_uip().screen.newmousepos.x - control->actualpos.x - control->shown.data[0]->sizex - (control->shown.data[2]->sizex /2));
 		float tempsize = ( control->sizex - (control->shown.data[0]->sizex * 2) - (control->shown.data[2]->sizex));
 
 		if(temppos < 0)
@@ -1016,7 +1227,7 @@ void handle_harrowright_release(widget *control, int button, int pressed)
 }
 
 //Vertical scrollbar testing
-void create_vscrollbar(widget *control, widget *parent, uint16 x, uint16 y, uint16 height, uint16 width, uint16 sizey, uint16 sizex, uint16 value, uint16 max_value, char *background,char *buttontop, char *buttonbottom,char *scrollbar)
+void create_vscrollbar(widget *control, widget *parent, uint16 x, uint16 y, uint16 height, uint16 width, uint16 buttonheight, uint16 buttonwidth, uint16 sizey, uint16 sizex, uint16 value, uint16 max_value, char *background,char *buttontop, char *buttonbottom,char *scrollbar, widget *clone)
 {
 	widget *button_top = (widget *)calloc(1, sizeof(widget));
 	widget *button_bottom= (widget *)calloc(1, sizeof(widget));
@@ -1032,7 +1243,10 @@ void create_vscrollbar(widget *control, widget *parent, uint16 x, uint16 y, uint
 	widget_init(button_top);//top
 	widget_init(button_bottom);//bottom
 
-	set_control_image(control, background);
+	if(clone)
+		clone_control_images(control, clone, FALSE, FALSE);
+	else
+		set_control_image(control, comb_2str(GUI_PATH, background));
 	control->pos.x = x;
 	control->pos.y = y;
 	control->height = height;
@@ -1050,7 +1264,9 @@ void create_vscrollbar(widget *control, widget *parent, uint16 x, uint16 y, uint
 
 	control->value = value;
 
-	set_control_image(button_top, buttontop);
+	if(!clone)
+		set_control_image(button_top, comb_2str(GUI_PATH, buttontop));
+
 	button_top->pos.x = 0;
 	button_top->pos.y = 0;
 	button_top->imgpos.x = 0;
@@ -1066,7 +1282,9 @@ void create_vscrollbar(widget *control, widget *parent, uint16 x, uint16 y, uint
 	button_top->controlmouserelease = &handle_varrowtop_release;
 	button_top->controlmouseexit = &handle_varrowtop_exit;
 
-	set_control_image(button_bottom, buttonbottom);
+	if(!clone)
+		set_control_image(button_bottom, comb_2str(GUI_PATH, buttonbottom));
+
 	button_bottom->height = button_bottom->img->height ;
 	button_bottom->width = button_bottom->img->width / 3;
 	button_bottom->sizex = sizex;
@@ -1082,7 +1300,9 @@ void create_vscrollbar(widget *control, widget *parent, uint16 x, uint16 y, uint
 	button_bottom->controlmouserelease = &handle_varrowbottom_release;
 	button_bottom->controlmouseexit = &handle_varrowbottom_exit;
 
-	set_control_image(bar, scrollbar);
+	if(!clone)
+		set_control_image(bar, comb_2str(GUI_PATH, scrollbar));
+
 	bar->height = bar->img->height;
 	bar->width = bar->img->width / 3;
 	bar->sizex = sizex;
@@ -1216,8 +1436,7 @@ void handle_varrowbottom_over(widget *control)
 void handle_vbar_slide(widget *control)
 {
 	if(control->shown.data[2]->action & WIDGET_MOVING){
-		user_interface *ui = widget_get_uip();
-		float temppos = (ui->screen.newmousepos.y - control->actualpos.y - control->shown.data[0]->sizey - (control->shown.data[2]->sizey /2));
+		float temppos = (widget_get_uip().screen.newmousepos.y - control->actualpos.y - control->shown.data[0]->sizey - (control->shown.data[2]->sizey /2));
 		float tempsize = ( control->sizey - (control->shown.data[0]->sizey * 2) - (control->shown.data[2]->sizey));
 
 		if(temppos < 0)
@@ -1249,8 +1468,7 @@ void handle_vbar_slide(widget *control)
 void handle_vscrollbar_click(widget *control, int button, int pressed)
 {
 	if(button == 0){
-		user_interface *ui = widget_get_uip();
-		float temppos = (ui->screen.newmousepos.y - control->actualpos.y - control->shown.data[0]->sizey - (control->shown.data[2]->sizey /2));
+		float temppos = (widget_get_uip().screen.newmousepos.y - control->actualpos.y - control->shown.data[0]->sizey - (control->shown.data[2]->sizey /2));
 		float tempsize = ( control->sizey - (control->shown.data[0]->sizey * 2) - (control->shown.data[2]->sizey));
 
 		if(temppos < 0)
@@ -1396,7 +1614,7 @@ void handle_vscrollbar_move(widget *control)
 	widget_update_vector(control);
 }
 
-void create_vprogressbar(widget *control, widget *parent, uint16 x, uint16 y, uint16 height, uint16 width, uint16 sizey, uint16 sizex, uint8 value, char *background, char *vbar)
+void create_vprogressbar(widget *control, widget *parent, uint16 x, uint16 y, uint16 height, uint16 width, uint16 sizey, uint16 sizex, uint8 value, char *background, char *vbar, widget *clone)
 {
 	widget *bar = (widget *)calloc(1, sizeof(widget));
 
@@ -1418,11 +1636,17 @@ void create_vprogressbar(widget *control, widget *parent, uint16 x, uint16 y, ui
 	control->draw = &draw_vprogressbar;
 	control->controlmousepress = &handle_vprogressbar_click;
 	control->controlupdatepos = &handle_vprogressbar_move;
-	set_control_image(control, background);
+	if(clone)
+		clone_control_images(control, clone, FALSE, FALSE);
+	else
+		set_control_image(control, comb_2str(GUI_PATH, background));
 	control->value = value;
 
 	widget_init(bar);
-	set_control_image(bar, vbar);
+
+	if(!clone)
+		set_control_image(bar, comb_2str(GUI_PATH, vbar));
+
 	bar->pos.x = 0;
 	bar->pos.y = 0;
 	bar->height = bar->img->height - 1;
@@ -1464,7 +1688,7 @@ void handle_vprogressbars_move(widget *control)
 	widget_update_progressbars_vector(control);
 }
 
-void create_stextbox(widget *control, widget *parent, uint16 x, uint16 y, uint16 width, uint16 height, uint8 offsetx, uint8 offsety, uint16 sx, uint16 sy, uint8 red, uint8 blue, uint8 green, uint8 alpha, uint16 maxchars, uint8 fontid, sbool ispass, char *imgpath)
+void create_stextbox(widget *control, widget *parent, uint16 x, uint16 y, uint16 width, uint16 height, uint8 offsetx, uint8 offsety, uint16 sx, uint16 sy, uint8 red, uint8 blue, uint8 green, uint8 alpha, uint16 maxchars, uint8 fontid, sbool ispass, char *imgpath, widget *clone)
 {
 	textbox *init_text = (textbox *)calloc(1,sizeof(textbox));
 	widget *string = (widget *)calloc(1, sizeof(widget));
@@ -1482,12 +1706,15 @@ void create_stextbox(widget *control, widget *parent, uint16 x, uint16 y, uint16
 	control->imgpos.x = 0;
 	control->imgpos.y = 0;
 	control->type = CONTROL_TEXTBOX;
-	control->draw = &draw_mtextbox;
+	control->draw = &draw_stextbox;
 	control->controlmousepress = &handle_stextbox_click;
 	control->controlupdatepos = &handle_stextbox_move;
 	control->controlkeypressed = &handle_stextbox_input;
 	control->action |= WIDGET_CAN_FOCUS;
-	set_control_image(control, imgpath);
+	if(clone)
+		clone_control_images(control, clone, FALSE, FALSE);
+	else
+		set_control_image(control, comb_2str(GUI_PATH, imgpath));
 
 	widget_init(string);
 	string->pos.x = 0;
@@ -1526,6 +1753,7 @@ void create_stextbox(widget *control, widget *parent, uint16 x, uint16 y, uint16
 
 	widget_add(parent,control);
 	widget_add(control,string);
+
 	create_widget_vertex_buffer(control);
 	create_cursor_vertex(string);
 }
@@ -1533,6 +1761,19 @@ void create_stextbox(widget *control, widget *parent, uint16 x, uint16 y, uint16
 void draw_stextbox(widget *control)
 {
 	draw_widget(control);
+}
+
+void unload_textbox_elements(widget *control)
+{
+	textbox *init_text;
+	if(control->control){
+		init_text = (textbox *)control->control;
+
+		free(init_text->string->buf.data);
+		init_text->string->font = NULL;
+		free(init_text->string->data);
+		free(init_text->string);
+	}
 }
 
 void draw_stextbox_text(widget *control)
@@ -1711,7 +1952,7 @@ void handle_stextbox_input(widget *control, int key)
 	}
 }
 
-void create_mtextbox(widget *control, widget *parent, uint16 x, uint16 y, uint16 width, uint16 height, uint8 offsetx, uint8 offsety, uint16 sx, uint16 sy, uint8 red, uint8 blue, uint8 green, uint8 alpha, uint16 maxchars, uint16 maxcharpl, uint8 fontid, char *imgpath)
+void create_mtextbox(widget *control, widget *parent, uint16 x, uint16 y, uint16 width, uint16 height, uint8 offsetx, uint8 offsety, uint16 sx, uint16 sy, uint8 red, uint8 blue, uint8 green, uint8 alpha, uint16 maxchars, uint16 maxcharpl, uint8 fontid, char *imgpath, widget *clone)
 {
 	textbox *init_text = (textbox *)calloc(1,sizeof(textbox));
 	widget *string = (widget *)calloc(1, sizeof(widget));
@@ -1733,7 +1974,10 @@ void create_mtextbox(widget *control, widget *parent, uint16 x, uint16 y, uint16
 	control->controlmousepress = &handle_mtextbox_click;
 	control->controlupdatepos = &handle_mtextbox_move;
 	control->controlkeypressed = &handle_mtextbox_input;
-	set_control_image(control, imgpath);
+	if(clone)
+		clone_control_images(control, clone, FALSE, FALSE);
+	else
+		set_control_image(control, comb_2str(GUI_PATH, imgpath));
 
 	widget_init(string);
 	string->pos.x = 0;
@@ -1870,9 +2114,11 @@ void handle_mtextbox_input(widget *control, int key)
 	}
 }
 
-void create_listbox(widget *control, widget *parent, uint16 x, uint16 y, uint16 height, uint16 width, uint16 sizey, uint16 sizex, uint8 offsetx, uint8 offsety, uint32 amount, uint8 maxchars, uint8 fontid, uint8 red, uint8 green, uint8 blue, uint8 alpha, char *imglistbg, char *imgbg, char *imgup, char *imgdown, char *bar, char *select, char *mouseover)
+void create_listbox(widget *control, widget *parent, uint16 x, uint16 y, uint16 height, uint16 width,uint16 barwidth, uint16 buttonheight, uint16 buttonwidth, uint16 sizey, uint16 sizex, uint8 offsetx, uint8 offsety, uint32 amount, uint8 maxchars, uint8 fontid, uint8 red, uint8 green, uint8 blue, uint8 alpha, char *imglistbg, char *imgbg, char *imgup, char *imgdown, char *bar, char *select, char *mouseover, widget *clone)
 {
 	listbox *list = (listbox *)calloc(1,sizeof(listbox));
+	listbox *list2 = NULL;
+
 	uint32 i = 0;
 	atlas *prefont = get_atlas(fontid);
 
@@ -1887,7 +2133,12 @@ void create_listbox(widget *control, widget *parent, uint16 x, uint16 y, uint16 
 	}
 
 	widget_init(control);
-	set_control_image(control, imglistbg);
+	if(clone){
+		list2 = (listbox *)clone->control;
+		clone_control_images(control, clone, FALSE, FALSE);
+	}
+	else
+		set_control_image(control, comb_2str(GUI_PATH, imglistbg));
 	control->pos.x = x;
 	control->pos.y = y;
 	control->height = control->img->height;
@@ -1905,7 +2156,8 @@ void create_listbox(widget *control, widget *parent, uint16 x, uint16 y, uint16 
 	control->draw = &draw_listbox;
 
 	widget_init(list->select);
-	set_control_image(list->select, select);
+	if(!clone)
+		set_control_image(list->select, comb_2str(GUI_PATH, select));
 	list->select->pos.x = offsetx;
 	list->select->pos.y = offsety;
 	list->select->height = list->select->img->height;
@@ -1918,7 +2170,8 @@ void create_listbox(widget *control, widget *parent, uint16 x, uint16 y, uint16 
 	list->select->parent = control;
 
 	widget_init(list->selectover);
-	set_control_image(list->selectover, mouseover);
+	if(!clone)
+		set_control_image(list->selectover, comb_2str(GUI_PATH, mouseover));
 	list->selectover->pos.x = offsetx;
 	list->selectover->pos.y = offsety;
 	list->selectover->height = list->selectover->img->height;
@@ -1935,9 +2188,12 @@ void create_listbox(widget *control, widget *parent, uint16 x, uint16 y, uint16 
 	list->voffset = 0;
 
 	widget_add(parent,control);
-	create_widget_vertex_buffer(control);
-	create_widget_vertex_buffer(list->selectover);
-	create_widget_vertex_buffer(list->select);
+	if(imglistbg != NULL)
+		create_widget_vertex_buffer(control);
+	if(mouseover != NULL)
+		create_widget_vertex_buffer(list->selectover);
+	if(select != NULL)
+		create_widget_vertex_buffer(list->select);
 
 	for(i = 0; i < amount; i++){
 		label *init_text = (label *)calloc(1,sizeof(label));
@@ -2002,8 +2258,91 @@ void create_listbox(widget *control, widget *parent, uint16 x, uint16 y, uint16 
 	list->size = amount;
 
 	control->control = list;
-	create_vscrollbar(&list->vbar,control,width - 22,0,height,22,sizey,22,0,amount - list->max,imgbg,imgup,imgdown,bar);
+	if(list2)
+		create_vscrollbar(&list->vbar,control,width - barwidth,0,height,barwidth,buttonheight,buttonwidth,sizey,22,0,amount - list->max,imgbg,imgup,imgdown,bar,&list2->vbar);
+	else
+		create_vscrollbar(&list->vbar,control,width - barwidth,0,height,barwidth,buttonheight,buttonwidth,sizey,22,0,amount - list->max,imgbg,imgup,imgdown,bar,NULL);
 	set_scrollbar_buttons(&list->vbar, &handle_listbox_scroll);
+}
+
+void unload_list_elements(widget *control)
+{
+	uint32 i = 0;
+	listbox *list = (listbox *)control->control;
+
+	for(i = 0; i < list->count; i++){
+		label *init_text = (label *)list->list[i]->data;
+		free(init_text->string->buf.data);
+		free(init_text->string);
+		init_text->string->font = NULL;
+		init_text->string->data = NULL;
+
+		free(list->list[i]->data);
+		free(list->list[i]->control);
+
+		if(!(list->list[i]->action & WIDGET_USED_CLONE))
+			free(list->list[i]->img);
+
+		free(list->list[i]->shown.data);
+		free(list->list[i]->hidden.data);
+		list->list[i]->hidden.data = NULL;
+		list->list[i]->data = NULL;
+		list->list[i]->control = NULL;
+		list->list[i]->img = NULL;
+		list->list[i]->shown.data = NULL;
+		free(list->list[i]);
+	}
+
+	free(list->list);
+	list->list = NULL;
+
+	free(list->control->data);
+	free(list->control->control);
+
+	if(!(list->control->action & WIDGET_USED_CLONE))
+		free(list->control->img);
+
+	free(list->control->shown.data);
+	free(list->control->hidden.data);
+	list->control->hidden.data = NULL;
+	list->control->data = NULL;
+	list->control->control = NULL;
+	list->control->img = NULL;
+	list->control->shown.data = NULL;
+	free(list->control);
+	list->control = NULL;
+
+	free(list->select->data);
+	free(list->select->control);
+
+	if(!(list->select->action & WIDGET_USED_CLONE))
+		free(list->select->img);
+
+	free(list->select->shown.data);
+	free(list->select->hidden.data);
+	list->select->hidden.data = NULL;
+	list->select->data = NULL;
+	list->select->control = NULL;
+	list->select->img = NULL;
+	list->select->shown.data = NULL;
+	free(list->select);
+	list->select = NULL;
+
+	free(list->selectover->data);
+	free(list->selectover->control);
+
+	if(!(list->selectover->action & WIDGET_USED_CLONE))
+		free(list->selectover->img);
+
+	free(list->selectover->shown.data);
+	free(list->selectover->hidden.data);
+	list->selectover->hidden.data = NULL;
+	list->selectover->data = NULL;
+	list->selectover->control = NULL;
+	list->selectover->img = NULL;
+	list->selectover->shown.data = NULL;
+	free(list->selectover);
+	list->selectover = NULL;
 }
 
 void draw_listbox(widget *control)
@@ -2030,7 +2369,7 @@ void handle_listbox_release(widget *control, int button, int pressed)
 	uint32 i = 0;
 
 	for(i = list->voffset; i < list->voffset + list->max; i++){
-		if(widget_rect_contains(list->list[i], control)){
+		if(widget_rect_contains(list->list[i])){
 			if(list->list[i]->action & WIDGET_CLICKED){
 				list->list[i]->action &= ~(WIDGET_CLICKED);
 				list->list[i]->controlmousepress(list->list[i],button,pressed);
@@ -2044,13 +2383,13 @@ void handle_listbox_click(widget *control, int button, int pressed)
 	listbox *list = (listbox *)control->control;
 	uint32 i = 0;
 
-	if(list->control && widget_rect_contains(list->control, control)){
+	if(list->control && widget_rect_contains(list->control)){
 		list->select->value = FALSE;
 		list->control = NULL;
 	}
 	else{
 		for(i = list->voffset; i < list->voffset + list->max; i++){
-			if(widget_rect_contains(list->list[i], control)){
+			if(widget_rect_contains(list->list[i])){
 				list->list[i]->action |= WIDGET_CLICKED;
 				list->list[i]->controlmousepress(list->list[i],button,pressed);
 			}
@@ -2064,7 +2403,7 @@ void handle_listbox_mouse_over(widget *control)
 	uint32 i = 0;
 
 	for(i = list->voffset; i < list->voffset + list->max; i++){
-		if(widget_rect_contains(list->list[i], control)){
+		if(widget_rect_contains(list->list[i])){
 			list->list[i]->action |= WIDGET_MOUSE_OVER;
 			list->list[i]->controlmouseover(list->list[i]);
 		}
@@ -2201,4 +2540,52 @@ listbox *get_list(widget *control)
 {
 	listbox * list = (listbox *)control->control;
 	return list;
+}
+
+void create_frame(widget *control, widget *parent, uint16 x, uint16 y, uint16 height, uint16 width, sbool events,sbool window_moveable)
+{
+	widget_init(control);
+	control->pos.x = x;
+	control->pos.y = y;
+	control->height = height;
+	control->width = width;
+	control->sizey = height;
+	control->sizex = width;
+	control->imgpos.x = 0;
+	control->imgpos.y = 0;
+	control->type = CONTROL_FRAME;
+	control->controlmousepress = &handle_frame_click;
+	control->controlupdatepos = &handle_frame_move;
+
+	if(events)
+		control->action |= WIDGET_CAN_USE_EVENT;
+
+	if(window_moveable)
+		control->action |= WIDGET_WINDOW_MOVEABLE;
+
+	widget_add(parent,control);
+	control->actualpos.x = control->pos.x + control->parent->actualpos.x;
+	control->actualpos.y = control->pos.y + control->parent->actualpos.y;
+}
+
+void handle_frame_click(widget *control, int button, int pressed)
+{
+	if(control->action & WIDGET_CAN_USE_EVENT){
+		control->mousepress(control,button,pressed);
+	}
+
+	if(control->action & WIDGET_WINDOW_MOVEABLE){
+		if(pressed == 1)
+			widget_get_focused()->action &= ~WIDGET_MOVING;
+		else{
+			if(control->action & WIDGET_WINDOW_MOVEABLE)
+				widget_get_focused()->action &= ~WIDGET_MOVING;
+		}
+	}
+}
+
+void handle_frame_move(widget *control)
+{
+	control->actualpos.x = control->pos.x + control->parent->actualpos.x;
+	control->actualpos.y = control->pos.y + control->parent->actualpos.y;
 }
