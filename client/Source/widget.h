@@ -184,6 +184,9 @@ void widget_clear_hidden(widget *parent);
 //clears the shown array
 void widget_clear_shown(widget *parent);
 
+//free's the widgets inner data;
+void free_widget_data(widget *control);
+
 //resizes the ID for more Z depth of Deep user interface systems for widget manager.
 void widget_resize_id(uint16 **id, uint16 size);
 

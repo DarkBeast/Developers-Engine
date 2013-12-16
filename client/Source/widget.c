@@ -1,6 +1,7 @@
 ﻿/*******************************************************************************
 * Credits:  Andrew Wheeler/Genusis
 ******************************************************************************/
+#include <GL/glew.h>
 #include <stdlib.h>
 #include "widget.h"
 #include "integer.h"
@@ -609,8 +610,143 @@ void widget_hidden_resize(widget *parent, uint16 size)
 	parent->hidden.size =  size;
 }
 
-//frees just the widgets in the shown array under the parent.
+void free_widget_data(widget *control)
+{
+	switch(control->type){
+	case CONTROL_LISTBOX: unload_list_elements(control); break;
+	case CONTROL_LABEL: unload_label_elements(control); break;
+	case CONTROL_TEXTBOX: unload_textbox_elements(control); break;
+	case CONTROL_RADIO: unload_radio_elements(control); break;
+	}
+	free(control->data);
+	free(control->control);
+
+	if(!(control->action & WIDGET_USED_CLONE))
+		free(control->img);
+
+	free(control->shown.data);
+	if(control->hidden.data){
+		widget_clear_hidden(control);
+	}
+	free(control->hidden.data);
+
+	glBindBuffer(GL_ARRAY_BUFFER,control->buf.buffer);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER,control->buf.index);
+	glBufferData(GL_ARRAY_BUFFER,control->buf.size *( 4 * sizeof(vertex_t)),NULL,GL_STREAM_DRAW);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, control->buf.isize * sizeof(GLuint),NULL,GL_STATIC_DRAW);
+	control->hidden.data = NULL;
+	control->data = NULL;
+	control->control = NULL;
+	control->img = NULL;
+	control->shown.data = NULL;
+}
+
 void widget_clear_shown(widget *parent)//used to draw the widgets onto the screen.
+{
+	widget *child;
+	uint16 *id = (uint16 *)calloc(1, 32 * sizeof(uint16));
+	uint16 index = 0;
+	uint16 idindex;
+	uint16 idsize;
+
+	if(id == NULL){
+		error_handler(DE_ERROR_POINTER_NULL);
+		return;
+	}
+
+	idsize = 32;
+	idindex = 0;
+	id[idindex] = 0;
+
+	for( index = 0; index < parent->shown.count; ++index){
+		child = parent->shown.data[index];
+
+		if(child->shown.data){
+			id[idindex] = 0;
+			while(id[idindex] <= child->shown.count){
+				if(child->shown.data){
+					if(id[idindex]  >= child->shown.count){
+						if(idindex != 0){
+							id[idindex] = 0;
+							--idindex;
+
+							free_widget_data(child);
+							child = child->parent;
+							if(id[idindex] < child->shown.count){
+								//free(child->shown.data[id[idindex]]);
+								child->shown.data[id[idindex]] = NULL;
+							}
+							++id[idindex];
+						}
+						else{
+							free_widget_data(child);
+							child = child->parent;
+							if(id[idindex] < child->shown.count){
+								free(child->shown.data[id[idindex]]);
+								child->shown.data[id[idindex]] = NULL;
+							}
+							++id[idindex];
+						}
+					}
+					else{
+						if(id[idindex] < child->shown.count){
+							if (child->shown.data[id[idindex]]){
+								child = child->shown.data[id[idindex]];
+
+								++idindex;//we set the z buffer index to know which layer we are in
+
+								if(idindex + 1 >= idsize){//make sure there is not too many layers for the id array.
+									idsize = (uint16)next_power_of_two(idsize);
+									widget_resize_id(&id,idsize);
+								}
+								id[idindex] = 0;//set the new ID index to 0
+							}
+							else{
+								free_widget_data(child);
+								child = child->parent;
+								if(id[idindex] < child->shown.count){
+									free(child->shown.data[id[idindex]]);
+									child->shown.data[id[idindex]] = NULL;
+								}
+								++id[idindex];
+							}
+						}
+						else{
+							++id[idindex];
+						}
+					}
+				}
+				else{
+					if(idindex != 0){
+						id[idindex] = 0;
+						--idindex;
+						free_widget_data(child);
+						child = child->parent;
+						if(id[idindex] < child->shown.count){
+							//	free(child->shown.data[id[idindex]]);
+							child->shown.data[id[idindex]] = NULL;
+						}
+						++id[idindex];
+					}
+					else{
+						free_widget_data(child);
+						child = child->parent;
+						if(id[idindex] < child->shown.count){
+							//free(child->shown.data[id[idindex]]);
+							child->shown.data[id[idindex]] = NULL;
+						}
+						break;
+					}
+				}
+			}
+		}
+	}
+
+	free(id);
+}
+//frees just the widgets in the shown array under the parent.
+void widget_clear_shown_old(widget *parent);
+void widget_clear_shown_old(widget *parent)//used to draw the widgets onto the screen.
 {
 	widget *child;
 	uint16 *id = (uint16 *)calloc(1, 32 * sizeof(uint16));
