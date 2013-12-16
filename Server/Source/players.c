@@ -97,7 +97,7 @@ void init_players(void)
 		player_array[i].equipment = (uint16 *)calloc(EQUIPMENT_COUNT, sizeof(uint16));
 		player_array[i].vitals = (uint16 *)calloc(VITAL_COUNT, sizeof(uint16));
 		player_array[i].inv = (inventory_t *)calloc(MAX_INV, sizeof(inventory_t));
-		player_array[i].spells = (uint8 *)calloc(MAX_PLAYER_SPELLS, sizeof(uint8));
+		player_array[i].spells = (uint16 *)calloc(MAX_PLAYER_SPELLS, sizeof(uint16));
 		player_array[i].stat = (uint8 *)calloc(STAT_COUNT, sizeof(uint8));
 	}
 
@@ -182,7 +182,7 @@ void write_player(char *path, int32 i)
 	fwrite(&player_array[i].x, sizeof(uint8), 1, fp);
 	fwrite(&player_array[i].y, sizeof(uint8), 1, fp);
 	fwrite(&player_array[i].dir, sizeof(uint8), 1, fp);
-	fwrite(player_array[i].spells, sizeof(uint8), MAX_PLAYER_SPELLS, fp);
+	fwrite(player_array[i].spells, sizeof(uint16), MAX_PLAYER_SPELLS, fp);
 	fwrite(player_array[i].stat, sizeof(uint8), STAT_COUNT, fp);
 	fwrite(player_array[i].vitals, sizeof(uint16), VITAL_COUNT, fp);
 	fwrite(player_array[i].equipment, sizeof(uint16), EQUIPMENT_COUNT, fp);
@@ -214,7 +214,7 @@ void read_player(char *path, int32 i)
 	fread(&player_array[i].x, sizeof(uint8), 1, fp);
 	fread(&player_array[i].y, sizeof(uint8), 1, fp);
 	fread(&player_array[i].dir, sizeof(uint8), 1, fp);
-	fread(player_array[i].spells, sizeof(uint8), MAX_PLAYER_SPELLS, fp);
+	fread(player_array[i].spells, sizeof(uint16), MAX_PLAYER_SPELLS, fp);
 	fread(player_array[i].stat, sizeof(uint8), STAT_COUNT, fp);
 	fread(player_array[i].vitals, sizeof(uint16), VITAL_COUNT, fp);
 	fread(player_array[i].equipment, sizeof(uint16), EQUIPMENT_COUNT, fp);
