@@ -1,10 +1,11 @@
 /*******************************************************************************
-* Credits:  Stephan
+* Credits:  S.J.R. van Schaik
 ******************************************************************************/
 #ifndef DE_INTEGER_H
 #define DE_INTEGER_H
 
 #include <limits.h>
+#include "bool.h"
 
 #if 0
 int8: -128 to 127
