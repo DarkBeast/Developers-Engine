@@ -1,7 +1,7 @@
 /*******************************************************************************
 * Credits:  Anthony Ianozi
 *			Andrew Wheeler/Genusis
-*           Stephan
+*           S.J.R. van Schaik
 ******************************************************************************/
 #ifndef DE_BOOL_H
 #define DE_BOOL_H
