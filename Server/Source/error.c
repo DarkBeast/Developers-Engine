@@ -48,55 +48,42 @@ void error_handler(int error_flag)
 	case DE_ERROR_SOCKET_INIT:
 		printf("ERROR: Socket did not initialize.\n");
 		return;
-		break;
 	case DE_ERROR_SOCKET_LISTEN:
 		printf("ERROR: Socket could not listen to port.\n");
 		return;
-		break;
 	case DE_ERROR_SOCKET_SELECT_FAILED:
 		printf("ERROR: Socket SELECT initialization failed.\n");
 		return;
-		break;
 	case DE_ERROR_SOCKET_SELECT_TIMED_OUT:
 		printf("ERROR: Socket timed out.\n");
 		return;
-		break;
 	case DE_ERROR_SOCKET_ACCEPT:
 		printf("ERROR: Socket could not accept. Must be full.\n");
 		return;
-		break;
 	case DE_ERROR_SOCKET_RECEIVE:
 		printf("ERROR: Socket could not receive data.\n");
 		return;
-		break;
 	case DE_ERROR_SOCKET_WSASTARTUP:
 		printf("ERROR: windows socket startup error.\n");
 		return;
-		break;
 	case DE_ERROR_SOCKET_SEND_SIZE:
 		printf("MESSAGE: send size was incorrect\n");
 		return;
-		break;
 	case DE_ERROR_SOCKET_CONNECTION_LOSS:
 		printf("MESSAGE: connection was lost\n");
 		return;
-		break;
 	case DE_ERROR_SOCKET_OPTION_SET_REUSE:
 		printf("MESSAGE: could not set socket option reuse.\n");
 		return;
-		break;
 	case DE_ERROR_SOCKET_OPTION_SET_NONBLOCK:
 		printf("MESSAGE: could not set socket to NONBLOCK mode.\n");
 		return;
-		break;
 	case DE_ERROR_INVALID_PACKET_ID:
 		printf("MESSAGE: Packet ID is invalid.\n");
 		return;
-		break;
 	case DE_ERROR_INVALID_PACKET_OFFSET:
 		printf("MESSAGE: Packet offset equals zero.\n");
 		return;
-		break;
 	default:
 		printf("ERROR: Unknown Error!\n");
 	}
