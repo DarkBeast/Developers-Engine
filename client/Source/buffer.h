@@ -30,15 +30,23 @@ enum data_sizes{
 };
 
 int  add_buffer(buffer_t *buffer, const void* source, size_t size);
+
 int  add_opcode(buffer_t* buffer, uint8 opcode);
+
 int  add_string(buffer_t* buffer, char* str);
+
 int  buffer_full(buffer_t* buffer, size_t size);
+
 int  set_raw_string(buffer_t *buffer, char* str);
+
 void clear_buffer(buffer_t *buffer);
+
 void take_buffer(void* dest, buffer_t* buffer, size_t size);
+
 void take_string(char* dest, buffer_t *buffer);
+
 void encrypt_packet(buffer_t* buffer);
+
 void decrypt_packet(buffer_t* buffer);
-void compress_packet(buffer_t *buffer);
-void decompress_packet(buffer_t *buffer);
+
 #endif
