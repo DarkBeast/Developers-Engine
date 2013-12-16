@@ -564,6 +564,15 @@ void widget_unload(widget *parent)
 {
 	if(!widget_clear_parent(parent))
 		return;// add error message
+
+	free(parent->data);
+	free(parent->control);
+	free(parent->img);
+	focused = NULL;
+	lastmouseover = NULL;
+	parent->control = NULL;
+	parent->img = NULL;
+	parent->data = NULL;
 }
 
 void widget_init_shown(widget *parent)// only use once and if only we wanted to add a widget to a Array with no size.
@@ -610,7 +619,7 @@ void widget_hidden_resize(widget *parent, uint16 size)
 	parent->hidden.size =  size;
 }
 
-void free_widget_data(widget *control)
+void widget_free_widget(widget *control, sbool hidden)
 {
 	switch(control->type){
 	case CONTROL_LISTBOX: unload_list_elements(control); break;
@@ -624,10 +633,13 @@ void free_widget_data(widget *control)
 	if(!(control->action & WIDGET_USED_CLONE))
 		free(control->img);
 
-	free(control->shown.data);
-	if(control->hidden.data){
+	if(control->shown.data && !hidden){
+		widget_clear_shown(control);
+	}
+	if(control->hidden.data && hidden){
 		widget_clear_hidden(control);
 	}
+	free(control->shown.data);
 	free(control->hidden.data);
 
 	glBindBuffer(GL_ARRAY_BUFFER,control->buf.buffer);
@@ -670,7 +682,7 @@ void widget_clear_shown(widget *parent)//used to draw the widgets onto the scree
 							id[idindex] = 0;
 							--idindex;
 
-							free_widget_data(child);
+							widget_free_widget(child, FALSE);
 							child = child->parent;
 							if(id[idindex] < child->shown.count){
 								//free(child->shown.data[id[idindex]]);
@@ -679,7 +691,7 @@ void widget_clear_shown(widget *parent)//used to draw the widgets onto the scree
 							++id[idindex];
 						}
 						else{
-							free_widget_data(child);
+							widget_free_widget(child, FALSE);
 							child = child->parent;
 							if(id[idindex] < child->shown.count){
 								free(child->shown.data[id[idindex]]);
@@ -702,7 +714,7 @@ void widget_clear_shown(widget *parent)//used to draw the widgets onto the scree
 								id[idindex] = 0;//set the new ID index to 0
 							}
 							else{
-								free_widget_data(child);
+								widget_free_widget(child, FALSE);
 								child = child->parent;
 								if(id[idindex] < child->shown.count){
 									free(child->shown.data[id[idindex]]);
@@ -720,7 +732,7 @@ void widget_clear_shown(widget *parent)//used to draw the widgets onto the scree
 					if(idindex != 0){
 						id[idindex] = 0;
 						--idindex;
-						free_widget_data(child);
+						widget_free_widget(child, FALSE);
 						child = child->parent;
 						if(id[idindex] < child->shown.count){
 							//	free(child->shown.data[id[idindex]]);
@@ -729,7 +741,7 @@ void widget_clear_shown(widget *parent)//used to draw the widgets onto the scree
 						++id[idindex];
 					}
 					else{
-						free_widget_data(child);
+						widget_free_widget(child, FALSE);
 						child = child->parent;
 						if(id[idindex] < child->shown.count){
 							//free(child->shown.data[id[idindex]]);
@@ -742,230 +754,6 @@ void widget_clear_shown(widget *parent)//used to draw the widgets onto the scree
 		}
 	}
 
-	free(id);
-}
-//frees just the widgets in the shown array under the parent.
-void widget_clear_shown_old(widget *parent);
-void widget_clear_shown_old(widget *parent)//used to draw the widgets onto the screen.
-{
-	widget *child;
-	uint16 *id = (uint16 *)calloc(1, 32 * sizeof(uint16));
-	uint16 index = 0;
-	uint16 idindex;
-	uint16 idsize;
-
-	if(id == NULL){
-		error_handler(DE_ERROR_POINTER_NULL);
-		return;
-	}
-
-	idsize = 32;
-	idindex = 0;
-	id[idindex] = 0;
-
-	for( index = 0; index < parent->shown.count; ++index){
-		child =  parent->shown.data[index];
-
-		if(child->shown.data){
-			id[idindex] = 0;
-			while(id[idindex] <= child->shown.count){
-				if(child->shown.data){
-					if(id[idindex]  >= child->shown.count && idindex != 0){
-						id[idindex] = 0;
-						--idindex;
-
-						switch(child->type){
-						case CONTROL_LISTBOX: unload_list_elements(child); break;
-						case CONTROL_LABEL: unload_label_elements(child); break;
-						case CONTROL_TEXTBOX: unload_textbox_elements(child); break;
-						case CONTROL_RADIO: unload_radio_elements(child); break;
-						}
-						free(child->data);
-						free(child->control);
-
-						if(!(child->action & WIDGET_USED_CLONE))
-							free(child->img);
-
-						free(child->shown.data);
-						if(child->hidden.data){
-							widget_clear_hidden(child);
-						}
-						free(child->hidden.data);
-						child->hidden.data = NULL;
-						child->data = NULL;
-						child->control = NULL;
-						child->img = NULL;
-						child->shown.data = NULL;
-
-						child = child->parent;
-						if(idindex != 0){
-							free(child->shown.data[id[idindex]]);
-							child->shown.data[id[idindex]] = NULL;
-						}
-					}
-					else{
-						if(id[idindex] < child->shown.count){
-							if (child->shown.data[id[idindex]]){
-								child = child->shown.data[id[idindex]];
-
-								++id[idindex];
-								++idindex;//we set the z buffer index to know which layer we are in
-
-								if(idindex + 1 >= idsize){//make sure there is not too many layers for the id array.
-									idsize = (uint16)next_power_of_two(idsize);
-									widget_resize_id(&id,idsize);
-								}
-								id[idindex] = 0;//set the new ID index to 0
-							}
-							else{
-								if(idindex != 0){
-									switch(child->type){
-									case CONTROL_LISTBOX: unload_list_elements(child); break;
-									case CONTROL_LABEL: unload_label_elements(child); break;
-									case CONTROL_TEXTBOX: unload_textbox_elements(child); break;
-									case CONTROL_RADIO: unload_radio_elements(child); break;
-									}
-									free(child->data);
-									free(child->control);
-									free(child->shown.data);
-									if(!(child->action & WIDGET_USED_CLONE))
-										free(child->img);
-
-									if(child->hidden.data)
-										widget_clear_hidden(child);
-
-									free(child->hidden.data);
-
-									child->hidden.data = NULL;
-									child->data = NULL;
-									child->control = NULL;
-									child->img = NULL;
-									child->shown.data = NULL;
-
-									child = child->parent;
-
-									free(child->parent->shown.data[id[idindex]]);
-									child->parent->shown.data[id[idindex]] = NULL;
-								}
-								++id[idindex];
-							}
-						}
-						else{
-							switch(child->type){
-							case CONTROL_LISTBOX: unload_list_elements(child); break;
-							case CONTROL_LABEL: unload_label_elements(child); break;
-							case CONTROL_TEXTBOX: unload_textbox_elements(child); break;
-							case CONTROL_RADIO: unload_radio_elements(child); break;
-							}
-							free(child->data);
-							free(child->control);
-							free(child->shown.data);
-							if(!(child->action & WIDGET_USED_CLONE))
-								free(child->img);
-
-							if(child->hidden.data)
-								widget_clear_hidden(child);
-
-							free(child->hidden.data);
-
-							child->hidden.data = NULL;
-							child->data = NULL;
-							child->control = NULL;
-							child->img = NULL;
-							child->shown.data = NULL;
-
-							free(child->parent->shown.data[id[idindex]]);
-							child->parent->shown.data[id[idindex]] = NULL;
-							++id[idindex];
-						}
-					}
-				}
-				else{
-					if(idindex != 0){
-						id[idindex] = 0;
-						--idindex;
-						switch(child->type){
-						case CONTROL_LISTBOX: unload_list_elements(child); break;
-						case CONTROL_LABEL: unload_label_elements(child); break;
-						case CONTROL_TEXTBOX: unload_textbox_elements(child); break;
-						case CONTROL_RADIO: unload_radio_elements(child); break;
-						}
-						free(child->data);
-						free(child->control);
-						if(!(child->action & WIDGET_USED_CLONE))
-							free(child->img);
-						free(child->shown.data);
-
-						if(child->hidden.data)
-							widget_clear_hidden(child);
-
-						free(child->hidden.data);
-						child->hidden.data = NULL;
-						child->data = NULL;
-						child->control = NULL;
-						child->img = NULL;
-						child->shown.data = NULL;
-						child = child->parent;
-						if(id[idindex] < child->shown.count){
-							free(child->shown.data[id[idindex]]);
-							child->shown.data[id[idindex]] = NULL;
-						}
-						else{
-							++id[idindex];
-						}
-					}
-					else{
-						switch(child->type){
-						case CONTROL_LISTBOX: unload_list_elements(child); break;
-						case CONTROL_LABEL: unload_label_elements(child); break;
-						case CONTROL_TEXTBOX: unload_textbox_elements(child); break;
-						case CONTROL_RADIO: unload_radio_elements(child); break;
-						}
-						free(child->data);
-						free(child->control);
-						if(!(child->action & WIDGET_USED_CLONE))
-							free(child->img);
-						free(child->shown.data);
-
-						if(child->hidden.data)
-							widget_clear_hidden(child);
-
-						free(child->hidden.data);
-						child->hidden.data = NULL;
-						child->data = NULL;
-						child->control = NULL;
-						child->img = NULL;
-						child->shown.data = NULL;
-						child = child->parent;
-						free(child->shown.data[id[idindex]]);
-						child->shown.data[id[idindex]] = NULL;
-						break;
-					}
-				}
-			}
-			switch(child->type){
-			case CONTROL_LISTBOX: unload_list_elements(child); break;
-			case CONTROL_LABEL: unload_label_elements(child); break;
-			case CONTROL_TEXTBOX: unload_textbox_elements(child); break;
-			case CONTROL_RADIO: unload_radio_elements(child); break;
-			}
-			free(child->data);
-			free(child->control);
-			if(!(child->action & WIDGET_USED_CLONE))
-				free(child->img);
-
-			free(child->shown.data);
-			if(child->hidden.data)
-				widget_clear_hidden(child);
-
-			free(child->hidden.data);
-			child->hidden.data = NULL;
-			child->data = NULL;
-			child->control = NULL;
-			child->img = NULL;
-			child->shown.data = NULL;
-		}
-	}
 	free(id);
 }
 
@@ -988,40 +776,33 @@ void widget_clear_hidden(widget *parent)//used to draw the widgets onto the scre
 	id[idindex] = 0;
 
 	for( index = 0; index < parent->hidden.count; ++index){
-		child =  parent->hidden.data[index];
+		child = parent->hidden.data[index];
 
 		if(child->hidden.data){
 			id[idindex] = 0;
 			while(id[idindex] <= child->hidden.count){
 				if(child->hidden.data){
-					if(id[idindex]  >= child->hidden.count && idindex != 0){
-						id[idindex] = 0;
-						--idindex;
-						switch(child->type){
-						case CONTROL_LISTBOX: unload_list_elements(child); break;
-						case CONTROL_LABEL: unload_label_elements(child); break;
-						case CONTROL_TEXTBOX: unload_textbox_elements(child); break;
-						case CONTROL_RADIO: unload_radio_elements(child); break;
-						}
-						free(child->data);
-						free(child->control);
-						if(!(child->action & WIDGET_USED_CLONE))
-							free(child->img);
-
-						free(child->hidden.data);
-						if(child->shown.data)
-							widget_clear_shown(child);
-
-						free(child->shown.data);
-						child->data = NULL;
-						child->control = NULL;
-						child->img = NULL;
-						child->hidden.data = NULL;
-						child->shown.data = NULL;
-						child = child->parent;
+					if(id[idindex]  >= child->hidden.count){
 						if(idindex != 0){
-							free(child->hidden.data[id[idindex]]);
-							child->hidden.data[id[idindex]] = NULL;
+							id[idindex] = 0;
+							--idindex;
+
+							widget_free_widget(child, TRUE);
+							child = child->parent;
+							if(id[idindex] < child->hidden.count){
+								//free(child->hidden.data[id[idindex]]);
+								child->hidden.data[id[idindex]] = NULL;
+							}
+							++id[idindex];
+						}
+						else{
+							widget_free_widget(child, TRUE);
+							child = child->parent;
+							if(id[idindex] < child->hidden.count){
+								free(child->hidden.data[id[idindex]]);
+								child->hidden.data[id[idindex]] = NULL;
+							}
+							++id[idindex];
 						}
 					}
 					else{
@@ -1029,7 +810,6 @@ void widget_clear_hidden(widget *parent)//used to draw the widgets onto the scre
 							if (child->hidden.data[id[idindex]]){
 								child = child->hidden.data[id[idindex]];
 
-								++id[idindex];
 								++idindex;//we set the z buffer index to know which layer we are in
 
 								if(idindex + 1 >= idsize){//make sure there is not too many layers for the id array.
@@ -1039,29 +819,11 @@ void widget_clear_hidden(widget *parent)//used to draw the widgets onto the scre
 								id[idindex] = 0;//set the new ID index to 0
 							}
 							else{
-								if(idindex != 0){
-									switch(child->type){
-									case CONTROL_LISTBOX: unload_list_elements(child); break;
-									case CONTROL_LABEL: unload_label_elements(child); break;
-									case CONTROL_TEXTBOX: unload_textbox_elements(child); break;
-									case CONTROL_RADIO: unload_radio_elements(child); break;
-									}
-									free(child->data);
-									free(child->control);
-									free(child->hidden.data);
-									if(!(child->action & WIDGET_USED_CLONE))
-										free(child->img);
-
-									if(child->shown.data)
-										widget_clear_shown(child);
-
-									free(child->shown.data);
-
-									child->hidden.data = NULL;
-									child->data = NULL;
-									child->control = NULL;
-									child->img = NULL;
-									child->shown.data = NULL;
+								widget_free_widget(child, TRUE);
+								child = child->parent;
+								if(id[idindex] < child->hidden.count){
+									free(child->hidden.data[id[idindex]]);
+									child->hidden.data[id[idindex]] = NULL;
 								}
 								++id[idindex];
 							}
@@ -1075,86 +837,25 @@ void widget_clear_hidden(widget *parent)//used to draw the widgets onto the scre
 					if(idindex != 0){
 						id[idindex] = 0;
 						--idindex;
-						switch(child->type){
-						case CONTROL_LISTBOX: unload_list_elements(child); break;
-						case CONTROL_LABEL: unload_label_elements(child); break;
-						case CONTROL_TEXTBOX: unload_textbox_elements(child); break;
-						case CONTROL_RADIO: unload_radio_elements(child); break;
-						}
-						free(child->data);
-						free(child->control);
-						if(!(child->action & WIDGET_USED_CLONE))
-							free(child->img);
-
-						free(child->hidden.data);
-						if(child->shown.data)
-							widget_clear_shown(child);
-
-						free(child->shown.data);
-						child->data = NULL;
-						child->control = NULL;
-						child->img = NULL;
-						child->hidden.data = NULL;
-						child->shown.data = NULL;
+						widget_free_widget(child, TRUE);
 						child = child->parent;
-						if(idindex != 0){
-							free(child->hidden.data[id[idindex]]);
+						if(id[idindex] < child->hidden.count){
+							//	free(child->hidden.data[id[idindex]]);
 							child->hidden.data[id[idindex]] = NULL;
 						}
+						++id[idindex];
 					}
 					else{
-						switch(child->type){
-						case CONTROL_LISTBOX: unload_list_elements(child); break;
-						case CONTROL_LABEL: unload_label_elements(child); break;
-						case CONTROL_TEXTBOX: unload_textbox_elements(child); break;
-						case CONTROL_RADIO: unload_radio_elements(child); break;
-						}
-						free(child->data);
-						free(child->control);
-						if(!(child->action & WIDGET_USED_CLONE))
-							free(child->img);
-
-						free(child->hidden.data);
-						if(child->shown.data)
-							widget_clear_shown(child);
-
-						free(child->shown.data);
-						child->data = NULL;
-						child->control = NULL;
-						child->img = NULL;
-						child->hidden.data = NULL;
-						child->shown.data = NULL;
+						widget_free_widget(child, TRUE);
 						child = child->parent;
-						free(child->hidden.data[id[idindex]]);
-						child->hidden.data[id[idindex]] = NULL;
+						if(id[idindex] < child->hidden.count){
+							//free(child->hidden.data[id[idindex]]);
+							child->hidden.data[id[idindex]] = NULL;
+						}
 						break;
 					}
 				}
 			}
-			switch(child->type){
-			case CONTROL_LISTBOX: unload_list_elements(child); break;
-			case CONTROL_LABEL: unload_label_elements(child); break;
-			case CONTROL_TEXTBOX: unload_textbox_elements(child); break;
-			case CONTROL_RADIO: unload_radio_elements(child); break;
-			}
-			free(child->data);
-			free(child->control);
-			if(!(child->action & WIDGET_USED_CLONE))
-				free(child->img);
-
-			free(child->hidden.data);
-			if(child->shown.data)
-				widget_clear_shown(child);
-
-			free(child->shown.data);
-			child->data = NULL;
-			child->control = NULL;
-			child->img = NULL;
-			child->hidden.data = NULL;
-			child->shown.data = NULL;
-			child = child->parent;
-			free(child->hidden.data[id[idindex]]);
-			child->hidden.data[id[idindex]] = NULL;
 		}
 	}
 
@@ -1176,21 +877,14 @@ sbool widget_clear_parent(widget *parent)
 
 	free(parent->hidden.data);
 	free(parent->shown.data);
-	free(parent->data);
-	free(parent->control);
-	free(parent->img);
 	focused = NULL;
 	lastmouseover = NULL;
-	parent->control = NULL;
-	parent->img = NULL;
-	parent->data = NULL;
 	parent->hidden.data = NULL;
 	parent->shown.data = NULL;
 	parent->hidden.size = 0;
 	parent->shown.size = 0;
 	parent->hidden.count = 0;
 	parent->shown.count = 0;
-
 	return TRUE;
 }
 
