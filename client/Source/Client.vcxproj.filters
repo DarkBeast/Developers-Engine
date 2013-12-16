@@ -14,22 +14,13 @@
     <ClCompile Include="controls.c">
       <Filter>graphics</Filter>
     </ClCompile>
-    <ClCompile Include="program_path.c">
-      <Filter>core</Filter>
-    </ClCompile>
     <ClCompile Include="input.c">
-      <Filter>core</Filter>
-    </ClCompile>
-    <ClCompile Include="globals.c">
       <Filter>core</Filter>
     </ClCompile>
     <ClCompile Include="function.c">
       <Filter>core</Filter>
     </ClCompile>
     <ClCompile Include="error.c">
-      <Filter>core</Filter>
-    </ClCompile>
-    <ClCompile Include="cstring.c">
       <Filter>core</Filter>
     </ClCompile>
     <ClCompile Include="mainmenu.c">
@@ -56,6 +47,45 @@
     <ClCompile Include="clienttcp.c">
       <Filter>network</Filter>
     </ClCompile>
+    <ClCompile Include="path.c">
+      <Filter>core</Filter>
+    </ClCompile>
+    <ClCompile Include="general.c">
+      <Filter>general</Filter>
+    </ClCompile>
+    <ClCompile Include="items.c">
+      <Filter>general</Filter>
+    </ClCompile>
+    <ClCompile Include="maps.c">
+      <Filter>general</Filter>
+    </ClCompile>
+    <ClCompile Include="npcs.c">
+      <Filter>general</Filter>
+    </ClCompile>
+    <ClCompile Include="players.c">
+      <Filter>general</Filter>
+    </ClCompile>
+    <ClCompile Include="shops.c">
+      <Filter>general</Filter>
+    </ClCompile>
+    <ClCompile Include="spells.c">
+      <Filter>general</Filter>
+    </ClCompile>
+    <ClCompile Include="gamelogics.c">
+      <Filter>gamelogics</Filter>
+    </ClCompile>
+    <ClCompile Include="editor.c">
+      <Filter>gamelogics</Filter>
+    </ClCompile>
+    <ClCompile Include="credits.c">
+      <Filter>ui</Filter>
+    </ClCompile>
+    <ClCompile Include="login.c">
+      <Filter>ui</Filter>
+    </ClCompile>
+    <ClCompile Include="newaccount.c">
+      <Filter>ui</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="widget.h">
@@ -73,9 +103,6 @@
     <ClInclude Include="types.h">
       <Filter>core</Filter>
     </ClInclude>
-    <ClInclude Include="program_path.h">
-      <Filter>core</Filter>
-    </ClInclude>
     <ClInclude Include="integer.h">
       <Filter>core</Filter>
     </ClInclude>
@@ -89,9 +116,6 @@
       <Filter>core</Filter>
     </ClInclude>
     <ClInclude Include="error.h">
-      <Filter>core</Filter>
-    </ClInclude>
-    <ClInclude Include="cstring.h">
       <Filter>core</Filter>
     </ClInclude>
     <ClInclude Include="mainmenu.h">
@@ -127,6 +151,46 @@
     <ClInclude Include="clienttcp.h">
       <Filter>network</Filter>
     </ClInclude>
+    <ClInclude Include="path.h">
+      <Filter>core</Filter>
+    </ClInclude>
+    <ClInclude Include="general.h">
+      <Filter>general</Filter>
+    </ClInclude>
+    <ClInclude Include="items.h">
+      <Filter>general</Filter>
+    </ClInclude>
+    <ClInclude Include="maps.h">
+      <Filter>general</Filter>
+    </ClInclude>
+    <ClInclude Include="npcs.h">
+      <Filter>general</Filter>
+    </ClInclude>
+    <ClInclude Include="players.h">
+      <Filter>general</Filter>
+    </ClInclude>
+    <ClInclude Include="shops.h">
+      <Filter>general</Filter>
+    </ClInclude>
+    <ClInclude Include="spells.h">
+      <Filter>general</Filter>
+    </ClInclude>
+    <ClInclude Include="gamelogics.h">
+      <Filter>gamelogics</Filter>
+    </ClInclude>
+    <ClInclude Include="editor.h">
+      <Filter>gamelogics</Filter>
+    </ClInclude>
+    <ClInclude Include="credits.h">
+      <Filter>ui</Filter>
+    </ClInclude>
+    <ClInclude Include="main.h" />
+    <ClInclude Include="login.h">
+      <Filter>ui</Filter>
+    </ClInclude>
+    <ClInclude Include="newaccount.h">
+      <Filter>ui</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="ui">
@@ -143,6 +207,12 @@
     </Filter>
     <Filter Include="network\socket">
       <UniqueIdentifier>{09f836e7-6f45-4830-9d4a-a6e78eee02cf}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="general">
+      <UniqueIdentifier>{7c18c0de-c5cb-43e9-ade7-3fb63ac83e28}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="gamelogics">
+      <UniqueIdentifier>{27645aee-bffc-4b95-8bbe-990abc8245e9}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>

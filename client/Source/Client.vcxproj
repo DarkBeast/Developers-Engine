@@ -196,7 +196,7 @@
       <ExceptionHandling>false</ExceptionHandling>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;OPENGL32.LIB;GLU32.lib;glfw3dll.lib;glut32.lib;libpng15.lib;freetype2.lib;glew32.lib;zlibd.lib;Ws2_32.lib</AdditionalDependencies>
+      <AdditionalDependencies>kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;OPENGL32.LIB;GLU32.lib;glfw3dll.lib;glut32.lib;libpng15.lib;freetype2.lib;glew32.lib;zlib.lib;Ws2_32.lib</AdditionalDependencies>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <IgnoreSpecificDefaultLibraries>libc.lib, msvcrt.lib, libcd.lib, libcmtd.lib, msvcrtd.lib</IgnoreSpecificDefaultLibraries>
       <AdditionalOptions>/NODEFAULTLIB:LIBCMT.LIB %(AdditionalOptions)</AdditionalOptions>
@@ -405,6 +405,18 @@
     <ClInclude Include="buffer.h" />
     <ClInclude Include="clienttcp.h" />
     <ClInclude Include="controls.h" />
+    <ClInclude Include="credits.h" />
+    <ClInclude Include="editor.h" />
+    <ClInclude Include="gamelogics.h" />
+    <ClInclude Include="general.h" />
+    <ClInclude Include="items.h" />
+    <ClInclude Include="login.h" />
+    <ClInclude Include="main.h" />
+    <ClInclude Include="maps.h" />
+    <ClInclude Include="newaccount.h" />
+    <ClInclude Include="npcs.h" />
+    <ClInclude Include="players.h" />
+    <ClInclude Include="shops.h" />
     <ClInclude Include="socket.h" />
     <ClInclude Include="error.h" />
     <ClInclude Include="function.h" />
@@ -417,8 +429,8 @@
     <ClInclude Include="packetenum.h" />
     <ClInclude Include="render.h" />
     <ClInclude Include="integer.h" />
-    <ClInclude Include="program_path.h" />
-    <ClInclude Include="cstring.h" />
+    <ClInclude Include="path.h" />
+    <ClInclude Include="spells.h" />
     <ClInclude Include="text.h" />
     <ClInclude Include="tinycthread.h" />
     <ClInclude Include="types.h" />
@@ -429,21 +441,31 @@
     <ClCompile Include="buffer.c" />
     <ClCompile Include="clienttcp.c" />
     <ClCompile Include="controls.c" />
+    <ClCompile Include="credits.c" />
     <ClCompile Include="error.c" />
     <ClCompile Include="function.c" />
-    <ClCompile Include="globals.c" />
+    <ClCompile Include="editor.c" />
+    <ClCompile Include="gamelogics.c" />
+    <ClCompile Include="general.c" />
     <ClCompile Include="handlepackets.c" />
     <ClCompile Include="image.c" />
     <ClCompile Include="input.c" />
+    <ClCompile Include="items.c" />
     <ClCompile Include="linsocket.c" />
+    <ClCompile Include="login.c" />
     <ClCompile Include="mainmenu.c" />
+    <ClCompile Include="maps.c" />
+    <ClCompile Include="newaccount.c" />
+    <ClCompile Include="npcs.c" />
+    <ClCompile Include="players.c" />
     <ClCompile Include="render.c" />
     <ClCompile Include="main.c" />
-    <ClCompile Include="program_path.c" />
+    <ClCompile Include="path.c" />
+    <ClCompile Include="shops.c" />
+    <ClCompile Include="spells.c" />
     <ClCompile Include="text.c" />
     <ClCompile Include="tinycthread.c" />
     <ClCompile Include="widget.c" />
-    <ClCompile Include="cstring.c" />
     <ClCompile Include="winsocket.c" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
