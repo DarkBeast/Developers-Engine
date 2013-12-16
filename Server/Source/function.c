@@ -14,7 +14,7 @@ void init_timer(void)
 
 double gettickcount(void)
 {
-return glfwGetTime();
+	return glfwGetTime();
 }
 
 size_t next_power_of_two(size_t input)
@@ -26,4 +26,25 @@ size_t next_power_of_two(size_t input)
 	}
 
 	return ++input;
+}
+
+sbool comp_str(char *string1, char *string2)
+{
+	uint32 i = 1;
+
+	while(*string2){
+		if(*(string1 + i) == *(string2++)){
+			if(*(string1 + i) == ' ' || *(string1 + i) == '\n')
+				return TRUE;
+
+			i++;
+		}
+		else{
+			if(*(string1 + i) == ' ' || *(string1 + i) == '\n')
+				return TRUE;
+
+			return FALSE;
+		}
+		return FALSE;
+	}
 }
