@@ -52,7 +52,7 @@ reloop:
 					switch(*(++p)){
 					case 's':
 						{
-							if( *(p + 1) == 'e' && *(p + 2) == 't' && *(p + 3) == 'g' && *(p + 4) == 'r' && *(p + 5) == 'o' && *(p + 6) == 'u' && *(p + 7) == 'p'){
+							if(comp_str(p, "etgroup")){
 								char user[MAX_NAME_LENGTH];
 								int i = 0;
 								int group;
@@ -87,13 +87,13 @@ reloop:
 								break;
 							}
 
-							if( *(p + 1) == 'h' && *(p + 2) == 'u' && *(p + 3) == 't' && *(p + 4) == 'd' && *(p + 5) == 'o' && *(p + 6) == 'w' && *(p + 7) == 'n')
+							if( comp_str(p, "hutdown"))
 								set_shut_down();
 
 							break;
 						}
 					case 'c':
-						if( *(p + 1) == 'l' && *(p + 2) == 'o' && *(p + 3) == 's' && *(p + 4) == 'e'){
+						if( comp_str(p, "lose")){
 							destroy_server();
 							return;
 						}
