@@ -14,7 +14,7 @@ typedef enum control_types control_types;
 typedef struct label label;
 typedef struct window window;
 typedef struct radio radio;
-typedef struct scrollbar scrollbar;
+typedef struct scrollbar_t scrollbar_t;
 typedef struct textbox textbox;
 typedef struct listbox listbox;
 
@@ -53,8 +53,10 @@ struct radio{
 	uint8 count;
 };
 
-struct scrollbar{
-	uint32 max;
+struct scrollbar_t{
+	widget button_left;
+	widget button_right;
+	widget bar;
 };
 
 struct textbox{

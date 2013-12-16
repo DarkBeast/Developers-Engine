@@ -2,7 +2,7 @@
 * Credits:  Andrew Wheeler/Genusis
 *           Purlox
 ******************************************************************************/
-
+#include <GL/glew.h>
 #include "render.h"
 #include "controls.h"
 #include "function.h"
@@ -308,6 +308,10 @@ void unload_label_elements(widget *control)
 	init_text->string->font = NULL;
 	init_text->string->data = NULL;
 	free(init_text->string->buf.data);
+	glBindBuffer(GL_ARRAY_BUFFER,init_text->string->buf.buffer);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER,init_text->string->buf.index);
+	glBufferData(GL_ARRAY_BUFFER,init_text->string->buf.size *( 4 * sizeof(vertex_t)),NULL,GL_STREAM_DRAW);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, init_text->string->buf.isize * sizeof(GLuint),NULL,GL_STATIC_DRAW);
 	free(init_text->string);
 }
 
@@ -837,19 +841,17 @@ void handle_picturebox_move(widget *control)
 
 void create_hscrollbar(widget *control, widget *parent, uint16 x, uint16 y, uint16 height, uint16 width, uint16 buttonheight, uint16 buttonwidth, uint16 sizey, uint16 sizex, uint16 value, uint16 max_value, char *background,char *buttonleft, char *buttonright,char *scrollbar, widget *clone)
 {
-	widget *button_left = (widget *)calloc(1, sizeof(widget));
-	widget *button_right = (widget *)calloc(1, sizeof(widget));
-	widget *bar = (widget *)calloc(1, sizeof(widget));
+	scrollbar_t *scroll_t = (scrollbar_t *)calloc(1, sizeof(scrollbar_t));
 
-	if(button_left == NULL || button_right == NULL || bar == NULL){
+	if(scroll_t == NULL ){
 		error_handler(DE_ERROR_POINTER_NULL);
 		return;
 	}
 
 	widget_init(control);
-	widget_init(bar);//moving bar.
-	widget_init(button_left);//left
-	widget_init(button_right);//right
+	widget_init(&scroll_t->bar);//moving bar.
+	widget_init(&scroll_t->button_left);//left
+	widget_init(&scroll_t->button_right);//right
 
 	if(clone)
 		clone_control_images(control, clone, FALSE, FALSE);
@@ -874,77 +876,78 @@ void create_hscrollbar(widget *control, widget *parent, uint16 x, uint16 y, uint
 	control->value = value;
 
 	if(!clone)
-		set_control_image(button_left, comb_2str(GUI_PATH, buttonleft));
+		set_control_image(&scroll_t->button_left, comb_2str(GUI_PATH, buttonleft));
 
-	button_left->pos.x = 0;
-	button_left->pos.y = 0;
-	button_left->height = buttonheight;
-	button_left->width = buttonwidth;
-	button_left->sizex = buttonwidth;
-	button_left->sizey = sizey;
-	button_left->controlmousepress = &handle_harrowleft_click;
-	button_left->controlupdatepos = &handle_hscrollbar_move;
-	button_left->controlmouseover = &handle_harrowleft_over;
-	button_left->controlmouserelease = &handle_harrowleft_release;
-	button_left->controlmouseexit = &handle_harrowleft_exit;
-	button_left->draw = &draw_hscrollbar;
-
-	if(!clone)
-		set_control_image(button_right, comb_2str(GUI_PATH, buttonright));
-
-	button_right->height = buttonheight;
-	button_right->width = buttonwidth;
-	button_right->sizex = buttonwidth;
-	button_right->sizey = sizey;
-	button_right->pos.x = sizex - button_right->sizex;
-	button_right->pos.y = 0;
-	button_right->controlmousepress = &handle_harrowright_click;
-	button_right->controlupdatepos = &handle_hscrollbar_move;
-	button_right->controlmouseover = &handle_harrowright_over;
-	button_right->controlmouserelease = &handle_harrowright_release;
-	button_right->controlmouseexit = &handle_harrowright_exit;
-	button_right->draw = &draw_hscrollbar;
+	scroll_t->button_left.pos.x = 0;
+	scroll_t->button_left.pos.y = 0;
+	scroll_t->button_left.height = buttonheight;
+	scroll_t->button_left.width = buttonwidth;
+	scroll_t->button_left.sizex = buttonwidth;
+	scroll_t->button_left.sizey = sizey;
+	scroll_t->button_left.controlmousepress = &handle_harrowleft_click;
+	scroll_t->button_left.controlupdatepos = &handle_hscrollbar_move;
+	scroll_t->button_left.controlmouseover = &handle_harrowleft_over;
+	scroll_t->button_left.controlmouserelease = &handle_harrowleft_release;
+	scroll_t->button_left.controlmouseexit = &handle_harrowleft_exit;
+	scroll_t->button_left.draw = &draw_hscrollbar;
 
 	if(!clone)
-		set_control_image(bar, comb_2str(GUI_PATH, scrollbar));
+		set_control_image(&scroll_t->button_right, comb_2str(GUI_PATH, buttonright));
 
-	bar->height = bar->img->height;
-	bar->width = bar->img->width / 3;
-	bar->imgpos.x = 0;
-	bar->imgpos.y = 0;
-	bar->sizex = (sizex + button_right->sizex  + button_left->sizex) / max_value;
-	bar->sizey = sizey;
+	scroll_t->button_right.height = buttonheight;
+	scroll_t->button_right.width = buttonwidth;
+	scroll_t->button_right.sizex = buttonwidth;
+	scroll_t->button_right.sizey = sizey;
+	scroll_t->button_right.pos.x = sizex - scroll_t->button_right.sizex;
+	scroll_t->button_right.pos.y = 0;
+	scroll_t->button_right.controlmousepress = &handle_harrowright_click;
+	scroll_t->button_right.controlupdatepos = &handle_hscrollbar_move;
+	scroll_t->button_right.controlmouseover = &handle_harrowright_over;
+	scroll_t->button_right.controlmouserelease = &handle_harrowright_release;
+	scroll_t->button_right.controlmouseexit = &handle_harrowright_exit;
+	scroll_t->button_right.draw = &draw_hscrollbar;
 
-	if(bar->sizex < 2)
-		bar->sizex = 2;
+	if(!clone)
+		set_control_image(&scroll_t->bar, comb_2str(GUI_PATH, scrollbar));
 
-	bar->pos.x = (button_left->pos.x + button_left->sizex) + (value *(sizex - (button_left->sizex) - 1 ) / max_value);
+	scroll_t->bar.height = scroll_t->bar.img->height;
+	scroll_t->bar.width = scroll_t->bar.img->width / 3;
+	scroll_t->bar.imgpos.x = 0;
+	scroll_t->bar.imgpos.y = 0;
+	scroll_t->bar.sizex = (sizex + scroll_t->button_right.sizex  + scroll_t->button_left.sizex) / max_value;
+	scroll_t->bar.sizey = sizey;
 
-	bar->value = max_value;
-	bar->pos.y = 0;
+	if(scroll_t->bar.sizex < 2)
+		scroll_t->bar.sizex = 2;
 
-	if(bar->pos.x < button_left->pos.x)
-		bar->pos.x = button_left->pos.x + button_left->sizex;
+	scroll_t->bar.pos.x = (scroll_t->button_left.pos.x + scroll_t->button_left.sizex) + (value *(sizex - (scroll_t->button_left.sizex) - 1 ) / max_value);
 
-	if(bar->pos.x > button_right->pos.x)
-		bar->pos.x = button_right->pos.x;
+	scroll_t->bar.value = max_value;
+	scroll_t->bar.pos.y = 0;
 
-	bar->controlupdatepos = &handle_hscrollbar_move;
-	bar->controlmousepress = &handle_hbar_click;
-	bar->controlmouserelease = &handle_hbar_release;
-	bar->controlmouseover = &handle_hbar_over;
-	bar->controlmouseexit = &handle_hbar_exit;
-	bar->draw = &draw_hscrollbar;
+	if(scroll_t->bar.pos.x < scroll_t->button_left.pos.x)
+		scroll_t->bar.pos.x = scroll_t->button_left.pos.x + scroll_t->button_left.sizex;
+
+	if(scroll_t->bar.pos.x > scroll_t->button_right.pos.x)
+		scroll_t->bar.pos.x = scroll_t->button_right.pos.x;
+
+	scroll_t->bar.controlupdatepos = &handle_hscrollbar_move;
+	scroll_t->bar.controlmousepress = &handle_hbar_click;
+	scroll_t->bar.controlmouserelease = &handle_hbar_release;
+	scroll_t->bar.controlmouseover = &handle_hbar_over;
+	scroll_t->bar.controlmouseexit = &handle_hbar_exit;
+	scroll_t->bar.draw = &draw_hscrollbar;
+	control->control = scroll_t;
 
 	widget_add(parent,control);
-	widget_add(control,button_left);
-	widget_add(control,button_right);
-	widget_add(control,bar);
+	widget_add(control,&scroll_t->button_left);
+	widget_add(control,&scroll_t->button_right);
+	widget_add(control,&scroll_t->bar);
 
 	create_widget_vertex_buffer(control);
-	create_widget_vertex_buffer(button_left);
-	create_widget_vertex_buffer(button_right);
-	create_widget_vertex_buffer(bar);
+	create_widget_vertex_buffer(&scroll_t->button_left);
+	create_widget_vertex_buffer(&scroll_t->button_right);
+	create_widget_vertex_buffer(&scroll_t->bar);
 }
 
 void draw_hscrollbar(widget *control)
@@ -1772,6 +1775,10 @@ void unload_textbox_elements(widget *control)
 		free(init_text->string->buf.data);
 		init_text->string->font = NULL;
 		free(init_text->string->data);
+		glBindBuffer(GL_ARRAY_BUFFER,init_text->string->buf.buffer);
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER,init_text->string->buf.index);
+		glBufferData(GL_ARRAY_BUFFER,init_text->string->buf.size *( 4 * sizeof(vertex_t)),NULL,GL_STREAM_DRAW);
+		glBufferData(GL_ELEMENT_ARRAY_BUFFER, init_text->string->buf.isize * sizeof(GLuint),NULL,GL_STATIC_DRAW);
 		free(init_text->string);
 	}
 }
@@ -2273,6 +2280,10 @@ void unload_list_elements(widget *control)
 	for(i = 0; i < list->count; i++){
 		label *init_text = (label *)list->list[i]->data;
 		free(init_text->string->buf.data);
+		glBindBuffer(GL_ARRAY_BUFFER,init_text->string->buf.buffer);
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER,init_text->string->buf.index);
+		glBufferData(GL_ARRAY_BUFFER,init_text->string->buf.size *( 4 * sizeof(vertex_t)),NULL,GL_STREAM_DRAW);
+		glBufferData(GL_ELEMENT_ARRAY_BUFFER, init_text->string->buf.isize * sizeof(GLuint),NULL,GL_STATIC_DRAW);
 		free(init_text->string);
 		init_text->string->font = NULL;
 		init_text->string->data = NULL;
