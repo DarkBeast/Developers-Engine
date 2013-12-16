@@ -21,6 +21,37 @@
 #define VERSION_MINOR   0
 #define VERSION_REV   0
 
+#define ADMIN_LOG  ".\\logs\\admin.log"
+#define PLAYER_LOG  ".\\logs\\player.log"
+#define LOG_PATH ".\\logs"
+#define FILE_ENDING ".dat"
+#define MAP_PATH ".\\maps"
+#define GUI_PATH ".\\images\\gui\\"
+#define ITEM_PATH ".\\images\\items"
+#define TILE_PATH ".\\images\\tiles"
+#define SPRITE_PATH ".\\images\\npcs"
+#define SPELL_PATH ".\\images\\spells"
+#define IMAGE_ENDING ".png"
+#define PIC_SIZE 32
+
+//Data constants
+#define MAX_ITEMS  255
+#define MAX_NPCS   255
+#define MAX_INV   50
+#define MAX_MAP_ITEMS   20
+#define MAX_MAP_NPCS   5
+#define MAX_SHOPS   50
+#define MAX_PLAYER_SPELLS   20
+#define MAX_SPELLS   255
+#define MAX_TRADES   8
+#define MAX_LEVELS   100
+#define MAX_JOBS  3
+#define MAX_SPELLANIM 8
+
+//player movement constants.
+#define WALK_SPEED 4
+#define RUN_SPEED 8
+
 //encrypt key must be string!
 //Server and Client encrypt key must match.
 #define ENCRYPT_KEY  "Aab456"
@@ -33,10 +64,14 @@
 
 /* player defines*/
 #define MAX_PLAYERS        64  // # of players the server can support
-#define MAX_PASSWORD_SIZE  32
-#define MAX_USERNAME_SIZE  32  // Let's have a reasonable size for user names
+#define MAX_PASS_LENGTH  32
+#define MAX_NAME_LENGTH  32  // Let's have a reasonable size for user names, npc names etc.
+#define MAX_SAY_LENGTH  100  // Let's have a reasonable size for user names, npc names etc.
 
 /* map defines*/
+#define MAX_MAPS   100
+#define MAX_MAPX   15
+#define MAX_MAPY   11
 #define TILE_SIZE_X     32	//magic pixels
 #define TILE_SIZE_Y     32	//magic pixels
 
@@ -48,11 +83,5 @@
 then compile the Program for it to go into Debug mode*/
 #define DEBUG 0
 
-/* Public global's */
-//see globals.c it contains public global's types and a example.
-void set_players_online(int players);
-void increase_players_online(void);
-void decrease_players_online(void);
-int get_players_online(void);
 /* Always the end nothing past this point. */
 #endif
