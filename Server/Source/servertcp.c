@@ -468,8 +468,8 @@ void send_edit_item_to(int16 index, uint16 itemnum)
 	add_opcode(&buffer, SEDITITEM);
 	add_buffer(&buffer, &itemnum, SIZE16);
 	add_string(&buffer,item(itemnum)->name);
-	add_buffer(&buffer, &item(itemnum)->pic, SIZE16);
 	add_buffer(&buffer, &item(itemnum)->type, SIZE8);
+	add_buffer(&buffer, &item(itemnum)->pic, SIZE16);
 	add_buffer(&buffer, &item(itemnum)->data1, SIZE16);
 	add_buffer(&buffer, &item(itemnum)->data2, SIZE16);
 	add_buffer(&buffer, &item(itemnum)->data3, SIZE16);
@@ -515,12 +515,13 @@ void send_edit_npc_to(int16 index, uint16 npcnum)
 	add_buffer(&buffer, &npcnum, SIZE16);
 	add_string(&buffer,npc(npcnum)->name);
 	add_string(&buffer,npc(npcnum)->say);
-	add_buffer(&buffer, &npc(npcnum)->spawnsecs, SIZE16);
+	add_buffer(&buffer, &npc(npcnum)->sprite, SIZE16);
 	add_buffer(&buffer, &npc(npcnum)->behavior, SIZE16);
 	add_buffer(&buffer, &npc(npcnum)->range, SIZE16);
 	add_buffer(&buffer, &npc(npcnum)->dropitem, SIZE16);
 	add_buffer(&buffer, &npc(npcnum)->dropchance, SIZE16);
 	add_buffer(&buffer, &npc(npcnum)->dropitemvalue, SIZE16);
+	add_buffer(&buffer, &npc(npcnum)->spawnsecs, SIZE16);
 	add_buffer(&buffer, npc(npcnum)->stat, STAT_COUNT * sizeof(uint8));
 
 	send_data(&buffer,index);
@@ -575,7 +576,7 @@ void send_edit_shop_to(int16 index, uint16 shopnum)
 	add_string(&buffer,shop(shopnum)->leavesay);
 	add_buffer(&buffer, &shop(shopnum)->fixesitems, SIZE8);
 	add_buffer(&buffer, &shop(shopnum)->tradeitem, MAX_TRADES * sizeof(trade_item_t));
-	
+
 	send_data(&buffer,index);
 }
 
@@ -666,8 +667,7 @@ void send_players_spells(int16 index)
 
 	add_opcode(&buffer, SSPELLS);
 	for(i = 1; i > MAX_PLAYER_SPELLS; i++){
-		add_buffer(&buffer, &i, SIZE8);
-		add_buffer(&buffer, &player(index)->spells[i], SIZE8);
+		add_buffer(&buffer, &player(index)->spells[i], SIZE16);
 	}
 
 	send_data(&buffer,index);

@@ -537,12 +537,12 @@ void spawn_map_items(uint32 mapnum)
 
 	for( x = 0; x < MAX_MAPX; x++){
 		for( y = 0; y < MAX_MAPY; y++){
-			if(map(mapnum)->tile[GETXY_UNSAFE(x,y)].type == TILE_TYPE_ITEM){
-				if(item(map(mapnum)->tile[GETXY_UNSAFE(x,y)].data1)->type == ITEM_TYPE_CURRENCY && map(mapnum)->tile[GETXY_UNSAFE(x,y)].data2 == 0){
-					spawn_item(map(mapnum)->tile[GETXY_UNSAFE(x,y)].data1, 1, mapnum, x, y);
+			if(map(mapnum)->tile[GETXY(x,y)].type == TILE_TYPE_ITEM){
+				if(item(map(mapnum)->tile[GETXY(x,y)].data1)->type == ITEM_TYPE_CURRENCY && map(mapnum)->tile[GETXY(x,y)].data2 == 0){
+					spawn_item(map(mapnum)->tile[GETXY(x,y)].data1, 1, mapnum, x, y);
 				}
 				else{
-					spawn_item(map(mapnum)->tile[GETXY_UNSAFE(x,y)].data1, map(mapnum)->tile[GETXY_UNSAFE(x,y)].data2, mapnum, x, y);
+					spawn_item(map(mapnum)->tile[GETXY(x,y)].data1, map(mapnum)->tile[GETXY(x,y)].data2, mapnum, x, y);
 				}
 			}
 		}
@@ -572,7 +572,7 @@ void spawn_npc(uint8 mapnpcnum, uint32 mapnum)
 			x = (rand() % (MAX_MAPX - 1));
 			y = (rand() % (MAX_MAPY - 1));
 
-			if(map(mapnum)->tile[GETXY_UNSAFE(x,y)].type = TILE_TYPE_WALKABLE){
+			if(map(mapnum)->tile[GETXY(x,y)].type = TILE_TYPE_WALKABLE){
 				map(mapnum)->npc[mapnpcnum].x = x;
 				map(mapnum)->npc[mapnpcnum].y = y;
 				spawned = TRUE;
@@ -583,7 +583,7 @@ void spawn_npc(uint8 mapnpcnum, uint32 mapnum)
 		if(!spawned){
 			for(x = 0; x < MAX_MAPX; x++){
 				for(y = 0; y < MAX_MAPY; y++){
-					if(map(mapnum)->tile[GETXY_UNSAFE(x,y)].type = TILE_TYPE_WALKABLE){
+					if(map(mapnum)->tile[GETXY(x,y)].type = TILE_TYPE_WALKABLE){
 						map(mapnum)->npc[mapnpcnum].x = x;
 						map(mapnum)->npc[mapnpcnum].y = y;
 						spawned = TRUE;
@@ -854,7 +854,7 @@ sbool can_npc_move(uint32 mapnum, uint8 mapnpcnum, uint8 dir)
 	uint8 x;
 	uint8 y;
 
-	if(mapnum >= MAX_MAPS || mapnpcnum >= MAX_MAP_NPCS|| dir >= DIR_COUNT)
+	if(mapnum >= MAX_MAPS || mapnpcnum >= MAX_MAP_NPCS|| dir >= DIR_COUNT || dir == 0)
 		return FALSE;
 
 	switch(dir){
@@ -890,7 +890,7 @@ sbool can_npc_move(uint32 mapnum, uint8 mapnpcnum, uint8 dir)
 		return FALSE;
 	}
 
-	if( map(mapnum)->tile[GETXY_UNSAFE(x,y)].type != TILE_TYPE_WALKABLE && map(mapnum)->tile[GETXY_UNSAFE(x,y)].type != TILE_TYPE_ITEM)
+	if( map(mapnum)->tile[GETXY(x,y)].type != TILE_TYPE_WALKABLE && map(mapnum)->tile[GETXY(x,y)].type != TILE_TYPE_ITEM)
 		return FALSE;
 
 	for(i = 0; i < total_players_online(); i++){
@@ -946,7 +946,7 @@ void npc_dir(uint32 mapnum, uint8 mapnpcnum, uint8 dir)
 {
 	buffer_t buffer;
 
-	if(mapnum >= MAX_MAPS || mapnpcnum >= MAX_MAP_NPCS || dir >= DIR_COUNT)
+	if(mapnum >= MAX_MAPS || mapnpcnum >= MAX_MAP_NPCS || dir >= DIR_COUNT || dir == 0)
 		return;
 
 	map(mapnum)->npc[mapnpcnum].dir = dir;
@@ -1026,7 +1026,7 @@ uint32 get_player_protection(int16 index)
 
 	if(player(index)->equipment[EQUIPMENT_HELMET] > 0)
 		protection += item(player(index)->inv[player(index)->equipment[EQUIPMENT_HELMET]].id)->data2;
-	
+
 	return protection;
 }
 
@@ -1068,7 +1068,7 @@ sbool can_player_block_hit(int16 index)
 	return FALSE;
 }
 
-void cast_spell(int16 index, uint8 spellslot)
+void cast_spell(int16 index, uint16 spellslot)
 {
 	uint16 spellnum;
 	uint16 n = 0;
@@ -1078,6 +1078,8 @@ void cast_spell(int16 index, uint8 spellslot)
 	char *targetname = NULL;
 	char *string = NULL;
 	buffer_t buffer;
+	uint8 x;
+	uint8 y;
 
 	if(spellslot >= MAX_PLAYER_SPELLS)
 		return;
@@ -1165,6 +1167,9 @@ void cast_spell(int16 index, uint8 spellslot)
 				return;
 			}
 
+			x = player(n)->x;
+			y = player(n)->y;
+
 			casted = TRUE;
 		}
 		break;
@@ -1204,6 +1209,10 @@ void cast_spell(int16 index, uint8 spellslot)
 			default:
 				return;
 			}
+
+			x = map(player(index)->map)->npc[n].x;
+			y = map(player(index)->map)->npc[n].y;
+
 			casted = TRUE;
 		}
 		break;
@@ -1219,9 +1228,9 @@ void cast_spell(int16 index, uint8 spellslot)
 		clear_buffer(&buffer);
 
 		add_opcode(&buffer,SCASTSPELL);
-		add_buffer(&buffer, &temp_player(index)->targettype, SIZE8);
-		add_buffer(&buffer, &n, SIZE16);
 		add_buffer(&buffer, &spellnum, SIZE16);
+		add_buffer(&buffer, &x,SIZE8);
+		add_buffer(&buffer, &y,SIZE8);
 
 		send_data_to_map(&buffer, player(index)->map);
 
@@ -1340,7 +1349,7 @@ void player_move(int16 index, uint8 dir, uint8 movement)
 	default: return;
 	}
 
-	if(map(player(index)->map)->tile[GETXY_UNSAFE(x,y)].type != TILE_TYPE_BLOCKED && moved == FALSE){
+	if(map(player(index)->map)->tile[GETXY(x,y)].type != TILE_TYPE_BLOCKED && moved == FALSE){
 		player(index)->x = x;
 		player(index)->y = y;
 
@@ -1355,8 +1364,8 @@ void player_move(int16 index, uint8 dir, uint8 movement)
 		moved = TRUE;
 	}
 
-	if(map(player(index)->map)->tile[GETXY_UNSAFE(x,y)].type == TILE_TYPE_WARP){
-		player_warp(index, map(player(index)->map)->tile[GETXY_UNSAFE(x,y)].data1, map(player(index)->map)->tile[GETXY_UNSAFE(x,y)].data2, map(player(index)->map)->tile[GETXY_UNSAFE(x,y)].data3);
+	if(map(player(index)->map)->tile[GETXY(x,y)].type == TILE_TYPE_WARP){
+		player_warp(index, map(player(index)->map)->tile[GETXY(x,y)].data1, map(player(index)->map)->tile[GETXY(x,y)].data2, map(player(index)->map)->tile[GETXY(x,y)].data3);
 		moved = TRUE;
 	}
 

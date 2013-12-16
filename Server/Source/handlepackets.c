@@ -330,7 +330,7 @@ void handle_player_move(buffer_t *data, int16 index)
 	take_buffer(&dir, data, SIZE8);
 	take_buffer(&movement, data, SIZE8);
 
-	if( dir < DIR_DOWN || dir >= DIR_COUNT){
+	if( dir == 0 || dir >= DIR_COUNT){
 		hacking_attempt(index,"Invalid Direction");
 		return;
 	}
@@ -362,7 +362,7 @@ void handle_player_dir(buffer_t *data, int16 index)
 
 	take_buffer(&dir, data, SIZE8);
 
-	if( dir < DIR_DOWN || dir >= DIR_COUNT){
+	if( dir == 0 || dir >= DIR_COUNT){
 		hacking_attempt(index,"Invalid Direction");
 		return;
 	}
@@ -764,7 +764,7 @@ void handle_request_new_map(buffer_t *data, int16 index)
 
 	take_buffer(&dir,data,SIZE8);
 
-	if(dir >= DIR_COUNT){
+	if(dir >= DIR_COUNT || dir == 0){
 		hacking_attempt(index, "Invalid Direction");
 		return;
 	}
@@ -1527,7 +1527,7 @@ void handle_spells(buffer_t *data, int16 index)
 
 void handle_cast(buffer_t *data, int16 index)
 {
-	uint16 n;
+	uint32 n;
 	take_buffer(&n,data, SIZE16);
 	cast_spell(index,n);
 }
