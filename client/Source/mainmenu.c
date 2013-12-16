@@ -2,26 +2,22 @@
 * Credits:  Andrew Wheeler/Genusis
 ******************************************************************************/
 #include "GL/glew.h"
-#include "widget.h"
 #include "mainmenu.h"
 #include "controls.h"
 #include "render.h"
 #include "clienttcp.h"
 #include "bool.h"
+#include "globals.h"
+#include "general.h"
 
-widget window1;
-widget button1;
-widget label1;
-widget label2;
-widget textbox1;
-widget textbox2;
+main_menu_t gui;
 
 void main_menu(void)
 {
-	int running = TRUE;
 	uint32 time;
 	uint32 lpstimer = 0;
 	uint32 lps = 0;
+	int running = TRUE;
 
 	draw_state_reset();
 
@@ -51,33 +47,50 @@ void main_menu(void)
 
 		// Check if ESC key was pressed or window was closed
 		running = is_window_open();
-	}
 
-	widget_unload(&window1);
+		if(get_menu_state() != MENU_STATE_MAIN)
+			break;
+	}
 }
 
 void init_main_menu(void)
 {
-	create_window(&window1, NULL, 0, 0, 600, 800, 600, 800, "image\\main.png");
-	create_label(&label1,&window1,60,95,120,200,0,0,0,255,FALSE,1,10,TRUE,"input text in text box then press the button");
-	create_stextbox(&textbox1,&window1,140,395,100,32,2,2,100,32,0,255,0,255,0,1,FALSE,"image\\textbox.png");
-	create_stextbox(&textbox2,&window1,140,335,100,32,2,2,100,32,0,255,0,255,0,1,TRUE,"image\\textbox.png");
-	create_button(&button1,&window1,380,220,60,100,60,100,"image\\button.png");
-
-	button1.mousepress = &button1_press;
-
-	widget_manual_focused(&window1);
+	create_window(&gui.wndmainmenu, NULL, 0, 0, 600, 800, 600, 800,"menuback.png", NULL);
+	create_frame(&gui.frmmain, &gui.wndmainmenu,0,0,60,800,FALSE, TRUE);
+	create_button(&gui.btnclose,&gui.frmmain,750,10,34,34,34,34,"closebutton.png", NULL);
+	create_button(&gui.btnlogin,&gui.wndmainmenu,195,170,50,405,50,405,"buttonlarge.png", NULL);
+	create_button(&gui.btncreate,&gui.wndmainmenu,195,240,50,405,50,405,NULL,&gui.btnlogin);
+	create_button(&gui.btncredits,&gui.wndmainmenu,195,310,50,405,50,405,NULL,&gui.btnlogin);
+	create_label(&gui.lbllogin, &gui.btnlogin,170,10,80,25,0,0,0,120,FALSE,2,8,FALSE,"LOGIN");
+	create_label(&gui.lblcreate, &gui.btncreate,120,10,80,25,0,0,0,120,FALSE,2,8,FALSE,"NEW ACCOUNT");
+	create_label(&gui.lblcredits, &gui.btncredits,155,10,80,25,0,0,0,120,FALSE,2,8,FALSE,"CREDITS");
+	gui.btnclose.mousepress = &main_btnclose_press;
+	gui.btncredits.mousepress = &main_btncredits_press;
+	gui.btnlogin.mousepress = &main_btnlogin_press;
+	gui.btncreate.mousepress = &main_btncreate_press;
+	gui.lbllogin.action |= WIDGET_CAN_CLICK_BEHIND;
+	gui.lblcreate.action |= WIDGET_CAN_CLICK_BEHIND;
+	gui.lblcredits.action |= WIDGET_CAN_CLICK_BEHIND;
+	gui.btnclose.action |= WIDGET_ALWAYS_USEABLE;
+	widget_manual_focused(&gui.wndmainmenu);
 }
 
-void button1_press(widget *control, int button, int pressed)
+void main_btnclose_press(widget *control, int button, int pressed)
 {
-	textbox *data1 = (textbox *)textbox1.shown.data[0]->control;
-	textbox *data2 = (textbox *)textbox2.shown.data[0]->control;
+	set_menu_state(MENU_STATE_EXIT);
+}
 
-	if(data1->string->data && data2->string->data){
-		sendlogin(data1->string->data, data2->string->data);
-	}
-	else{
-		printf("Username or Password can not be empty \n");
-	}
+void main_btncredits_press(widget *control, int button, int pressed)
+{
+	set_menu_state(MENU_STATE_CREDITS);
+}
+
+void main_btnlogin_press(widget *control, int button, int pressed)
+{
+	set_menu_state(MENU_STATE_LOGIN);
+}
+
+void main_btncreate_press(widget *control, int button, int pressed)
+{
+	set_menu_state(MENU_STATE_CREATE);
 }
