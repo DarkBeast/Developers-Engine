@@ -4,24 +4,24 @@
 ** Copyright (C) 2002-2008, Marcelo E. Magallon <mmagallo[]debian org>
 ** Copyright (C) 2002, Lev Povalahev
 ** All rights reserved.
-**
-** Redistribution and use in source and binary forms, with or without
+** 
+** Redistribution and use in source and binary forms, with or without 
 ** modification, are permitted provided that the following conditions are met:
-**
-** * Redistributions of source code must retain the above copyright notice,
+** 
+** * Redistributions of source code must retain the above copyright notice, 
 **   this list of conditions and the following disclaimer.
-** * Redistributions in binary form must reproduce the above copyright notice,
-**   this list of conditions and the following disclaimer in the documentation
+** * Redistributions in binary form must reproduce the above copyright notice, 
+**   this list of conditions and the following disclaimer in the documentation 
 **   and/or other materials provided with the distribution.
-** * The name of the author may be used to endorse or promote products
+** * The name of the author may be used to endorse or promote products 
 **   derived from this software without specific prior written permission.
 **
-** THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
-** AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+** THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" 
+** AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE 
 ** IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
-** ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE
-** LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
-** CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+** ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE 
+** LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR 
+** CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF 
 ** SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
 ** INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
 ** CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
@@ -30,32 +30,32 @@
 */
 
 /*
-* Mesa 3-D graphics library
-* Version:  7.0
-*
-* Copyright (C) 1999-2007  Brian Paul   All Rights Reserved.
-*
-* Permission is hereby granted, free of charge, to any person obtaining a
-* copy of this software and associated documentation files (the "Software"),
-* to deal in the Software without restriction, including without limitation
-* the rights to use, copy, modify, merge, publish, distribute, sublicense,
-* and/or sell copies of the Software, and to permit persons to whom the
-* Software is furnished to do so, subject to the following conditions:
-*
-* The above copyright notice and this permission notice shall be included
-* in all copies or substantial portions of the Software.
-*
-* THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
-* OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-* FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.  IN NO EVENT SHALL
-* BRIAN PAUL BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN
-* AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
-* CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
-*/
+ * Mesa 3-D graphics library
+ * Version:  7.0
+ *
+ * Copyright (C) 1999-2007  Brian Paul   All Rights Reserved.
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a
+ * copy of this software and associated documentation files (the "Software"),
+ * to deal in the Software without restriction, including without limitation
+ * the rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included
+ * in all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
+ * OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.  IN NO EVENT SHALL
+ * BRIAN PAUL BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN
+ * AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
+ * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+ */
 
 /*
 ** Copyright (c) 2007 The Khronos Group Inc.
-**
+** 
 ** Permission is hereby granted, free of charge, to any person obtaining a
 ** copy of this software and/or associated documentation files (the
 ** "Materials"), to deal in the Materials without restriction, including
@@ -63,10 +63,10 @@
 ** distribute, sublicense, and/or sell copies of the Materials, and to
 ** permit persons to whom the Materials are furnished to do so, subject to
 ** the following conditions:
-**
+** 
 ** The above copyright notice and this permission notice shall be included
 ** in all copies or substantial portions of the Materials.
-**
+** 
 ** THE MATERIALS ARE PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
 ** EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
 ** MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
@@ -98,6 +98,10 @@
 #include <X11/Xutil.h>
 #include <X11/Xmd.h>
 #include <GL/glew.h>
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 /* ---------------------------- GLX_VERSION_1_0 --------------------------- */
 
@@ -137,7 +141,7 @@ typedef struct __glXContextRec *GLXContext;
 typedef struct __GLXcontextRec *GLXContext;
 #endif
 
-typedef unsigned int GLXVideoDeviceNV;
+typedef unsigned int GLXVideoDeviceNV; 
 
 extern Bool glXQueryExtension (Display *dpy, int *errorBase, int *eventBase);
 extern Bool glXQueryVersion (Display *dpy, int *major, int *minor);
@@ -259,21 +263,21 @@ typedef XID GLXWindow;
 typedef struct __GLXFBConfigRec *GLXFBConfig;
 
 typedef struct {
-	int event_type;
-	int draw_type;
-	unsigned long serial;
-	Bool send_event;
-	Display *display;
-	GLXDrawable drawable;
-	unsigned int buffer_mask;
-	unsigned int aux_buffer;
-	int x, y;
-	int width, height;
-	int count;
+  int event_type; 
+  int draw_type; 
+  unsigned long serial; 
+  Bool send_event; 
+  Display *display; 
+  GLXDrawable drawable; 
+  unsigned int buffer_mask; 
+  unsigned int aux_buffer; 
+  int x, y; 
+  int width, height; 
+  int count; 
 } GLXPbufferClobberEvent;
 typedef union __GLXEvent {
-	GLXPbufferClobberEvent glxpbufferclobber;
-	long pad[24];
+  GLXPbufferClobberEvent glxpbufferclobber; 
+  long pad[24]; 
 } GLXEvent;
 
 typedef GLXFBConfig* ( * PFNGLXCHOOSEFBCONFIGPROC) (Display *dpy, int screen, const int *attrib_list, int *nelements);
@@ -357,6 +361,26 @@ extern void ( * glXGetProcAddress (const GLubyte *procName)) (void);
 #define GLX_GPU_NUM_SIMD_AMD 0x21A6
 #define GLX_GPU_NUM_RB_AMD 0x21A7
 #define GLX_GPU_NUM_SPI_AMD 0x21A8
+
+typedef void ( * PFNGLXBLITCONTEXTFRAMEBUFFERAMDPROC) (GLXContext dstCtx, GLint srcX0, GLint srcY0, GLint srcX1, GLint srcY1, GLint dstX0, GLint dstY0, GLint dstX1, GLint dstY1, GLbitfield mask, GLenum filter);
+typedef GLXContext ( * PFNGLXCREATEASSOCIATEDCONTEXTAMDPROC) (unsigned int id, GLXContext share_list);
+typedef GLXContext ( * PFNGLXCREATEASSOCIATEDCONTEXTATTRIBSAMDPROC) (unsigned int id, GLXContext share_context, const int* attribList);
+typedef Bool ( * PFNGLXDELETEASSOCIATEDCONTEXTAMDPROC) (GLXContext ctx);
+typedef unsigned int ( * PFNGLXGETCONTEXTGPUIDAMDPROC) (GLXContext ctx);
+typedef GLXContext ( * PFNGLXGETCURRENTASSOCIATEDCONTEXTAMDPROC) (void);
+typedef unsigned int ( * PFNGLXGETGPUIDSAMDPROC) (unsigned int maxCount, unsigned int* ids);
+typedef int ( * PFNGLXGETGPUINFOAMDPROC) (unsigned int id, int property, GLenum dataType, unsigned int size, void* data);
+typedef Bool ( * PFNGLXMAKEASSOCIATEDCONTEXTCURRENTAMDPROC) (GLXContext ctx);
+
+#define glXBlitContextFramebufferAMD GLXEW_GET_FUN(__glewXBlitContextFramebufferAMD)
+#define glXCreateAssociatedContextAMD GLXEW_GET_FUN(__glewXCreateAssociatedContextAMD)
+#define glXCreateAssociatedContextAttribsAMD GLXEW_GET_FUN(__glewXCreateAssociatedContextAttribsAMD)
+#define glXDeleteAssociatedContextAMD GLXEW_GET_FUN(__glewXDeleteAssociatedContextAMD)
+#define glXGetContextGPUIDAMD GLXEW_GET_FUN(__glewXGetContextGPUIDAMD)
+#define glXGetCurrentAssociatedContextAMD GLXEW_GET_FUN(__glewXGetCurrentAssociatedContextAMD)
+#define glXGetGPUIDsAMD GLXEW_GET_FUN(__glewXGetGPUIDsAMD)
+#define glXGetGPUInfoAMD GLXEW_GET_FUN(__glewXGetGPUInfoAMD)
+#define glXMakeAssociatedContextCurrentAMD GLXEW_GET_FUN(__glewXMakeAssociatedContextCurrentAMD)
 
 #define GLXEW_AMD_gpu_association GLXEW_GET_VAR(__GLXEW_AMD_gpu_association)
 
@@ -550,6 +574,17 @@ typedef void ( * PFNGLXRELEASETEXIMAGEATIPROC) (Display *dpy, GLXPbuffer pbuf, i
 #define GLXEW_ATI_render_texture GLXEW_GET_VAR(__GLXEW_ATI_render_texture)
 
 #endif /* GLX_ATI_render_texture */
+
+/* --------------------------- GLX_EXT_buffer_age -------------------------- */
+
+#ifndef GLX_EXT_buffer_age
+#define GLX_EXT_buffer_age 1
+
+#define GLX_BACK_BUFFER_AGE_EXT 0x20F4
+
+#define GLXEW_EXT_buffer_age GLXEW_GET_VAR(__GLXEW_EXT_buffer_age)
+
+#endif /* GLX_EXT_buffer_age */
 
 /* ------------------- GLX_EXT_create_context_es2_profile ------------------ */
 
@@ -958,10 +993,10 @@ typedef void ( * PFNGLXRELEASEVIDEOCAPTUREDEVICENVPROC) (Display* dpy, GLXVideoC
 
 #endif /* GLX_NV_video_capture */
 
-/* ---------------------------- GLX_NV_video_out --------------------------- */
+/* -------------------------- GLX_NV_video_output -------------------------- */
 
-#ifndef GLX_NV_video_out
-#define GLX_NV_video_out 1
+#ifndef GLX_NV_video_output
+#define GLX_NV_video_output 1
 
 #define GLX_VIDEO_OUT_COLOR_NV 0x20C3
 #define GLX_VIDEO_OUT_ALPHA_NV 0x20C4
@@ -988,9 +1023,9 @@ typedef int ( * PFNGLXSENDPBUFFERTOVIDEONVPROC) (Display* dpy, GLXPbuffer pbuf, 
 #define glXReleaseVideoImageNV GLXEW_GET_FUN(__glewXReleaseVideoImageNV)
 #define glXSendPbufferToVideoNV GLXEW_GET_FUN(__glewXSendPbufferToVideoNV)
 
-#define GLXEW_NV_video_out GLXEW_GET_VAR(__GLXEW_NV_video_out)
+#define GLXEW_NV_video_output GLXEW_GET_VAR(__GLXEW_NV_video_output)
 
-#endif /* GLX_NV_video_out */
+#endif /* GLX_NV_video_output */
 
 /* -------------------------- GLX_OML_swap_method -------------------------- */
 
@@ -1042,16 +1077,6 @@ typedef Bool ( * PFNGLXWAITFORSBCOMLPROC) (Display* dpy, GLXDrawable drawable, i
 
 #ifndef GLX_SGIS_color_range
 #define GLX_SGIS_color_range 1
-
-#define GLX_MIN_RED_SGIS 0
-#define GLX_MAX_GREEN_SGIS 0
-#define GLX_MIN_BLUE_SGIS 0
-#define GLX_MAX_ALPHA_SGIS 0
-#define GLX_MIN_GREEN_SGIS 0
-#define GLX_MIN_ALPHA_SGIS 0
-#define GLX_MAX_RED_SGIS 0
-#define GLX_EXTENDED_RANGE_SGIS 0
-#define GLX_MAX_BLUE_SGIS 0
 
 #define GLXEW_SGIS_color_range GLXEW_GET_VAR(__GLXEW_SGIS_color_range)
 
@@ -1136,32 +1161,32 @@ typedef XVisualInfo* ( * PFNGLXGETVISUALFROMFBCONFIGSGIXPROC) (Display *dpy, GLX
 #define GLX_HYPERPIPE_ID_SGIX 0x8030
 
 typedef struct {
-	char pipeName[GLX_HYPERPIPE_PIPE_NAME_LENGTH_SGIX];
-	int  networkId;
+  char pipeName[GLX_HYPERPIPE_PIPE_NAME_LENGTH_SGIX]; 
+  int  networkId; 
 } GLXHyperpipeNetworkSGIX;
 typedef struct {
-	char pipeName[GLX_HYPERPIPE_PIPE_NAME_LENGTH_SGIX];
-	int XOrigin;
-	int YOrigin;
-	int maxHeight;
-	int maxWidth;
+  char pipeName[GLX_HYPERPIPE_PIPE_NAME_LENGTH_SGIX]; 
+  int XOrigin; 
+  int YOrigin; 
+  int maxHeight; 
+  int maxWidth; 
 } GLXPipeRectLimits;
 typedef struct {
-	char pipeName[GLX_HYPERPIPE_PIPE_NAME_LENGTH_SGIX];
-	int channel;
-	unsigned int participationType;
-	int timeSlice;
+  char pipeName[GLX_HYPERPIPE_PIPE_NAME_LENGTH_SGIX]; 
+  int channel; 
+  unsigned int participationType; 
+  int timeSlice; 
 } GLXHyperpipeConfigSGIX;
 typedef struct {
-	char pipeName[GLX_HYPERPIPE_PIPE_NAME_LENGTH_SGIX];
-	int srcXOrigin;
-	int srcYOrigin;
-	int srcWidth;
-	int srcHeight;
-	int destXOrigin;
-	int destYOrigin;
-	int destWidth;
-	int destHeight;
+  char pipeName[GLX_HYPERPIPE_PIPE_NAME_LENGTH_SGIX]; 
+  int srcXOrigin; 
+  int srcYOrigin; 
+  int srcWidth; 
+  int srcHeight; 
+  int destXOrigin; 
+  int destYOrigin; 
+  int destWidth; 
+  int destHeight; 
 } GLXPipeRect;
 
 typedef int ( * PFNGLXBINDHYPERPIPESGIXPROC) (Display *dpy, int hpId);
@@ -1389,7 +1414,7 @@ typedef int ( * PFNGLXVIDEORESIZESUNPROC) (Display* display, GLXDrawable window,
 /* ------------------------------------------------------------------------- */
 
 #ifdef GLEW_MX
-#define GLXEW_FUN_EXPORT
+#define GLXEW_FUN_EXPORT GLEW_FUN_EXPORT
 #define GLXEW_VAR_EXPORT
 #else
 #define GLXEW_FUN_EXPORT GLEW_FUN_EXPORT
@@ -1415,6 +1440,16 @@ GLXEW_FUN_EXPORT PFNGLXMAKECONTEXTCURRENTPROC __glewXMakeContextCurrent;
 GLXEW_FUN_EXPORT PFNGLXQUERYCONTEXTPROC __glewXQueryContext;
 GLXEW_FUN_EXPORT PFNGLXQUERYDRAWABLEPROC __glewXQueryDrawable;
 GLXEW_FUN_EXPORT PFNGLXSELECTEVENTPROC __glewXSelectEvent;
+
+GLXEW_FUN_EXPORT PFNGLXBLITCONTEXTFRAMEBUFFERAMDPROC __glewXBlitContextFramebufferAMD;
+GLXEW_FUN_EXPORT PFNGLXCREATEASSOCIATEDCONTEXTAMDPROC __glewXCreateAssociatedContextAMD;
+GLXEW_FUN_EXPORT PFNGLXCREATEASSOCIATEDCONTEXTATTRIBSAMDPROC __glewXCreateAssociatedContextAttribsAMD;
+GLXEW_FUN_EXPORT PFNGLXDELETEASSOCIATEDCONTEXTAMDPROC __glewXDeleteAssociatedContextAMD;
+GLXEW_FUN_EXPORT PFNGLXGETCONTEXTGPUIDAMDPROC __glewXGetContextGPUIDAMD;
+GLXEW_FUN_EXPORT PFNGLXGETCURRENTASSOCIATEDCONTEXTAMDPROC __glewXGetCurrentAssociatedContextAMD;
+GLXEW_FUN_EXPORT PFNGLXGETGPUIDSAMDPROC __glewXGetGPUIDsAMD;
+GLXEW_FUN_EXPORT PFNGLXGETGPUINFOAMDPROC __glewXGetGPUInfoAMD;
+GLXEW_FUN_EXPORT PFNGLXMAKEASSOCIATEDCONTEXTCURRENTAMDPROC __glewXMakeAssociatedContextCurrentAMD;
 
 GLXEW_FUN_EXPORT PFNGLXCREATECONTEXTATTRIBSARBPROC __glewXCreateContextAttribsARB;
 
@@ -1532,70 +1567,71 @@ struct GLXEWContextStruct
 {
 #endif /* GLEW_MX */
 
-	GLXEW_VAR_EXPORT GLboolean __GLXEW_VERSION_1_0;
-	GLXEW_VAR_EXPORT GLboolean __GLXEW_VERSION_1_1;
-	GLXEW_VAR_EXPORT GLboolean __GLXEW_VERSION_1_2;
-	GLXEW_VAR_EXPORT GLboolean __GLXEW_VERSION_1_3;
-	GLXEW_VAR_EXPORT GLboolean __GLXEW_VERSION_1_4;
-	GLXEW_VAR_EXPORT GLboolean __GLXEW_3DFX_multisample;
-	GLXEW_VAR_EXPORT GLboolean __GLXEW_AMD_gpu_association;
-	GLXEW_VAR_EXPORT GLboolean __GLXEW_ARB_create_context;
-	GLXEW_VAR_EXPORT GLboolean __GLXEW_ARB_create_context_profile;
-	GLXEW_VAR_EXPORT GLboolean __GLXEW_ARB_create_context_robustness;
-	GLXEW_VAR_EXPORT GLboolean __GLXEW_ARB_fbconfig_float;
-	GLXEW_VAR_EXPORT GLboolean __GLXEW_ARB_framebuffer_sRGB;
-	GLXEW_VAR_EXPORT GLboolean __GLXEW_ARB_get_proc_address;
-	GLXEW_VAR_EXPORT GLboolean __GLXEW_ARB_multisample;
-	GLXEW_VAR_EXPORT GLboolean __GLXEW_ARB_robustness_application_isolation;
-	GLXEW_VAR_EXPORT GLboolean __GLXEW_ARB_robustness_share_group_isolation;
-	GLXEW_VAR_EXPORT GLboolean __GLXEW_ARB_vertex_buffer_object;
-	GLXEW_VAR_EXPORT GLboolean __GLXEW_ATI_pixel_format_float;
-	GLXEW_VAR_EXPORT GLboolean __GLXEW_ATI_render_texture;
-	GLXEW_VAR_EXPORT GLboolean __GLXEW_EXT_create_context_es2_profile;
-	GLXEW_VAR_EXPORT GLboolean __GLXEW_EXT_create_context_es_profile;
-	GLXEW_VAR_EXPORT GLboolean __GLXEW_EXT_fbconfig_packed_float;
-	GLXEW_VAR_EXPORT GLboolean __GLXEW_EXT_framebuffer_sRGB;
-	GLXEW_VAR_EXPORT GLboolean __GLXEW_EXT_import_context;
-	GLXEW_VAR_EXPORT GLboolean __GLXEW_EXT_scene_marker;
-	GLXEW_VAR_EXPORT GLboolean __GLXEW_EXT_swap_control;
-	GLXEW_VAR_EXPORT GLboolean __GLXEW_EXT_swap_control_tear;
-	GLXEW_VAR_EXPORT GLboolean __GLXEW_EXT_texture_from_pixmap;
-	GLXEW_VAR_EXPORT GLboolean __GLXEW_EXT_visual_info;
-	GLXEW_VAR_EXPORT GLboolean __GLXEW_EXT_visual_rating;
-	GLXEW_VAR_EXPORT GLboolean __GLXEW_INTEL_swap_event;
-	GLXEW_VAR_EXPORT GLboolean __GLXEW_MESA_agp_offset;
-	GLXEW_VAR_EXPORT GLboolean __GLXEW_MESA_copy_sub_buffer;
-	GLXEW_VAR_EXPORT GLboolean __GLXEW_MESA_pixmap_colormap;
-	GLXEW_VAR_EXPORT GLboolean __GLXEW_MESA_release_buffers;
-	GLXEW_VAR_EXPORT GLboolean __GLXEW_MESA_set_3dfx_mode;
-	GLXEW_VAR_EXPORT GLboolean __GLXEW_MESA_swap_control;
-	GLXEW_VAR_EXPORT GLboolean __GLXEW_NV_copy_image;
-	GLXEW_VAR_EXPORT GLboolean __GLXEW_NV_float_buffer;
-	GLXEW_VAR_EXPORT GLboolean __GLXEW_NV_multisample_coverage;
-	GLXEW_VAR_EXPORT GLboolean __GLXEW_NV_present_video;
-	GLXEW_VAR_EXPORT GLboolean __GLXEW_NV_swap_group;
-	GLXEW_VAR_EXPORT GLboolean __GLXEW_NV_vertex_array_range;
-	GLXEW_VAR_EXPORT GLboolean __GLXEW_NV_video_capture;
-	GLXEW_VAR_EXPORT GLboolean __GLXEW_NV_video_out;
-	GLXEW_VAR_EXPORT GLboolean __GLXEW_OML_swap_method;
-	GLXEW_VAR_EXPORT GLboolean __GLXEW_OML_sync_control;
-	GLXEW_VAR_EXPORT GLboolean __GLXEW_SGIS_blended_overlay;
-	GLXEW_VAR_EXPORT GLboolean __GLXEW_SGIS_color_range;
-	GLXEW_VAR_EXPORT GLboolean __GLXEW_SGIS_multisample;
-	GLXEW_VAR_EXPORT GLboolean __GLXEW_SGIS_shared_multisample;
-	GLXEW_VAR_EXPORT GLboolean __GLXEW_SGIX_fbconfig;
-	GLXEW_VAR_EXPORT GLboolean __GLXEW_SGIX_hyperpipe;
-	GLXEW_VAR_EXPORT GLboolean __GLXEW_SGIX_pbuffer;
-	GLXEW_VAR_EXPORT GLboolean __GLXEW_SGIX_swap_barrier;
-	GLXEW_VAR_EXPORT GLboolean __GLXEW_SGIX_swap_group;
-	GLXEW_VAR_EXPORT GLboolean __GLXEW_SGIX_video_resize;
-	GLXEW_VAR_EXPORT GLboolean __GLXEW_SGIX_visual_select_group;
-	GLXEW_VAR_EXPORT GLboolean __GLXEW_SGI_cushion;
-	GLXEW_VAR_EXPORT GLboolean __GLXEW_SGI_make_current_read;
-	GLXEW_VAR_EXPORT GLboolean __GLXEW_SGI_swap_control;
-	GLXEW_VAR_EXPORT GLboolean __GLXEW_SGI_video_sync;
-	GLXEW_VAR_EXPORT GLboolean __GLXEW_SUN_get_transparent_index;
-	GLXEW_VAR_EXPORT GLboolean __GLXEW_SUN_video_resize;
+GLXEW_VAR_EXPORT GLboolean __GLXEW_VERSION_1_0;
+GLXEW_VAR_EXPORT GLboolean __GLXEW_VERSION_1_1;
+GLXEW_VAR_EXPORT GLboolean __GLXEW_VERSION_1_2;
+GLXEW_VAR_EXPORT GLboolean __GLXEW_VERSION_1_3;
+GLXEW_VAR_EXPORT GLboolean __GLXEW_VERSION_1_4;
+GLXEW_VAR_EXPORT GLboolean __GLXEW_3DFX_multisample;
+GLXEW_VAR_EXPORT GLboolean __GLXEW_AMD_gpu_association;
+GLXEW_VAR_EXPORT GLboolean __GLXEW_ARB_create_context;
+GLXEW_VAR_EXPORT GLboolean __GLXEW_ARB_create_context_profile;
+GLXEW_VAR_EXPORT GLboolean __GLXEW_ARB_create_context_robustness;
+GLXEW_VAR_EXPORT GLboolean __GLXEW_ARB_fbconfig_float;
+GLXEW_VAR_EXPORT GLboolean __GLXEW_ARB_framebuffer_sRGB;
+GLXEW_VAR_EXPORT GLboolean __GLXEW_ARB_get_proc_address;
+GLXEW_VAR_EXPORT GLboolean __GLXEW_ARB_multisample;
+GLXEW_VAR_EXPORT GLboolean __GLXEW_ARB_robustness_application_isolation;
+GLXEW_VAR_EXPORT GLboolean __GLXEW_ARB_robustness_share_group_isolation;
+GLXEW_VAR_EXPORT GLboolean __GLXEW_ARB_vertex_buffer_object;
+GLXEW_VAR_EXPORT GLboolean __GLXEW_ATI_pixel_format_float;
+GLXEW_VAR_EXPORT GLboolean __GLXEW_ATI_render_texture;
+GLXEW_VAR_EXPORT GLboolean __GLXEW_EXT_buffer_age;
+GLXEW_VAR_EXPORT GLboolean __GLXEW_EXT_create_context_es2_profile;
+GLXEW_VAR_EXPORT GLboolean __GLXEW_EXT_create_context_es_profile;
+GLXEW_VAR_EXPORT GLboolean __GLXEW_EXT_fbconfig_packed_float;
+GLXEW_VAR_EXPORT GLboolean __GLXEW_EXT_framebuffer_sRGB;
+GLXEW_VAR_EXPORT GLboolean __GLXEW_EXT_import_context;
+GLXEW_VAR_EXPORT GLboolean __GLXEW_EXT_scene_marker;
+GLXEW_VAR_EXPORT GLboolean __GLXEW_EXT_swap_control;
+GLXEW_VAR_EXPORT GLboolean __GLXEW_EXT_swap_control_tear;
+GLXEW_VAR_EXPORT GLboolean __GLXEW_EXT_texture_from_pixmap;
+GLXEW_VAR_EXPORT GLboolean __GLXEW_EXT_visual_info;
+GLXEW_VAR_EXPORT GLboolean __GLXEW_EXT_visual_rating;
+GLXEW_VAR_EXPORT GLboolean __GLXEW_INTEL_swap_event;
+GLXEW_VAR_EXPORT GLboolean __GLXEW_MESA_agp_offset;
+GLXEW_VAR_EXPORT GLboolean __GLXEW_MESA_copy_sub_buffer;
+GLXEW_VAR_EXPORT GLboolean __GLXEW_MESA_pixmap_colormap;
+GLXEW_VAR_EXPORT GLboolean __GLXEW_MESA_release_buffers;
+GLXEW_VAR_EXPORT GLboolean __GLXEW_MESA_set_3dfx_mode;
+GLXEW_VAR_EXPORT GLboolean __GLXEW_MESA_swap_control;
+GLXEW_VAR_EXPORT GLboolean __GLXEW_NV_copy_image;
+GLXEW_VAR_EXPORT GLboolean __GLXEW_NV_float_buffer;
+GLXEW_VAR_EXPORT GLboolean __GLXEW_NV_multisample_coverage;
+GLXEW_VAR_EXPORT GLboolean __GLXEW_NV_present_video;
+GLXEW_VAR_EXPORT GLboolean __GLXEW_NV_swap_group;
+GLXEW_VAR_EXPORT GLboolean __GLXEW_NV_vertex_array_range;
+GLXEW_VAR_EXPORT GLboolean __GLXEW_NV_video_capture;
+GLXEW_VAR_EXPORT GLboolean __GLXEW_NV_video_output;
+GLXEW_VAR_EXPORT GLboolean __GLXEW_OML_swap_method;
+GLXEW_VAR_EXPORT GLboolean __GLXEW_OML_sync_control;
+GLXEW_VAR_EXPORT GLboolean __GLXEW_SGIS_blended_overlay;
+GLXEW_VAR_EXPORT GLboolean __GLXEW_SGIS_color_range;
+GLXEW_VAR_EXPORT GLboolean __GLXEW_SGIS_multisample;
+GLXEW_VAR_EXPORT GLboolean __GLXEW_SGIS_shared_multisample;
+GLXEW_VAR_EXPORT GLboolean __GLXEW_SGIX_fbconfig;
+GLXEW_VAR_EXPORT GLboolean __GLXEW_SGIX_hyperpipe;
+GLXEW_VAR_EXPORT GLboolean __GLXEW_SGIX_pbuffer;
+GLXEW_VAR_EXPORT GLboolean __GLXEW_SGIX_swap_barrier;
+GLXEW_VAR_EXPORT GLboolean __GLXEW_SGIX_swap_group;
+GLXEW_VAR_EXPORT GLboolean __GLXEW_SGIX_video_resize;
+GLXEW_VAR_EXPORT GLboolean __GLXEW_SGIX_visual_select_group;
+GLXEW_VAR_EXPORT GLboolean __GLXEW_SGI_cushion;
+GLXEW_VAR_EXPORT GLboolean __GLXEW_SGI_make_current_read;
+GLXEW_VAR_EXPORT GLboolean __GLXEW_SGI_swap_control;
+GLXEW_VAR_EXPORT GLboolean __GLXEW_SGI_video_sync;
+GLXEW_VAR_EXPORT GLboolean __GLXEW_SUN_get_transparent_index;
+GLXEW_VAR_EXPORT GLboolean __GLXEW_SUN_video_resize;
 
 #ifdef GLEW_MX
 }; /* GLXEWContextStruct */
@@ -1625,5 +1661,9 @@ GLEWAPI GLboolean GLEWAPIENTRY glxewIsSupported (const char *name);
 #endif /* GLEW_MX */
 
 GLEWAPI GLboolean GLEWAPIENTRY glxewGetExtension (const char *name);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* __glxew_h__ */
