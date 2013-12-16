@@ -16,6 +16,7 @@ WSADATA wsadata;
 void initsocket(void)
 {
 	int on = 1;
+	int length = sizeof(struct sockaddr_in);
 
 	sock = (desocket *)calloc(1,sizeof(desocket));
 
@@ -36,15 +37,12 @@ void initsocket(void)
 		error_handler(DE_ERROR_SOCKET_OPTION_SET_NONBLOCK);
 
 	//set socket address
-	sock->host_port = SERVER_PORT;
-	sock->address_length = sizeof(struct sockaddr_in);
-
-	memset(&sock->host_address, 0, sock->address_length);     /* Zero out structure */
+	memset(&sock->host_address, 0, length);     /* Zero out structure */
 	sock->host_address.sin_family      = AF_INET;             /* Internet address family */
 	sock->host_address.sin_addr.s_addr = htonl(INADDR_ANY);   /* Server IP address */
-	sock->host_address.sin_port        = htons(sock->host_port); /* Server port */
+	sock->host_address.sin_port        = htons(SERVER_PORT); /* Server port */
 
-	bind(sock->socket, (struct sockaddr*)&sock->host_address, sock->address_length);
+	bind(sock->socket, (struct sockaddr*)&sock->host_address, length);
 
 	//listen for connections.
 	if(listen(sock->socket, SOMAXCONN) == -1)
@@ -52,7 +50,6 @@ void initsocket(void)
 
 	//initialize master set for select.
 	FD_ZERO(&sock->master_set);
-	FD_ZERO(&sock->working_set);
 	sock->max_socket = sock->socket;
 	FD_SET(sock->socket, &sock->master_set);
 }
@@ -61,81 +58,80 @@ int socketlisten(void *arg)
 {
 	sbool end_listen = FALSE;
 	struct sockaddr_in temp_address;
-	int temp_length = sock->address_length;
 	uint64 i = 0;
-	sock->connected = TRUE;
+	sbool connected = TRUE;
+	buffer_t buffer;
+	int ready_count;
 
 	do
 	{
 		memcpy(&sock->working_set, &sock->master_set, sizeof(sock->master_set));
 
 		//sock->working_set = sock->master_set;
-		sock->socket_active = 0;
-		if(select(sock->max_socket + 1, &sock->working_set, NULL, NULL, NULL) == -1){
+
+		if((ready_count = select(sock->max_socket + 1, &sock->working_set, NULL, NULL, NULL)) == -1){
 			error_handler(DE_ERROR_SOCKET_SELECT_FAILED);
 			break;
 		}
 
-		for (i=0; i <= sock->max_socket; ++i)
-		{
-			if (FD_ISSET(i, &sock->working_set))
-			{
-				sock->connected = TRUE;
+		for (i=0; i <= sock->max_socket && ready_count > 0; ++i){
+			if (FD_ISSET(i, &sock->working_set)){
+				connected = TRUE;
+				ready_count--;
 
 				if (i == sock->socket){
-					sock->new_socket = accept(sock->socket, NULL, NULL);
-					if (sock->new_socket == -1){
-						if (errno != EWOULDBLOCK){
-							error_handler(DE_ERROR_SOCKET_ACCEPT);
-							end_listen = TRUE;
+					do{
+						sock->new_socket = accept(sock->socket, NULL, NULL);
+						if (sock->new_socket < 0){
+							if (errno != EWOULDBLOCK){
+								error_handler(DE_ERROR_SOCKET_ACCEPT);
+								end_listen = TRUE;
+							}
+							break;
 						}
-						break;
-					}
 
-					//getpeername(i, (struct sockaddr*)&temp_address, &temp_length); TODO use to get ip address of user for banning purposes.
+						printf("accepting new user! \n");
 
-					printf("accepting new user! \n");
-
-					FD_SET(sock->new_socket, &sock->master_set);
-					if (sock->new_socket > sock->max_socket)
-						sock->max_socket = sock->new_socket;
-
-					if (!sock->connected){
-						clear_temp_player(i);
-						closesocket(i);
-						FD_CLR(i, &sock->master_set);
-					}
+						FD_SET(sock->new_socket, &sock->master_set);
+						if (sock->new_socket > sock->max_socket)
+							sock->max_socket = sock->new_socket;
+					} while (sock->new_socket != -1);
 				}
 				else{
 					int size;
-					char op;
-					clear_buffer(&sock->bufferin);
-					//get packet size
-					sock->bytes_read = recv(i, sock->bufferin.buff, SIZE32, 0);
-					take_buffer(&size,&sock->bufferin,SIZE32);
+					int bytes_read;
 
-					clear_buffer(&sock->bufferin);
-					sock->bytes_read = recv(i, sock->bufferin.buff, size, 0);
+					clear_buffer(&buffer);
+					bytes_read = recv(i, buffer.buff, SIZE32, 0); //get packet size.
+					take_buffer(&size,&buffer,SIZE32);
 
-					if (sock->bytes_read == 0){
+					clear_buffer(&buffer);
+					bytes_read = recv(i, buffer.buff, size, 0);  //get the packet.
+
+					if (bytes_read < 0){
 						if (errno != EWOULDBLOCK){
 							error_handler(DE_ERROR_SOCKET_RECEIVE);
-							sock->connected = FALSE;
+							connected = FALSE;
 						}
 					}
 
-					if (sock->bytes_read == -1){
+					if (bytes_read == 0){
 						error_handler(DE_ERROR_SOCKET_CONNECTION_LOSS);
-						sock->connected = FALSE;
+						connected = FALSE;
 					}
 
-					if (!sock->connected){
+					if (!connected){
 						clear_temp_player(i);
 						closesocket(i);
 						FD_CLR(i, &sock->master_set);
+
+						if (i == sock->max_socket){
+							while (FD_ISSET(sock->max_socket, &sock->master_set) == FALSE)
+								sock->max_socket -= 1;
+						}
 					}
 					else{
-						handle_data(&sock->bufferin, i);
+						handle_data(&buffer, i);
 					}
 				}
 			}
@@ -158,7 +154,13 @@ void socketidsend(buffer_t *data, uint64 id)
 
 void endsocket(void)
 {
-	closesocket(sock->socket);
+	uint32 i = 0;
+
+	for (i = 0; i <= sock->max_socket; ++i) {
+		if (FD_ISSET(i, &sock->master_set))
+			closesocket(i);
+	}
+
 	WSACleanup();
 	free(sock);
 }
@@ -168,4 +170,9 @@ void clear_user_socket(uint64 socket_id)
 	clear_temp_player(socket_id);
 	closesocket(socket_id);
 	FD_CLR(socket_id, &sock->master_set);
+
+	if (socket_id == sock->max_socket){
+		while (FD_ISSET(sock->max_socket, &sock->master_set) == FALSE)
+			sock->max_socket -= 1;
+	}
 }

@@ -17,19 +17,9 @@ struct desocket
 	SOCKET socket; // Socket descriptor
 	SOCKET max_socket; // Socket select max descriptor
 	SOCKET new_socket;
-	struct timeval timeout;
 	struct fd_set master_set;
 	struct fd_set working_set;
 	struct sockaddr_in host_address;
-	buffer_t bufferin;
-	buffer_t bufferout;
-	sbool connected;
-	int address_length;
-	int bytes_read;
-	int total_bytes_read;
-	int socket_active;
-	unsigned short host_port;
-	char *host_ip;
 };
 
 void initsocket(void);
