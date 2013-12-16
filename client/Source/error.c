@@ -8,7 +8,8 @@
 #include <stdio.h> //For file reading/writing and other functions. open document for more info.
 #include <stdlib.h>
 #include "error.h"
-
+#include "main.h"
+#include "widget.h"
 //TODO: Add Error File Save and More Error Functions/FLAGS as well as safe Error types that just display an error but continue operation.
 
 void error_handler(int error_flag)
@@ -63,31 +64,24 @@ void error_handler(int error_flag)
 	case DE_ERROR_NONE_ACSII:
 		fputs("MESSAGE: Does Not Support Unicode characters.\n", stderr);
 		return;
-		break;
 	case DE_ERROR_SOCKET_INIT:
 		fputs("ERROR: Socket did not initialize.\n", stderr);
 		return;
-		break;
 	case DE_ERROR_SOCKET_WSASTARTUP:
 		fputs("ERROR: windows socket startup error.\n", stderr);
 		return;
-		break;
 	case DE_ERROR_SOCKET_SEND_SIZE:
 		fputs("MESSAGE: send size was incorrect\n", stderr);
 		return;
-		break;
 	case DE_ERROR_SOCKET_CONNECTION_LOSS:
 		fputs("MESSAGE: connection was lost\n", stderr);
 		return;
-		break;
 	case DE_ERROR_INVALID_PACKET_ID:
 		fputs("MESSAGE: Packet ID is invalid.\n", stderr);
 		return;
-		break;
 	case DE_ERROR_INVALID_PACKET_OFFSET:
 		fputs("MESSAGE: Packet offset equals zero.\n", stderr);
 		return;
-		break;
 	default:
 		fputs("ERROR: Unknown Error!\n", stderr);
 	}
@@ -98,7 +92,6 @@ void error_handler(int error_flag)
 
 void shut_down(void)
 {
-	//TODO: Clean up memory, shut down sockets, etc....?
-	glfwTerminate();
-	exit( FALSE);
+	widget_unload(widget_get_uip().root);
+	unload_functions();
 }
