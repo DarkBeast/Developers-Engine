@@ -622,35 +622,21 @@ void widget_hidden_resize(widget *parent, uint16 size)
 void widget_free_widget(widget *control, sbool hidden)
 {
 	switch(control->type){
-	case CONTROL_LISTBOX: unload_list_elements(control); break;
-	case CONTROL_LABEL: unload_label_elements(control); break;
-	case CONTROL_TEXTBOX: unload_textbox_elements(control); break;
-	case CONTROL_RADIO: unload_radio_elements(control); break;
+	case CONTROL_LISTBOX: unload_listbox(control,hidden); break;
+	case CONTROL_LABEL: unload_label(control,hidden); break;
+	case CONTROL_TEXTBOX: unload_textbox(control,hidden); break;
+	case CONTROL_RADIO: unload_radio(control,hidden); break;
+	case CONTROL_BUTTON: unload_button(control, hidden); break;
+	case CONTROL_CHECKBOX: unload_checkbox(control,hidden); break;
+	case CONTROL_FRAME: unload_frame(control, hidden); break;
+	case CONTROL_HPROGRESSBAR:
+	case CONTROL_VPROGRESSBAR: unload_progressbar(control,hidden);
+	case CONTROL_HSCROLL_BAR:
+	case CONTROL_VSCROLL_BAR: unload_scrollbar(control, hidden); break;
+	case CONTROL_PICTUREBOX: unload_picturebox(control, hidden); break;
+	case CONTROL_WINDOW: unload_window(control, hidden); break;
+	default: return;
 	}
-	free(control->data);
-	free(control->control);
-
-	if(!(control->action & WIDGET_USED_CLONE))
-		free(control->img);
-
-	if(control->shown.data && !hidden){
-		widget_clear_shown(control);
-	}
-	if(control->hidden.data && hidden){
-		widget_clear_hidden(control);
-	}
-	free(control->shown.data);
-	free(control->hidden.data);
-
-	glBindBuffer(GL_ARRAY_BUFFER,control->buf.buffer);
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER,control->buf.index);
-	glBufferData(GL_ARRAY_BUFFER,control->buf.size *( 4 * sizeof(vertex_t)),NULL,GL_STREAM_DRAW);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, control->buf.isize * sizeof(GLuint),NULL,GL_STATIC_DRAW);
-	control->hidden.data = NULL;
-	control->data = NULL;
-	control->control = NULL;
-	control->img = NULL;
-	control->shown.data = NULL;
 }
 
 void widget_clear_shown(widget *parent)//used to draw the widgets onto the screen.
@@ -682,22 +668,18 @@ void widget_clear_shown(widget *parent)//used to draw the widgets onto the scree
 							id[idindex] = 0;
 							--idindex;
 
-							widget_free_widget(child, FALSE);
+							widget_free_widget(child, TRUE);
 							child = child->parent;
-							if(id[idindex] < child->shown.count){
-								//free(child->shown.data[id[idindex]]);
-								child->shown.data[id[idindex]] = NULL;
-							}
+							child->shown.data[id[idindex]] = NULL;
+
 							++id[idindex];
 						}
 						else{
-							widget_free_widget(child, FALSE);
+							widget_free_widget(child, TRUE);
 							child = child->parent;
-							if(id[idindex] < child->shown.count){
-								free(child->shown.data[id[idindex]]);
-								child->shown.data[id[idindex]] = NULL;
-							}
-							++id[idindex];
+							child->shown.data[id[idindex]] = NULL;
+
+							break;
 						}
 					}
 					else{
@@ -714,12 +696,9 @@ void widget_clear_shown(widget *parent)//used to draw the widgets onto the scree
 								id[idindex] = 0;//set the new ID index to 0
 							}
 							else{
-								widget_free_widget(child, FALSE);
+								widget_free_widget(child, TRUE);
 								child = child->parent;
-								if(id[idindex] < child->shown.count){
-									free(child->shown.data[id[idindex]]);
-									child->shown.data[id[idindex]] = NULL;
-								}
+								child->shown.data[id[idindex]] = NULL;
 								++id[idindex];
 							}
 						}
@@ -732,21 +711,15 @@ void widget_clear_shown(widget *parent)//used to draw the widgets onto the scree
 					if(idindex != 0){
 						id[idindex] = 0;
 						--idindex;
-						widget_free_widget(child, FALSE);
+						widget_free_widget(child, TRUE);
 						child = child->parent;
-						if(id[idindex] < child->shown.count){
-							//	free(child->shown.data[id[idindex]]);
-							child->shown.data[id[idindex]] = NULL;
-						}
+						child->shown.data[id[idindex]] = NULL;
 						++id[idindex];
 					}
 					else{
-						widget_free_widget(child, FALSE);
+						widget_free_widget(child, TRUE);
 						child = child->parent;
-						if(id[idindex] < child->shown.count){
-							//free(child->shown.data[id[idindex]]);
-							child->shown.data[id[idindex]] = NULL;
-						}
+						child->shown.data[id[idindex]] = NULL;
 						break;
 					}
 				}
@@ -787,16 +760,16 @@ void widget_clear_hidden(widget *parent)//used to draw the widgets onto the scre
 							id[idindex] = 0;
 							--idindex;
 
-							widget_free_widget(child, TRUE);
+							widget_free_widget(child, FALSE);
 							child = child->parent;
 							if(id[idindex] < child->hidden.count){
-								//free(child->hidden.data[id[idindex]]);
+								free(child->hidden.data[id[idindex]]);
 								child->hidden.data[id[idindex]] = NULL;
 							}
 							++id[idindex];
 						}
 						else{
-							widget_free_widget(child, TRUE);
+							widget_free_widget(child, FALSE);
 							child = child->parent;
 							if(id[idindex] < child->hidden.count){
 								free(child->hidden.data[id[idindex]]);
@@ -819,7 +792,7 @@ void widget_clear_hidden(widget *parent)//used to draw the widgets onto the scre
 								id[idindex] = 0;//set the new ID index to 0
 							}
 							else{
-								widget_free_widget(child, TRUE);
+								widget_free_widget(child, FALSE);
 								child = child->parent;
 								if(id[idindex] < child->hidden.count){
 									free(child->hidden.data[id[idindex]]);
@@ -837,19 +810,19 @@ void widget_clear_hidden(widget *parent)//used to draw the widgets onto the scre
 					if(idindex != 0){
 						id[idindex] = 0;
 						--idindex;
-						widget_free_widget(child, TRUE);
+						widget_free_widget(child, FALSE);
 						child = child->parent;
 						if(id[idindex] < child->hidden.count){
-							//	free(child->hidden.data[id[idindex]]);
+							free(child->hidden.data[id[idindex]]);
 							child->hidden.data[id[idindex]] = NULL;
 						}
 						++id[idindex];
 					}
 					else{
-						widget_free_widget(child, TRUE);
+						widget_free_widget(child, FALSE);
 						child = child->parent;
 						if(id[idindex] < child->hidden.count){
-							//free(child->hidden.data[id[idindex]]);
+							free(child->hidden.data[id[idindex]]);
 							child->hidden.data[id[idindex]] = NULL;
 						}
 						break;
