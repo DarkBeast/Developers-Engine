@@ -14,14 +14,17 @@
 #include "handlepackets.h"
 #include "winsocket.h"
 #include "general.h"
-
+#define _CRTDBG_MAP_ALLOC
+#include <stdlib.h>
+#include <crtdbg.h>
 mtx_t gmutex;
 cnd_t gcond;
 
 int main(void)
 {
 	thrd_t t1;
-
+	_CrtSetDbgFlag ( _CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF );
+	_CrtSetReportMode( _CRT_ERROR, _CRTDBG_MODE_DEBUG );
 	mtx_init(&gmutex, mtx_plain);
 	cnd_init(&gcond);
 
@@ -58,5 +61,6 @@ void unload_functions(void)
 	unloadsocket();
 	mtx_destroy(&gmutex);
 	cnd_destroy(&gcond);
+	_CrtDumpMemoryLeaks();
 	exit(TRUE);// Exit program
 }
