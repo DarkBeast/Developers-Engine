@@ -34,14 +34,14 @@ void main_menu(void)
 		glfwSwapBuffers(get_the_window());
 		glfwPollEvents();
 
-		if(lpstimer < time){//calculates the loops per second the code does, through everything
-			printf("%i\n",lps);
-			lpstimer = time + 1;
+		//if(lpstimer < time){//calculates the loops per second the code does, through everything
+		//	printf("%i\n",lps);
+		//	lpstimer = time + 1;
 
-			lps = 0;
-		}
+		//	lps = 0;
+		//}
 
-		lps += 1;
+		//lps += 1;
 
 		//_sleep(20);
 
