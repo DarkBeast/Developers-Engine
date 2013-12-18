@@ -81,18 +81,15 @@ void read_map(char *path)
 
 void unload_maps(void)
 {
-	uint32 i = 0;
 	uint32 n = 0;
 
-	for( i = 0; i < MAX_MAPS; i++){
-		for( n = 0; n < MAX_MAP_NPCS; n++){
-			free(map_data.npc[n].vitals);
-		}
-		free(map_data.name);
-		free(map_data.npc);
-		free(map_data.items);
-		free(map_data.tile);
+	for( n = 0; n < MAX_MAP_NPCS; n++){
+		free(map_data.npc[n].vitals);
 	}
+	free(map_data.name);
+	free(map_data.npc);
+	free(map_data.items);
+	free(map_data.tile);
 }
 
 void clear_map_npcs(void)
