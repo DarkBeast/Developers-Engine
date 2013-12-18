@@ -11,7 +11,9 @@
 #include <direct.h>
 
 char *path;
+uint32 path_size = 0;
 char *string = NULL;
+uint32 string_size = 0;
 char *number_string;
 #define MAX_NUMBER_LENGTH 12
 
@@ -20,8 +22,13 @@ char* get_path(char *file_path, int32 file_number, char *file_type)
 	char* temp;
 	size_t size = strlen(file_path) + strlen("\\") + MAX_NUMBER_LENGTH + strlen(file_type);
 
-	if(size >= strlen(path)){
-		temp = (char *)realloc(path, next_power_of_two(size));
+	if(size >= path_size){
+		if(path_size * 2 > size)
+			path_size *= 2;
+		else
+			path_size = next_power_of_two(size);
+
+		temp = (char *)realloc(string, path_size);
 
 		if(temp == NULL){
 			error_handler(DE_ERROR_POINTER_NULL);
@@ -49,8 +56,13 @@ char* get_path_name(char *file_path, char *file_name, char *file_type)
 	char* temp;
 	size_t size = strlen(file_path) + strlen("\\") + strlen(file_name) + strlen(file_type);
 
-	if(size >= strlen(path)){
-		temp = (char *)realloc(path, next_power_of_two(size));
+	if(size >= path_size){
+		if(path_size * 2 > size)
+			path_size *= 2;
+		else
+			path_size = next_power_of_two(size);
+
+		temp = (char *)realloc(string, path_size);
 
 		if(temp == NULL){
 			error_handler(DE_ERROR_POINTER_NULL);
@@ -76,7 +88,9 @@ char* get_path_name(char *file_path, char *file_name, char *file_type)
 void init_path(void)
 {
 	path = (char *)calloc(1024,sizeof(char));
+	path_size = 1024;
 	string = (char *)calloc(1024,sizeof(char));
+	string_size = 1024;
 	number_string = (char *)calloc(1024,sizeof(char));
 }
 
@@ -150,8 +164,13 @@ char *comb_str(char *a, char *b, char *c, char *d, char *e, char *f, char *g)
 	if(g != "" || g != NULL)
 		size += strlen(g);
 
-	if(size >= strlen(string)){
-		temp = (char *)realloc(string, next_power_of_two(size));
+	if(size >= string_size){
+		if(string_size * 2 > size)
+			string_size *= 2;
+		else
+			string_size = next_power_of_two(size);
+
+		temp = (char *)realloc(string, string_size);
 
 		if(temp == NULL){
 			error_handler(DE_ERROR_POINTER_NULL);
@@ -197,8 +216,13 @@ char *comb_2str(char *a, char *b)
 	if(b != "" || b != NULL)
 		size += strlen(b);
 
-	if(size >= strlen(string)){
-		temp = (char *)realloc(string, next_power_of_two(size));
+	if(size >= string_size){
+		if(string_size * 2 > size)
+			string_size *= 2;
+		else
+			string_size = next_power_of_two(size);
+
+		temp = (char *)realloc(string, string_size);
 
 		if(temp == NULL){
 			error_handler(DE_ERROR_POINTER_NULL);
@@ -232,8 +256,13 @@ char *comb_3str(char *a, char *b, char *c)
 	if(c != "" || c != NULL)
 		size += strlen(c);
 
-	if(size >= strlen(string)){
-		temp = (char *)realloc(string, next_power_of_two(size));
+	if(size >= string_size){
+		if(string_size * 2 > size)
+			string_size *= 2;
+		else
+			string_size = next_power_of_two(size);
+
+		temp = (char *)realloc(string, string_size);
 
 		if(temp == NULL){
 			error_handler(DE_ERROR_POINTER_NULL);
@@ -273,8 +302,13 @@ char *comb_4str(char *a, char *b, char *c, char *d)
 	if(d != "" || d != NULL)
 		size += strlen(d);
 
-	if(size >= strlen(string)){
-		temp = (char *)realloc(string, next_power_of_two(size));
+	if(size >= string_size){
+		if(string_size * 2 > size)
+			string_size *= 2;
+		else
+			string_size = next_power_of_two(size);
+
+		temp = (char *)realloc(string, string_size);
 
 		if(temp == NULL){
 			error_handler(DE_ERROR_POINTER_NULL);
@@ -320,8 +354,13 @@ char *comb_5str(char *a, char *b, char *c, char *d, char *e)
 	if(e != "" || e != NULL)
 		size += strlen(e);
 
-	if(size >= strlen(string)){
-		temp = (char *)realloc(string, next_power_of_two(size));
+	if(size >= string_size){
+		if(string_size * 2 > size)
+			string_size *= 2;
+		else
+			string_size = next_power_of_two(size);
+
+		temp = (char *)realloc(string, string_size);
 
 		if(temp == NULL){
 			error_handler(DE_ERROR_POINTER_NULL);
@@ -376,8 +415,13 @@ char *comb_7str(char *a, char *b, char *c, char *d, char *e, char *f, char *g)
 	if(g != "" || g != NULL)
 		size += strlen(g);
 
-	if(size >= strlen(string)){
-		temp = (char *)realloc(string, next_power_of_two(size));
+	if(size >= string_size){
+		if(string_size * 2 > size)
+			string_size *= 2;
+		else
+			string_size = next_power_of_two(size);
+
+		temp = (char *)realloc(string, string_size);
 
 		if(temp == NULL){
 			error_handler(DE_ERROR_POINTER_NULL);
