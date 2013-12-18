@@ -85,7 +85,6 @@ void init_players(void)
 	temp_data_t = (ingame_t *)calloc(1, sizeof(ingame_t));
 
 	for( i = 0; i < MAX_JOBS; i++){
-		job_array[i].name = (char *)calloc(MAX_NAME_LENGTH,sizeof(char));
 		job_array[i].stat = (uint8 *)calloc(STAT_COUNT, sizeof(uint8));
 	}
 
@@ -128,7 +127,6 @@ void unload_players(void)
 	uint32 i = 0;
 
 	for( i = 0; i < MAX_JOBS; i++){
-		free(job_array[i].name);
 		free(job_array[i].stat);
 	}
 
