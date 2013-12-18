@@ -94,4 +94,5 @@ void unloadsocket(void)
 {
 	closesocket(sock->socket);
 	WSACleanup();
+	free(sock);
 }

@@ -116,6 +116,9 @@ user_interface widget_get_uip(void);
 
 widget *widget_get_focused(void);
 
+//nulls the widgets data.
+void widget_null(widget *wgt);
+
 //changes the moving widgets position via mouse position.
 void widget_move(int16 x, int16 y);
 void widget_mouse_over(widget *control);
@@ -165,6 +168,9 @@ void widget_init(widget *wgt);
 
 //unloads a widget and its arrays
 void widget_unload(widget *parent);
+
+//unloads the entire widget system.
+void widget_unload_system(void);
 
 //initializes a widgets dormant arrays, used to save ram.
 void widget_init_shown(widget *parent);

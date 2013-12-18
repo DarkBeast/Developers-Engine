@@ -12,7 +12,9 @@
 
 void set_control_image(widget *control, char *path)
 {
-	control->img = (image *)calloc(1,sizeof(image));
+	if(!control->img)
+		control->img = (image *)calloc(1, sizeof(image));
+
 	load_image(path, control->img);
 }
 
@@ -217,11 +219,6 @@ void unload_button(widget *control, sbool hidden)
 
 	glDeleteBuffers(1, &control->buf.buffer);
 	glDeleteBuffers(1, &control->buf.index);
-	control->hidden.data = NULL;
-	control->data = NULL;
-	control->control = NULL;
-	control->img = NULL;
-	control->shown.data = NULL;
 }
 
 void draw_buttons(widget *control)
@@ -331,7 +328,6 @@ void unload_label(widget *control, sbool hidden)
 {
 	label *init_text = (label *)control->control;
 
-	init_text->string->font = NULL;
 	init_text->string->data = NULL;
 	free(init_text->string->buf.data);
 	glDeleteBuffers(1, &init_text->string->buf.buffer);
@@ -352,14 +348,6 @@ void unload_label(widget *control, sbool hidden)
 	}
 	free(control->shown.data);
 	free(control->hidden.data);
-
-	glDeleteBuffers(1, &control->buf.buffer);
-	glDeleteBuffers(1, &control->buf.index);
-	control->hidden.data = NULL;
-	control->data = NULL;
-	control->control = NULL;
-	control->img = NULL;
-	control->shown.data = NULL;
 }
 
 void draw_label(widget *control)
@@ -493,11 +481,6 @@ void unload_window(widget *control, sbool hidden)
 
 	glDeleteBuffers(1, &control->buf.buffer);
 	glDeleteBuffers(1, &control->buf.index);
-	control->hidden.data = NULL;
-	control->data = NULL;
-	control->control = NULL;
-	control->img = NULL;
-	control->shown.data = NULL;
 }
 void draw_windows(widget *control)
 {
@@ -555,11 +538,6 @@ void unload_checkbox(widget *control, sbool hidden)
 
 	glDeleteBuffers(1, &control->buf.buffer);
 	glDeleteBuffers(1, &control->buf.index);
-	control->hidden.data = NULL;
-	control->data = NULL;
-	control->control = NULL;
-	control->img = NULL;
-	control->shown.data = NULL;
 }
 
 void draw_checkbox(widget *control)
@@ -647,10 +625,12 @@ void unload_radio(widget *control, sbool hidden)
 	uint32 i = 0;
 	init_radio->main = NULL;
 
-	for(i = 0; i < init_radio->count; i++)
-		init_radio->list[i] = NULL;
+	if(init_radio){
+		for(i = 0; i < init_radio->count; i++)
+			init_radio->list[i] = NULL;
 
-	free(init_radio->list);
+		free(init_radio->list);
+	}
 
 	free(control->data);
 	free(control->control);
@@ -669,11 +649,6 @@ void unload_radio(widget *control, sbool hidden)
 
 	glDeleteBuffers(1, &control->buf.buffer);
 	glDeleteBuffers(1, &control->buf.index);
-	control->hidden.data = NULL;
-	control->data = NULL;
-	control->control = NULL;
-	control->img = NULL;
-	control->shown.data = NULL;
 }
 
 void draw_radio(widget *control)
@@ -905,11 +880,6 @@ void unload_progressbar(widget *control, sbool hidden)
 
 	glDeleteBuffers(1, &control->buf.buffer);
 	glDeleteBuffers(1, &control->buf.index);
-	control->hidden.data = NULL;
-	control->data = NULL;
-	control->control = NULL;
-	control->img = NULL;
-	control->shown.data = NULL;
 }
 void draw_hprogressbar(widget *control)
 {
@@ -975,11 +945,6 @@ void unload_picturebox(widget *control, sbool hidden)
 
 	glDeleteBuffers(1, &control->buf.buffer);
 	glDeleteBuffers(1, &control->buf.index);
-	control->hidden.data = NULL;
-	control->data = NULL;
-	control->control = NULL;
-	control->img = NULL;
-	control->shown.data = NULL;
 }
 
 void update_picturebox(widget *control, uint16 x, uint16 y, uint16 imgposx, uint16 imgposy, uint16 height, uint16 width, uint16 sizex, uint16 sizey, char *imagepath, widget *clone)
@@ -1061,6 +1026,7 @@ void create_hscrollbar(widget *control, widget *parent, uint16 x, uint16 y, uint
 	scroll_t->button_1.width = buttonwidth;
 	scroll_t->button_1.sizex = buttonwidth;
 	scroll_t->button_1.sizey = sizey;
+	scroll_t->button_1.type = CONTROL_HSCROLL_BAR;
 	scroll_t->button_1.controlmousepress = &handle_harrowleft_click;
 	scroll_t->button_1.controlupdatepos = &handle_hscrollbar_move;
 	scroll_t->button_1.controlmouseover = &handle_harrowleft_over;
@@ -1077,6 +1043,7 @@ void create_hscrollbar(widget *control, widget *parent, uint16 x, uint16 y, uint
 	scroll_t->button_2.sizey = sizey;
 	scroll_t->button_2.pos.x = sizex - scroll_t->button_2.sizex;
 	scroll_t->button_2.pos.y = 0;
+	scroll_t->button_2.type = CONTROL_HSCROLL_BAR;
 	scroll_t->button_2.controlmousepress = &handle_harrowright_click;
 	scroll_t->button_2.controlupdatepos = &handle_hscrollbar_move;
 	scroll_t->button_2.controlmouseover = &handle_harrowright_over;
@@ -1091,6 +1058,7 @@ void create_hscrollbar(widget *control, widget *parent, uint16 x, uint16 y, uint
 	scroll_t->bar.width = scroll_t->bar.img->width / 3;
 	scroll_t->bar.imgpos.x = 0;
 	scroll_t->bar.imgpos.y = 0;
+	scroll_t->bar.type = CONTROL_HSCROLL_BAR;
 	scroll_t->bar.sizex = (sizex + scroll_t->button_2.sizex  + scroll_t->button_1.sizex) / max_value;
 	scroll_t->bar.sizey = sizey;
 
@@ -1129,6 +1097,8 @@ void create_hscrollbar(widget *control, widget *parent, uint16 x, uint16 y, uint
 
 void unload_scrollbar(widget *control, sbool hidden)
 {
+	scrollbar_t *scroll_t = (scrollbar_t *)control->control;
+
 	free(control->data);
 	free(control->control);
 
@@ -1146,11 +1116,6 @@ void unload_scrollbar(widget *control, sbool hidden)
 
 	glDeleteBuffers(1, &control->buf.buffer);
 	glDeleteBuffers(1, &control->buf.index);
-	control->hidden.data = NULL;
-	control->data = NULL;
-	control->control = NULL;
-	control->img = NULL;
-	control->shown.data = NULL;
 }
 
 void draw_hscrollbar(widget *control)
@@ -1949,7 +1914,7 @@ void create_stextbox(widget *control, widget *parent, uint16 x, uint16 y, uint16
 	init_text->cursorblink = .8;
 	init_text->cursortime = 0;
 	init_text->cusorenabled = FALSE;
-	init_text->cursorheight = init_text->string->font->h - 3;
+	init_text->cursorheight = init_text->string->font.h - 3;
 	init_text->cursorwidth = 2;
 
 	control->height = height;
@@ -1979,11 +1944,13 @@ void unload_textbox(widget *control, sbool hidden)
 		init_text = (textbox *)control->control;
 
 		free(init_text->string->buf.data);
-		init_text->string->font = NULL;
 		free(init_text->string->data);
-		glDeleteBuffers(1, &control->buf.buffer);
-		glDeleteBuffers(1, &control->buf.index);
+		glDeleteBuffers(1, &init_text->string->buf.buffer);
+		glDeleteBuffers(1, &init_text->string->buf.index);
 		free(init_text->string);
+
+		glDeleteBuffers(1, &init_text->cursorbuffer.buffer);
+		glDeleteBuffers(1, &init_text->cursorbuffer.index);
 	}
 	else{
 		glDeleteBuffers(1, &control->buf.buffer);
@@ -2004,12 +1971,6 @@ void unload_textbox(widget *control, sbool hidden)
 	}
 	free(control->shown.data);
 	free(control->hidden.data);
-
-	control->hidden.data = NULL;
-	control->data = NULL;
-	control->control = NULL;
-	control->img = NULL;
-	control->shown.data = NULL;
 }
 
 void draw_stextbox_text(widget *control)
@@ -2080,14 +2041,14 @@ void handle_stextbox_input(widget *control, int key)
 					}
 
 					if(control->shown.data[0]->action & WIDGET_IS_PASSWORD){
-						data->string->textwidth -= (uint16)(data->string->font->c['*'].ax + data->string->font->c['*'].left);
+						data->string->textwidth -= (uint16)(data->string->font.c['*'].ax + data->string->font.c['*'].left);
 					}
 					else{
-						if(data->string->font->c[data->string->data[data->string->count - 1]].left >= 0){
-							data->string->textwidth -= (uint16)(data->string->font->c[data->string->data[data->string->count - 1]].ax + data->string->font->c[data->string->data[data->string->count - 1]].left);
+						if(data->string->font.c[data->string->data[data->string->count - 1]].left >= 0){
+							data->string->textwidth -= (uint16)(data->string->font.c[data->string->data[data->string->count - 1]].ax + data->string->font.c[data->string->data[data->string->count - 1]].left);
 						}
 						else{
-							data->string->textwidth -= (uint16)data->string->font->c[data->string->data[data->string->count - 1]].ax;
+							data->string->textwidth -= (uint16)data->string->font.c[data->string->data[data->string->count - 1]].ax;
 						}
 					}
 					data->string->count--;
@@ -2104,7 +2065,7 @@ void handle_stextbox_input(widget *control, int key)
 					uint16 i = 0;
 
 					if(control->shown.data[0]->action & WIDGET_IS_PASSWORD){
-						data->string->textwidth += (uint16)(data->string->font->c['*'].ax + data->string->font->c['*'].left);
+						data->string->textwidth += (uint16)(data->string->font.c['*'].ax + data->string->font.c['*'].left);
 
 						if(data->string->textwidth >= data->string->width - data->string->offsetx){
 							uint16 offset = 0;
@@ -2112,10 +2073,10 @@ void handle_stextbox_input(widget *control, int key)
 							data->string->displayoffset++;
 
 							for(i = data->string->displayoffset; i <= data->string->count + 1; i++){
-								offset += (uint16)(data->string->font->c['*'].ax + data->string->font->c['*'].left);
+								offset += (uint16)(data->string->font.c['*'].ax + data->string->font.c['*'].left);
 
 								if(i == data->string->count +1){
-									offset += (uint16)(data->string->font->c['*'].ax + data->string->font->c['*'].left);
+									offset += (uint16)(data->string->font.c['*'].ax + data->string->font.c['*'].left);
 								}
 								if(offset >= data->string->width - data->string->offsetx){
 									data->string->displayoffset++;
@@ -2136,11 +2097,11 @@ void handle_stextbox_input(widget *control, int key)
 						stextbox_text_update(data->string, control->shown.data[0]);
 					}
 					else{
-						if(data->string->font->c[key].left >= 0){
-							data->string->textwidth += (uint16)(data->string->font->c[key].ax + data->string->font->c[key].left);
+						if(data->string->font.c[key].left >= 0){
+							data->string->textwidth += (uint16)(data->string->font.c[key].ax + data->string->font.c[key].left);
 						}
 						else{
-							data->string->textwidth += (uint16)(data->string->font->c[key].ax);
+							data->string->textwidth += (uint16)(data->string->font.c[key].ax);
 						}
 
 						if(data->string->textwidth >= data->string->width - data->string->offsetx){
@@ -2149,19 +2110,19 @@ void handle_stextbox_input(widget *control, int key)
 							data->string->displayoffset++;
 
 							for(i = data->string->displayoffset; i <= data->string->count + 1; i++){
-								if(data->string->font->c[data->string->data[i]].left >= 0){
-									offset += (uint16)(data->string->font->c[data->string->data[i]].ax + data->string->font->c[data->string->data[i]].left);
+								if(data->string->font.c[data->string->data[i]].left >= 0){
+									offset += (uint16)(data->string->font.c[data->string->data[i]].ax + data->string->font.c[data->string->data[i]].left);
 								}
 								else{
-									offset += (uint16)(data->string->font->c[data->string->data[i]].ax);
+									offset += (uint16)(data->string->font.c[data->string->data[i]].ax);
 								}
 
 								if(i == data->string->count +1){
-									if(data->string->font->c[key].left >= 0){
-										offset += (uint16)(data->string->font->c[key].ax + data->string->font->c[key].left);
+									if(data->string->font.c[key].left >= 0){
+										offset += (uint16)(data->string->font.c[key].ax + data->string->font.c[key].left);
 									}
 									else{
-										offset += (uint16)(data->string->font->c[key].ax);
+										offset += (uint16)(data->string->font.c[key].ax);
 									}
 								}
 								if(offset >= data->string->width - data->string->offsetx){
@@ -2239,7 +2200,7 @@ void create_mtextbox(widget *control, widget *parent, uint16 x, uint16 y, uint16
 	init_text->cursorblink = .8;
 	init_text->cursortime = 0;
 	init_text->cusorenabled = FALSE;
-	init_text->cursorheight = init_text->string->font->h - 3;
+	init_text->cursorheight = init_text->string->font.h - 3;
 	init_text->cursorwidth = 2;
 
 	control->height = height;
@@ -2357,7 +2318,7 @@ void create_listbox(widget *control, widget *parent, uint16 x, uint16 y, uint16 
 	listbox *list2 = NULL;
 
 	uint32 i = 0;
-	atlas *prefont = get_atlas(fontid);
+	atlas prefont = get_atlas(fontid);
 
 	list->list = (widget **)calloc(1, amount * sizeof(widget));
 	list->select = (widget *)calloc(1,sizeof(widget));
@@ -2398,7 +2359,7 @@ void create_listbox(widget *control, widget *parent, uint16 x, uint16 y, uint16 
 	list->select->pos.y = offsety;
 	list->select->height = list->select->img->height;
 	list->select->width = list->select->img->width;
-	list->select->sizey = prefont->h;
+	list->select->sizey = prefont.h;
 	list->select->sizex = sizex  - 22;
 	list->select->imgpos.x = 0;
 	list->select->imgpos.y = 0;
@@ -2412,7 +2373,7 @@ void create_listbox(widget *control, widget *parent, uint16 x, uint16 y, uint16 
 	list->selectover->pos.y = offsety;
 	list->selectover->height = list->selectover->img->height;
 	list->selectover->width = list->selectover->img->width;
-	list->selectover->sizey = prefont->h;
+	list->selectover->sizey = prefont.h;
 	list->selectover->sizex = sizex  - 22;
 	list->selectover->imgpos.x = 0;
 	list->selectover->imgpos.y = 0;
@@ -2459,10 +2420,10 @@ void create_listbox(widget *control, widget *parent, uint16 x, uint16 y, uint16 
 			return;
 		}
 
-		text_set(init_text->string,0,0,width - 22,prefont->h,offsetx,offsety,maxchars,0,fontid,red,blue,green,alpha,int_to_string(i + 1));
+		text_set(init_text->string,0,0,width - 22,prefont.h,offsetx,offsety,maxchars,0,fontid,red,blue,green,alpha,int_to_string(i + 1));
 
-		list->list[i]->height = prefont->h;
-		list->list[i]->sizey = prefont->h;
+		list->list[i]->height = prefont.h;
+		list->list[i]->sizey = prefont.h;
 		list->list[i]->width = width - 22;
 		list->list[i]->sizex = width - 22;
 		list->list[i]->control = init_text;
@@ -2471,7 +2432,7 @@ void create_listbox(widget *control, widget *parent, uint16 x, uint16 y, uint16 
 		create_text_vertex(init_text->string, list->list[i]);
 	}
 
-	list->max = height/(prefont->h + offsety);
+	list->max = height/(prefont.h + offsety);
 
 	for(i = 0; i < list->max; i++){
 		label *lbl = (label *)list->list[i]->control;
@@ -2483,7 +2444,7 @@ void create_listbox(widget *control, widget *parent, uint16 x, uint16 y, uint16 
 		}
 		else{
 			list->list[i]->pos.x = offsetx;
-			list->list[i]->pos.y = offsety + ( i * prefont->h );
+			list->list[i]->pos.y = offsety + ( i * prefont.h );
 			text_position_supdate(lbl->string, list->list[i]);
 		}
 	}
@@ -2510,7 +2471,6 @@ void unload_listbox(widget *control, sbool hidden)
 		glDeleteBuffers(1, &init_text->string->buf.buffer);
 		glDeleteBuffers(1, &init_text->string->buf.index);
 		free(init_text->string);
-		init_text->string->font = NULL;
 		init_text->string->data = NULL;
 
 		free(list->list[i]->data);
@@ -2521,16 +2481,14 @@ void unload_listbox(widget *control, sbool hidden)
 
 		free(list->list[i]->shown.data);
 		free(list->list[i]->hidden.data);
-		list->list[i]->hidden.data = NULL;
-		list->list[i]->data = NULL;
-		list->list[i]->control = NULL;
-		list->list[i]->img = NULL;
-		list->list[i]->shown.data = NULL;
+		widget_null(list->list[i]);
 		free(list->list[i]);
+		list->list[i] = NULL;
 	}
 
 	free(list->list);
 	list->list = NULL;
+	widget_null(list->control);
 	list->control = NULL;
 
 	free(list->select->data);
@@ -2541,13 +2499,9 @@ void unload_listbox(widget *control, sbool hidden)
 
 	free(list->select->shown.data);
 	free(list->select->hidden.data);
-	list->select->hidden.data = NULL;
-	list->select->data = NULL;
-	list->select->control = NULL;
-	list->select->img = NULL;
-	list->select->shown.data = NULL;
-	glDeleteBuffers(1, &control->buf.buffer);
-	glDeleteBuffers(1, &control->buf.index);
+	glDeleteBuffers(1, &list->select->buf.buffer);
+	glDeleteBuffers(1, &list->select->buf.index);
+	widget_null(list->select);
 	free(list->select);
 	list->select = NULL;
 
@@ -2559,15 +2513,10 @@ void unload_listbox(widget *control, sbool hidden)
 
 	free(list->selectover->shown.data);
 	free(list->selectover->hidden.data);
-	list->selectover->hidden.data = NULL;
-	list->selectover->data = NULL;
-	list->selectover->control = NULL;
-	list->selectover->img = NULL;
-	list->selectover->shown.data = NULL;
+	glDeleteBuffers(1, &list->selectover->buf.buffer);
+	glDeleteBuffers(1, &list->selectover->buf.index);
+	widget_null(list->selectover);
 	free(list->selectover);
-
-	glDeleteBuffers(1, &control->buf.buffer);
-	glDeleteBuffers(1, &control->buf.index);
 	list->selectover = NULL;
 
 	free(control->data);
@@ -2584,14 +2533,8 @@ void unload_listbox(widget *control, sbool hidden)
 	}
 	free(control->shown.data);
 	free(control->hidden.data);
-
 	glDeleteBuffers(1, &control->buf.buffer);
 	glDeleteBuffers(1, &control->buf.index);
-	control->hidden.data = NULL;
-	control->data = NULL;
-	control->control = NULL;
-	control->img = NULL;
-	control->shown.data = NULL;
 }
 
 void draw_listbox(widget *control)
@@ -2752,7 +2695,7 @@ void handle_listbox_scroll(widget *control, int button, int pressed)
 		}
 		else{
 			list->list[i]->pos.x = list->offsetx;
-			list->list[i]->pos.y = list->offsety + ( (i - list->voffset) * lbl->string->font->h);
+			list->list[i]->pos.y = list->offsety + ( (i - list->voffset) * lbl->string->font.h);
 			text_position_supdate(lbl->string, list->list[i]);
 		}
 	}
@@ -2833,12 +2776,6 @@ void unload_frame(widget *control, sbool hidden)
 	}
 	free(control->shown.data);
 	free(control->hidden.data);
-
-	control->hidden.data = NULL;
-	control->data = NULL;
-	control->control = NULL;
-	control->img = NULL;
-	control->shown.data = NULL;
 }
 
 void handle_frame_click(widget *control, int button, int pressed)

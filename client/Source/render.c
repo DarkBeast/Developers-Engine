@@ -155,11 +155,7 @@ void init_image(image* img)
 	img->height = 0;
 	img ->width = 0;
 	img ->texid = 0;
-
-	if(img->pixels != NULL){
-		free(img->pixels);
-		img->pixels = NULL;
-	}
+	img->pixels = NULL;
 }
 
 void load_image(char *path, image *img)
@@ -168,11 +164,11 @@ void load_image(char *path, image *img)
 	load_png( path, img);
 
 	glGenTextures( 1, &img->texid);
-	glBindTexture( GL_TEXTURE_2D, img ->texid);
+	glBindTexture( GL_TEXTURE_2D, img->texid);
 	glPixelStoref(GL_UNPACK_ALIGNMENT, (GLfloat)1);
 
-	glTexImage2D( GL_TEXTURE_2D, 0, img ->format,
-		img ->width, img ->height, 0, img ->format,
+	glTexImage2D( GL_TEXTURE_2D, 0, img->format,
+		img->width, img->height, 0, img->format,
 		GL_UNSIGNED_BYTE, (void*) img->pixels);
 
 	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
@@ -378,11 +374,11 @@ void create_cursor_vertex(widget *control)
 	text->cursorpos.y = control->pos.y + control->parent->actualpos.y + text->string->offsety;
 
 	/*index 0*/
-	text->cursorbuffer.data[0].x = text->cursorpos.x + text->string->offsetx; text->cursorbuffer.data[0].y = text->cursorpos.y + text->string->font->h;
+	text->cursorbuffer.data[0].x = text->cursorpos.x + text->string->offsetx; text->cursorbuffer.data[0].y = text->cursorpos.y + text->string->font.h;
 	text->cursorbuffer.data[0].r = text->string->col.r; text->cursorbuffer.data[0].b = text->string->col.b; text->cursorbuffer.data[0].g = text->string->col.g; text->cursorbuffer.data[0].a = text->string->col.a;
 
 	/*index 1*/
-	text->cursorbuffer.data[1].x = text->cursorpos.x + text->string->offsetx; text->cursorbuffer.data[1].y = text->cursorpos.y + text->string->font->h - text->cursorheight + 2;
+	text->cursorbuffer.data[1].x = text->cursorpos.x + text->string->offsetx; text->cursorbuffer.data[1].y = text->cursorpos.y + text->string->font.h - text->cursorheight + 2;
 	text->cursorbuffer.data[1].r = text->string->col.r; text->cursorbuffer.data[1].b = text->string->col.b; text->cursorbuffer.data[1].g = text->string->col.g; text->cursorbuffer.data[1].a = text->string->col.a;
 
 	glGenBuffers(1,&text->cursorbuffer.buffer);

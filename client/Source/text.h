@@ -61,14 +61,15 @@ struct text
 	uint16 textheight; //text height.
 	uint16 textwidth; //text width.
 	uint16 displayoffset; //variable used to update drawable.
-	atlas *font; //font used for drawing.
+	atlas font; //font used for drawing.
 };
 
 void text_init_font(char *fontname);
 void text_init_atlas(atlas *data, uint8 textsize);
 void text_draw(text *str);
 void text_set(text *data, uint16 x, uint16 y, uint16 width, uint16 height, uint8 offsetx, uint8 offsety, uint16 maxchars, uint16 maxcharspl, uint8 fontid, uint8 red, uint8 blue, uint8 green, uint8 alpha, char *string);
-atlas *get_atlas(uint8 fontid);
+atlas get_atlas(uint8 fontid);
+void unload_fonts(void);
 
 void text_resize_buffer(vertex_array **buffer, size_t size);
 void create_text_vertex(text *str, widget *control);

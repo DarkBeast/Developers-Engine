@@ -315,10 +315,10 @@ void widget_init_system(void)
 	ui.screen.mousepos.y = -1;
 
 	//creates the focused items to contain widgets that are focused.
-	focused = (widget *)calloc(1, sizeof (widget));
+	//focused = (widget *)calloc(1, sizeof (widget));
 	focused = NULL;
 
-	lastmouseover = (widget *)calloc(1, sizeof (widget));
+	//lastmouseover = (widget *)calloc(1, sizeof (widget));
 	lastmouseover = NULL;
 
 	ui.screen.clicked = 0;
@@ -559,6 +559,61 @@ void widget_init(widget *wgt)//initializes a widget.
 	wgt->controlmouseexit = &widget_init_control_mouse_exit;
 }
 
+void widget_null(widget *wgt)//initializes a widget.
+{
+	if(wgt == NULL)
+		return;
+
+	wgt->parent = NULL;
+	wgt->control = NULL;
+	wgt->data = NULL;
+	wgt->shown.data  = NULL;
+	wgt->shown.count = 0;
+	wgt->shown.size = 0;
+	wgt->hidden.data  = NULL;
+	wgt->hidden.count = 0;
+	wgt->hidden.size = 0;
+	wgt->pos.x = 0;
+	wgt->pos.y = 0;
+	wgt->actualpos.x = 0;
+	wgt->actualpos.y = 0;
+	wgt->imgpos.x = 0;
+	wgt->imgpos.y = 0;
+	wgt->img = NULL;
+	wgt->width = 0;
+	wgt->height = 0;
+	wgt->sizex = 0;
+	wgt->sizey = 0;
+	wgt->action = 0;
+	wgt->type = 0;
+	wgt->buf.buffer = 0;
+	wgt->buf.index = 0;
+	wgt->buf.isize = 0;
+	wgt->buf.size = 0;
+	wgt->buf.count = 0;
+	wgt->draw = NULL;
+	wgt->mousepress = NULL;
+	wgt->mouserelease = NULL;
+	wgt->mousewheel = NULL;
+	wgt->keypressed = NULL;
+	wgt->mouseover = NULL;
+	wgt->mouseexit = NULL;
+	wgt->controlmousepress = NULL;
+	wgt->controlmouserelease = NULL;
+	wgt->controlmousewheel = NULL;
+	wgt->controlkeypressed = NULL;
+	wgt->controlupdatepos = NULL;
+	wgt->controlmouseover = NULL;
+	wgt->controlmouseexit = NULL;
+}
+
+void widget_unload_system(void)
+{
+	widget_unload(ui.root);
+	widget_null(ui.root);
+	free(ui.root);
+}
+
 //unloads a widget from memory
 void widget_unload(widget *parent)
 {
@@ -670,6 +725,8 @@ void widget_clear_shown(widget *parent)//used to draw the widgets onto the scree
 
 							widget_free_widget(child, TRUE);
 							child = child->parent;
+							if(id[idindex]  < child->shown.count)
+								widget_null(child->shown.data[id[idindex]]);
 							child->shown.data[id[idindex]] = NULL;
 
 							++id[idindex];
@@ -677,8 +734,9 @@ void widget_clear_shown(widget *parent)//used to draw the widgets onto the scree
 						else{
 							widget_free_widget(child, TRUE);
 							child = child->parent;
+							if(id[idindex]  < child->shown.count)
+								widget_null(child->shown.data[id[idindex]]);
 							child->shown.data[id[idindex]] = NULL;
-
 							break;
 						}
 					}
@@ -698,6 +756,8 @@ void widget_clear_shown(widget *parent)//used to draw the widgets onto the scree
 							else{
 								widget_free_widget(child, TRUE);
 								child = child->parent;
+								if(id[idindex]  < child->shown.count)
+									widget_null(child->shown.data[id[idindex]]);
 								child->shown.data[id[idindex]] = NULL;
 								++id[idindex];
 							}
@@ -713,12 +773,16 @@ void widget_clear_shown(widget *parent)//used to draw the widgets onto the scree
 						--idindex;
 						widget_free_widget(child, TRUE);
 						child = child->parent;
+						if(id[idindex]  < child->shown.count)
+							widget_null(child->shown.data[id[idindex]]);
 						child->shown.data[id[idindex]] = NULL;
 						++id[idindex];
 					}
 					else{
 						widget_free_widget(child, TRUE);
 						child = child->parent;
+						if(id[idindex]  < child->shown.count)
+							widget_null(child->shown.data[id[idindex]]);
 						child->shown.data[id[idindex]] = NULL;
 						break;
 					}
