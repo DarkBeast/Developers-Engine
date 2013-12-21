@@ -15,15 +15,15 @@ credits_t gui;
 
 void credits(void)
 {
-	uint32 time;
-	uint32 lpstimer = 0;
-	uint32 lps = 0;
+	//uint32 time;
+	//uint32 lpstimer = 0;
+	//uint32 lps = 0;
 	int running = TRUE;
 
 	draw_state_reset();
 
 	while(running){
-		time = (uint32 )glfwGetTime();
+		//time = (uint32 )glfwGetTime();
 
 		clear_screen(0,0,0,255);
 
