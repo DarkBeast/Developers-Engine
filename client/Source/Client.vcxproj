@@ -229,7 +229,7 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalOptions>/NODEFAULTLIB:LIBCMT.LIB %(AdditionalOptions)</AdditionalOptions>
       <IgnoreSpecificDefaultLibraries>libc.lib, msvcrt.lib, libcd.lib, libcmtd.lib, msvcrtd.lib</IgnoreSpecificDefaultLibraries>
-      <AdditionalDependencies>kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;OPENGL32.LIB;GLU32.lib;glfw3dll.lib;glut32.lib;libpng15.lib;freetype2.lib;glew32.lib;zlibd.lib;Ws2_32.lib</AdditionalDependencies>
+      <AdditionalDependencies>kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;OPENGL32.LIB;GLU32.lib;glfw3dll.lib;glut32.lib;libpng15.lib;freetype2.lib;glew32.lib;zlib.lib;Ws2_32.lib;</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -432,6 +432,7 @@
     <ClInclude Include="integer.h" />
     <ClInclude Include="path.h" />
     <ClInclude Include="spells.h" />
+    <ClInclude Include="status.h" />
     <ClInclude Include="text.h" />
     <ClInclude Include="tinycthread.h" />
     <ClInclude Include="types.h" />
@@ -464,6 +465,7 @@
     <ClCompile Include="path.c" />
     <ClCompile Include="shops.c" />
     <ClCompile Include="spells.c" />
+    <ClCompile Include="status.c" />
     <ClCompile Include="text.c" />
     <ClCompile Include="tinycthread.c" />
     <ClCompile Include="widget.c" />

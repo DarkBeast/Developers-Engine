@@ -86,6 +86,9 @@
     <ClCompile Include="newaccount.c">
       <Filter>ui</Filter>
     </ClCompile>
+    <ClCompile Include="status.c">
+      <Filter>ui</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="widget.h">
@@ -189,6 +192,9 @@
       <Filter>ui</Filter>
     </ClInclude>
     <ClInclude Include="newaccount.h">
+      <Filter>ui</Filter>
+    </ClInclude>
+    <ClInclude Include="status.h">
       <Filter>ui</Filter>
     </ClInclude>
   </ItemGroup>
