@@ -113,6 +113,8 @@ void *get_gui(void);
 //used to Obtain the UI system.
 user_interface widget_get_ui(void);
 user_interface widget_get_uip(void);
+void widget_set_disabled(sbool disabled);
+sbool widget_is_disabled(void);
 
 widget *widget_get_focused(void);
 

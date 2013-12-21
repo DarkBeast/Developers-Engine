@@ -14,8 +14,19 @@
 user_interface ui;
 widget *focused; //holds the widget currently focused on.
 widget *lastmouseover; //holds data for proper mouse exit sequences.
+sbool disable_controls = FALSE;
 
 //default get Main ui, probably never needed but there if someone needs everything.
+sbool widget_is_disabled(void)
+{
+	return disable_controls;
+}
+
+void widget_set_disabled(sbool disabled)
+{
+	disable_controls = disabled;
+}
+
 user_interface widget_get_ui(void)
 {
 	return ui;
