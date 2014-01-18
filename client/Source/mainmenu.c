@@ -14,15 +14,15 @@ main_menu_t gui;
 
 void main_menu(void)
 {
-	//uint32 time;
-	//uint32 lpstimer = 0;
-	//uint32 lps = 0;
+	uint32 time;
+	uint32 lpstimer = 0;
+	uint32 lps = 0;
 	int running = TRUE;
 
 	draw_state_reset();
 
 	while(running){
-		//time = (uint32 )glfwGetTime();
+		time = (uint32 )glfwGetTime();
 
 		clear_screen(0,0,0,255);
 
@@ -34,14 +34,14 @@ void main_menu(void)
 		glfwSwapBuffers(get_the_window());
 		glfwPollEvents();
 
-		//if(lpstimer < time){//calculates the loops per second the code does, through everything
-		//	printf("%i\n",lps);
-		//	lpstimer = time + 1;
+		if(lpstimer < time){//calculates the loops per second the code does, through everything
+			printf("%i\n",lps);
+			lpstimer = time + 1;
 
-		//	lps = 0;
-		//}
+			lps = 0;
+		}
 
-		//lps += 1;
+		lps += 1;
 
 		//_sleep(20);
 

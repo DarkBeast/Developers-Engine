@@ -10,7 +10,7 @@
 #include "bool.h"
 #include "globals.h"
 #include "general.h"
-#include "tinycthread.h"
+#include "main.h"
 
 status_t gui;
 sbool accepted = FALSE;
@@ -21,13 +21,9 @@ double timer;
 uint32 sizex;
 uint32 sizey;
 
-sbool update_string = FALSE;
-char *string;
-
 void set_status(char *text)
 {
-	string = text;
-	update_string = TRUE;
+	update_label_string(&gui.lbltext,text);
 }
 
 void status_unload(void)
@@ -50,11 +46,6 @@ int status(void *arg)
 		timer = glfwGetTime();
 
 		clear_screen(0,0,0,255);
-
-		if(update_string){
-			update_label_string(&gui.lbltext,string);
-			update_string = FALSE;
-		}
 
 		widget_manager();
 

@@ -1,0 +1,26 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 2012
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Server", "Source\Server.vcxproj", "{6124AAD8-33AF-4A86-B980-0314AF2E0934}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Win32 = Debug|Win32
+		Release|Win32 = Release|Win32
+		XPDebug|Win32 = XPDebug|Win32
+		XPRelease|Win32 = XPRelease|Win32
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{6124AAD8-33AF-4A86-B980-0314AF2E0934}.Debug|Win32.ActiveCfg = Debug|Win32
+		{6124AAD8-33AF-4A86-B980-0314AF2E0934}.Debug|Win32.Build.0 = Debug|Win32
+		{6124AAD8-33AF-4A86-B980-0314AF2E0934}.Release|Win32.ActiveCfg = Release|Win32
+		{6124AAD8-33AF-4A86-B980-0314AF2E0934}.Release|Win32.Build.0 = Release|Win32
+		{6124AAD8-33AF-4A86-B980-0314AF2E0934}.XPDebug|Win32.ActiveCfg = XPDebug|Win32
+		{6124AAD8-33AF-4A86-B980-0314AF2E0934}.XPDebug|Win32.Build.0 = XPDebug|Win32
+		{6124AAD8-33AF-4A86-B980-0314AF2E0934}.XPRelease|Win32.ActiveCfg = XPRelease|Win32
+		{6124AAD8-33AF-4A86-B980-0314AF2E0934}.XPRelease|Win32.Build.0 = XPRelease|Win32
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal

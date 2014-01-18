@@ -10,7 +10,6 @@
 #include "text.h"
 #include "bool.h"
 #include "main.h"
-#include "tinycthread.h"
 #include "handlepackets.h"
 #include "winsocket.h"
 #include "general.h"
@@ -21,6 +20,11 @@
 
 mtx_t gmutex;
 cnd_t gcond;
+
+mtx_t *get_mutex(void)
+{
+	return &gmutex;
+}
 
 int main(void)
 {
@@ -43,6 +47,7 @@ int main(void)
 	text_init_font("");//initializes the Font characters for use.
 
 	widget_init_system();//initializes the widget system for storing widgets.
+	mtx_lock(&gmutex);
 	//init_status_window(FALSE,100000);
 	//thrd_create(&t1, status, (void*)0);
 	//set_status("UI SYSTEM LOADED...");
@@ -63,6 +68,7 @@ int main(void)
 	//set_status("LOADING MENU...");
 
 	//status_unload();
+	mtx_unlock(&gmutex);
 	menustate();
 	unload_functions();
 }
