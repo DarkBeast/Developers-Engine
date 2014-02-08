@@ -99,9 +99,9 @@ void clear_shop(uint16 shopnum)
 	shop_array[shopnum].fixesitems = 0;
 
 	for(i = 0; i < MAX_TRADES; i++){
-	shop_array[shopnum].tradeitem[i].getitem = 0;
-	shop_array[shopnum].tradeitem[i].getvalue= 0;
-	shop_array[shopnum].tradeitem[i].giveitem = 0;
-	shop_array[shopnum].tradeitem[i].givevalue = 0;
+		shop_array[shopnum].tradeitem[i].getitem = 0;
+		shop_array[shopnum].tradeitem[i].getvalue= 0;
+		shop_array[shopnum].tradeitem[i].giveitem = 0;
+		shop_array[shopnum].tradeitem[i].givevalue = 0;
 	}
 }

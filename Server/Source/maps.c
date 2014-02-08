@@ -159,4 +159,3 @@ void mapcache_create(uint32 mapnum)
 	clear_buffer(&map_array_cache[mapnum]);
 	map_array_cache[mapnum] = buffer;
 }
-
