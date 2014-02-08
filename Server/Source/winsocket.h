@@ -5,7 +5,9 @@
 #define DE_WINSOCKET_H
 
 #include <stdlib.h>
-#include <winsock2.h>
+#include <event2/listener.h>
+#include <event2/bufferevent.h>
+#include <event2/buffer.h>
 #include "integer.h"
 #include "globals.h"
 #include "buffer.h"
@@ -14,26 +16,24 @@ typedef struct desocket desocket;
 
 struct desocket
 {
-	SOCKET socket; // Socket descriptor
-	SOCKET max_socket; // Socket select max descriptor
-	SOCKET new_socket;
-	struct fd_set master_set;
-	struct fd_set working_set;
+	struct event_base *base;
+	struct evconnlistener *listener;
 	struct sockaddr_in host_address;
 };
 
-void initsocket(void);
+int initsocket(void *arg);
 
-int socketconnect(void);
+void accept_connection(struct evconnlistener *listener, evutil_socket_t fd, struct sockaddr *address, int socklen, void *ctx);
 
-int socketlisten(void *arg);
+void event_error_handler(struct evconnlistener *listener, void *ctx);
 
-void socketsend(buffer_t *data, int16 index);
+void socket_read(struct bufferevent *bev, void *ctx);
 
-void socketidsend(buffer_t *data, uint64 id);
+void socket_event(struct bufferevent *bev, short events, void *ctx);
+
+void socketsend(buffer_t *data, struct bufferevent *bev);
 
 void endsocket(void);
 
-void clear_user_socket(uint64 socket_id);
-
+void clear_user_socket(struct bufferevent *bev);
 #endif

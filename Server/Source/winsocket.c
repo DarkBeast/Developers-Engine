@@ -1,8 +1,8 @@
 /*******************************************************************************
 * Credits:  Andrew Wheeler/Genusis
+*           LibEvents, http://www.wangafu.net/~nickm/libevent-book/
 ******************************************************************************/
 
-//TODO: change socket to use libevents.
 #include "winsocket.h"
 #include "socket.h"
 #include "error.h"
@@ -13,28 +13,21 @@
 desocket *sock; //short for socket
 WSADATA wsadata;
 
-void initsocket(void)
+int initsocket(void *arg)
 {
 	int on = 1;
 	int length = sizeof(struct sockaddr_in);
 
 	sock = (desocket *)calloc(1,sizeof(desocket));
 
-	//load windows socket library 2.2.
-	if (WSAStartup(0x0202, &wsadata) != 0)
-		error_handler(DE_ERROR_SOCKET_WSASTARTUP);
+		if (WSAStartup(0x0202, &wsadata) != 0)
+			error_handler(DE_ERROR_SOCKET_WSASTARTUP);
 
-	//set socket to TCP.
-	if ((sock->socket = socket(PF_INET, SOCK_STREAM, IPPROTO_TCP)) < 0)
-		error_handler(DE_ERROR_SOCKET_INIT);
-
-	//Allow reuse of address.
-	if(setsockopt(sock->socket, SOL_SOCKET,  SO_REUSEADDR, (char *)&on, sizeof(on)) < 0)
-		error_handler(DE_ERROR_SOCKET_OPTION_SET_REUSE);
-
-	//set socket to none blocking mode.
-	if(ioctlsocket(sock->socket, FIONBIO, (u_long *)&on) != 0)
-		error_handler(DE_ERROR_SOCKET_OPTION_SET_NONBLOCK);
+	sock->base = event_base_new();
+	if (!sock->base) {
+		puts("Couldn't open event base");
+		return 0;
+	}
 
 	//set socket address
 	memset(&sock->host_address, 0, length);     /* Zero out structure */
@@ -42,137 +35,87 @@ void initsocket(void)
 	sock->host_address.sin_addr.s_addr = htonl(INADDR_ANY);   /* Server IP address */
 	sock->host_address.sin_port        = htons(SERVER_PORT); /* Server port */
 
-	bind(sock->socket, (struct sockaddr*)&sock->host_address, length);
+	//auto creates the socket via lib events it chooses the fastest method for the TCP socket.
+	sock->listener = evconnlistener_new_bind(sock->base, accept_connection, NULL,LEV_OPT_CLOSE_ON_FREE | LEV_OPT_REUSEABLE, -1,(struct sockaddr *) &sock->host_address, length);
 
-	//listen for connections.
-	if(listen(sock->socket, SOMAXCONN) == -1)
-		error_handler(DE_ERROR_SOCKET_LISTEN);
+	if (!sock->listener) {
+		perror("Couldn't create listener");
+		return 0;
+	}
 
-	//initialize master set for select.
-	FD_ZERO(&sock->master_set);
-	sock->max_socket = sock->socket;
-	FD_SET(sock->socket, &sock->master_set);
+	//sets up the error event so if a error happens in the socket this allows us to link that error for handling.
+	evconnlistener_set_error_cb(sock->listener, event_error_handler);
+
+	event_base_dispatch(sock->base);
+	return 0;
 }
 
-int socketlisten(void *arg)
+void accept_connection(struct evconnlistener *listener, evutil_socket_t fd, struct sockaddr *address, int socklen, void *index)
 {
-	sbool end_listen = FALSE;
-	struct sockaddr_in temp_address;
-	uint64 i = 0;
-	sbool connected = TRUE;
+	struct event_base *base = evconnlistener_get_base(listener);
+	struct bufferevent *bev = bufferevent_socket_new(base, fd, BEV_OPT_CLOSE_ON_FREE);
+
+	bufferevent_setcb(bev, socket_read, NULL, socket_event, NULL);
+	bufferevent_enable(bev, EV_READ | EV_WRITE | EV_PERSIST );
+}
+
+void event_error_handler(struct evconnlistener *listener, void *index)
+{
+	struct event_base *base = evconnlistener_get_base(listener);
+	int err = EVUTIL_SOCKET_ERROR();
+	fprintf(stderr, "Got an error %d (%s) on the listener. "
+		"Shutting down.\n", err, evutil_socket_error_to_string(err));
+
+	event_base_loopexit(base, NULL);
+}
+
+void socket_read(struct bufferevent *bev, void *index)
+{
+	struct evbuffer *input = bufferevent_get_input(bev);
 	buffer_t buffer;
-	int ready_count;
+	uint32 size;
 
-	do
-	{
-		memcpy(&sock->working_set, &sock->master_set, sizeof(sock->master_set));
+	while(evbuffer_get_length(input) > 4){
 
-		//sock->working_set = sock->master_set;
+		clear_buffer(&buffer);
+		evbuffer_remove(input,buffer.buff,4);
+		take_buffer(&size, &buffer, SIZE32);
 
-		if((ready_count = select(sock->max_socket + 1, &sock->working_set, NULL, NULL, NULL)) == -1){
-			error_handler(DE_ERROR_SOCKET_SELECT_FAILED);
-			break;
-		}
+		clear_buffer(&buffer);
+		evbuffer_remove(input,buffer.buff,size);
 
-		for (i=0; i <= sock->max_socket && ready_count > 0; ++i){
-			if (FD_ISSET(i, &sock->working_set)){
-				connected = TRUE;
-				ready_count--;
-
-				if (i == sock->socket){
-					do{
-						sock->new_socket = accept(sock->socket, NULL, NULL);
-						if (sock->new_socket < 0){
-							if (errno != EWOULDBLOCK){
-								error_handler(DE_ERROR_SOCKET_ACCEPT);
-								end_listen = TRUE;
-							}
-							break;
-						}
-
-						printf("accepting new user! \n");
-
-						FD_SET(sock->new_socket, &sock->master_set);
-						if (sock->new_socket > sock->max_socket)
-							sock->max_socket = sock->new_socket;
-					} while (sock->new_socket != -1);
-				}
-				else{
-					int size;
-					int bytes_read;
-
-					clear_buffer(&buffer);
-					bytes_read = recv(i, buffer.buff, SIZE32, 0); //get packet size.
-					take_buffer(&size,&buffer,SIZE32);
-
-					clear_buffer(&buffer);
-					bytes_read = recv(i, buffer.buff, size, 0);  //get the packet.
-
-					if (bytes_read < 0){
-						if (errno != EWOULDBLOCK){
-							error_handler(DE_ERROR_SOCKET_RECEIVE);
-							connected = FALSE;
-						}
-					}
-
-					if (bytes_read == 0){
-						error_handler(DE_ERROR_SOCKET_CONNECTION_LOSS);
-						connected = FALSE;
-					}
-
-					if (!connected){
-						clear_temp_player(i);
-						closesocket(i);
-						FD_CLR(i, &sock->master_set);
-
-						if (i == sock->max_socket){
-							while (FD_ISSET(sock->max_socket, &sock->master_set) == FALSE)
-								sock->max_socket -= 1;
-						}
-					}
-					else{
-						handle_data(&buffer, i);
-					}
-				}
-			}
-		}
-	} while (end_listen == FALSE);
-	return TRUE;
+		handle_data(&buffer, bev, index);
+	}
 }
 
-void socketsend(buffer_t *data, int16 index)
+void socket_event(struct bufferevent *bev, short events, void *index)
 {
-	if (send(get_temp_player_socket(index), data->buff, data->offset, 0) != data->offset)
-		error_handler(DE_ERROR_SOCKET_SEND_SIZE);
+	if (events & BEV_EVENT_ERROR){
+		//Error handler here.++++
+
+	}
+	clear_temp_player(bev);
+	bufferevent_free(bev);
 }
 
-void socketidsend(buffer_t *data, uint64 id)
+void socketsend(buffer_t *data, struct bufferevent *bev)
 {
-	if (send(id, data->buff, data->offset, 0) != data->offset)
-		error_handler(DE_ERROR_SOCKET_SEND_SIZE);
+	struct evbuffer *output = bufferevent_get_output(bev);
+
+	evbuffer_add(output,data->buff,data->offset);
 }
 
 void endsocket(void)
 {
-	uint32 i = 0;
-
-	for (i = 0; i <= sock->max_socket; ++i) {
-		if (FD_ISSET(i, &sock->master_set))
-			closesocket(i);
-	}
-
-	WSACleanup();
+	event_base_loopexit(sock->base, NULL);
+	event_base_free(sock->base);
 	free(sock);
+	libevent_global_shutdown();
+	WSACleanup();
 }
 
-void clear_user_socket(uint64 socket_id)
+void clear_user_socket(struct bufferevent *bev)
 {
-	clear_temp_player(socket_id);
-	closesocket(socket_id);
-	FD_CLR(socket_id, &sock->master_set);
-
-	if (socket_id == sock->max_socket){
-		while (FD_ISSET(sock->max_socket, &sock->master_set) == FALSE)
-			sock->max_socket -= 1;
-	}
+	clear_temp_player(bev);
+	bufferevent_free(bev);
 }
