@@ -39,7 +39,7 @@ void initsocket(void)
 int socketlisten(void *arg)
 {
 	sbool i = TRUE;
-	int size;
+	uint32 size;
 	buffer_t buffer;
 
 	while (i){
