@@ -13,7 +13,7 @@
 
 mtx_t gmutex;
 cnd_t gcond;
-thrd_t t2;
+thrd_t t1, t2;
 
 int commands(void *arg);
 
@@ -21,6 +21,7 @@ int main(void)
 {
 	char *input = (char *)calloc(2000, sizeof(char));
 	sbool n = TRUE;
+	
 	SetConsoleTitle(TITLE);
 
 	mtx_init(&gmutex, mtx_plain);
@@ -28,10 +29,12 @@ int main(void)
 
 	init_timer();
 	init_path();
-	start_socket();
 	init_server();
+	thrd_create(&t1, initsocket, (void*)0);
 	thrd_create(&t2, commands, (void*)0);
 	server_loop();
+	TerminateThread(t1,0);
+	TerminateThread(t2,0);
 	mtx_destroy(&gmutex);
 	cnd_destroy(&gcond);
 	exit(TRUE);// Exit program
@@ -94,10 +97,18 @@ reloop:
 						}
 					case 'c':
 						if( comp_str(p, "lose")){
-							destroy_server();
+							set_server_offline();
 							return;
 						}
-
+						break;
+					case 'h':
+						if( comp_str(p, "elp")){
+							puts("::::Server Commands::::");
+							puts("/close: Instant shutdown of server.");
+							puts("/shutdown: Timed shutdown of server.");
+							puts("/setgroup username groupid: Sets a players group via server.");
+						}
+						break;
 					default:
 						puts("Invalid command, Type /help for a list of commands"); break;
 					}
