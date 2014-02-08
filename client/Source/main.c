@@ -59,12 +59,23 @@ int main(void)
 	//set_status("INITIALIZING SOCKET...");
 	initsocket();
 	//set_status("CONNECTING SOCKET...");
-	//if(socketconnect()) //just to test for server connection.
-	//	set_status("CONNECTION SUCCESSFUL...");
+	if(socketconnect()){ //just to test for server connection.
+		buffer_t buffer;
+		int32 i = 5;
+		int16 i2 = 25000;
+
+		thrd_create(&t1, socketlisten, (void*)0);
+
+		clear_buffer(&buffer);
+		add_buffer(&buffer,&i,SIZE32);
+		add_buffer(&buffer,&i2,SIZE16);
+		socketsend(&buffer);
+	}
+		//set_status("CONNECTION SUCCESSFUL...");
 	//else
 	//	set_status("CONNECTION UNSUCCESSFUL...");
 
-	//thrd_create(&t1, socketlisten, (void*)0);
+	
 	//set_status("LOADING MENU...");
 
 	//status_unload();
