@@ -16,7 +16,7 @@ typedef enum data_sizes data_sizes;
 struct buffer_t
 {
 	char buff[PACKET_SIZE];
-	uint16 offset;
+	uint32 offset;
 };
 
 enum data_sizes{
