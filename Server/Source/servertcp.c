@@ -86,10 +86,10 @@ void alert_msg(int16 index, char * msg)
 	add_string(&buffer, msg);
 
 	send_data(&buffer, index);
-	clear_user_socket(get_temp_player_socket(index));
+	clear_user_socket(get_temp_player_bufferevent(index));
 }
 
-void alert_msg_socket(uint64 id, char * msg)
+void alert_msg_socket(struct bufferevent *bev, char * msg)
 {
 	buffer_t buffer;
 	uint32 len;
@@ -101,8 +101,8 @@ void alert_msg_socket(uint64 id, char * msg)
 	add_buffer(&buffer, &len, SIZE32);
 	add_string(&buffer, msg);
 
-	send_socket_data(&buffer, id);
-	clear_user_socket(id);
+	send_socket_data(&buffer, bev);
+	clear_user_socket(bev);
 }
 
 void hacking_attempt(int16 index, char * msg)
@@ -392,7 +392,7 @@ void send_welcome(int16 index)
 		player_msg(index, string, 1);
 	}
 
-	// TODO: make better who is online for admin only.
+	// TODO: make better who is on-line for Administrators only.
 	//  Call SendWhosOnline(Index)
 }
 

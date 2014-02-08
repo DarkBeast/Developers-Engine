@@ -21,7 +21,7 @@ void map_msg(uint16 mapnum, char *msg, uint8 color);
 
 void alert_msg(int16 index, char *msg);
 
-void alert_msg_socket(uint64 id, char * msg);
+void alert_msg_socket(struct bufferevent *bev, char * msg);
 
 void hacking_attempt(int16 index, char *msg);
 
