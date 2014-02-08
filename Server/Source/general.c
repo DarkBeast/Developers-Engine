@@ -45,6 +45,9 @@ void init_server(void)
 	printf("Initializing Player Data. \n");
 	init_players();
 
+	printf("Initializing Temp Player Data. \n");
+	init_temp_player_index();
+
 	printf("Data Initialized. \n");
 }
 
@@ -93,4 +96,5 @@ void destroy_server(void)
 	unload_maps();
 	unload_socket();
 	path_destroy();
+	
 }
