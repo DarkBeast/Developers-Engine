@@ -65,41 +65,34 @@ void initpackets(void)
 	packets[CQUIT] = &handle_quit;
 }
 
-void handle_data(buffer_t *data, uint64 socket_id)
+void handle_data(buffer_t *data, struct bufferevent *bev, void *index)
 {
 	uint8 id = SNONE;
-	int16 index;
-	take_buffer(&id,data,1);
+
+	take_buffer(&id, data, SIZE8);
 
 	if(data->offset == 0){
 		error_handler(DE_ERROR_INVALID_PACKET_OFFSET);
 		return;
 	}
 
-	if(id == SNONE){
+	if(id == SNONE || id >= CMSG_COUNT){
 		error_handler(DE_ERROR_INVALID_PACKET_ID);
 		return;
 	}
 
-	if(id > CNEWACCOUNT)
-	{
-		index = get_temp_player_index(socket_id);
-
-		if(index != TEMP_NO_MATCH){
-			packets[id](data, index);
-		}
-	}
-	else{
-		switch(id){
-		case CLOGIN:
-			handle_login(data, socket_id); break;
-		case CNEWACCOUNT:
-			handle_new_account(data,socket_id); break;
-		}
+	switch(id){
+	case CLOGIN:
+		handle_login(data, bev); break;
+	case CNEWACCOUNT:
+		handle_new_account(data, bev); break;
+	default:
+		if(index != NULL)
+		packets[id](data, (int16)index);
 	}
 }
 
-void handle_login(buffer_t *data, uint64 socket_id)
+void handle_login(buffer_t *data, struct bufferevent *bev)
 {
 	char *name = (char *)calloc(MAX_NAME_LENGTH, sizeof(char));
 	char *password = (char *)calloc(MAX_PASS_LENGTH, sizeof(char));
@@ -118,20 +111,20 @@ void handle_login(buffer_t *data, uint64 socket_id)
 
 	if(client_major < VERSION_MAJOR || client_minor < VERSION_MINOR || client_rev < VERSION_REV){
 		string = comb_2str("Version outdated, please visit ", GAME_WEBSTIE);
-		alert_msg_socket(socket_id, string);
+		alert_msg_socket(bev, string);
 		return;
 	}
 
 	if(shutting_down()){
-		alert_msg_socket(socket_id, "Server is either rebooting or being shutdown.");
+		alert_msg_socket(bev, "Server is either rebooting or being shutdown.");
 		return;
 	}
 
-	index = get_temp_player_index(socket_id);
+	index = get_temp_player_index(bev);
 
 	if(index == TEMP_NO_MATCH){
-		if((index = set_temp_player_index(socket_id)) == TEMP_FULL){
-			alert_msg_socket(index, "Server is full.");
+		if((index = set_temp_player_index(bev)) == TEMP_FULL){
+			alert_msg_socket(bev, "Server is full.");
 		}
 	}
 	else{
@@ -156,7 +149,7 @@ void handle_login(buffer_t *data, uint64 socket_id)
 		if(!strcmp(player(index)->password, password)){
 			alert_msg(index, "Either your password or username where not correct. Or your account does not exist");
 			clear_player(index);
-			clear_user_socket(socket_id);
+			clear_user_socket(bev);
 			return;
 		}
 
@@ -173,7 +166,7 @@ void handle_login(buffer_t *data, uint64 socket_id)
 	}
 }
 
-void handle_new_account(buffer_t *data, uint64 socket_id)
+void handle_new_account(buffer_t *data, struct bufferevent *bev)
 {
 	char *name = (char *)calloc(MAX_NAME_LENGTH, sizeof(char));
 	char *charname = (char *)calloc(MAX_NAME_LENGTH, sizeof(char));
@@ -183,7 +176,7 @@ void handle_new_account(buffer_t *data, uint64 socket_id)
 	uint32 i = 0;
 	char *path;
 
-	if(get_temp_player_index(socket_id) == TEMP_NO_MATCH){
+	if(get_temp_player_index(bev) == TEMP_NO_MATCH){
 		take_string(name, data);
 		take_string(charname, data);
 		take_string(password, data);
@@ -191,13 +184,13 @@ void handle_new_account(buffer_t *data, uint64 socket_id)
 		take_buffer(&type, data, SIZE8);
 
 		if(strlen(name) < 3 || strlen(password) < 3){
-			alert_msg_socket(socket_id, "Your name and password must be at least three characters in length");
+			alert_msg_socket(bev, "Your name and password must be at least three characters in length");
 			return;
 		}
 
 		for( i = 0; i < strlen(name); i++){
 			if(!isnamelegal(name[i])){
-				alert_msg_socket(socket_id, "Invalid name, only letters, numbers, spaces, and _ allowed in names.");
+				alert_msg_socket(bev, "Invalid name, only letters, numbers, spaces, and _ allowed in names.");
 				return;
 			}
 		}
@@ -209,10 +202,10 @@ void handle_new_account(buffer_t *data, uint64 socket_id)
 			printf("Account %s has been created \n", name);
 			string = comb_3str("Account ", name, " has been created.");
 			add_log(string, PLAYER_LOG);
-			alert_msg_socket(socket_id, "Your account has been created!");
+			alert_msg_socket(bev, "Your account has been created!");
 		}
 		else{
-			alert_msg_socket(socket_id, "Sorry, that account name is already taken!");
+			alert_msg_socket(bev, "Sorry, that account name is already taken!");
 		}
 	}
 }
@@ -1535,6 +1528,5 @@ void handle_cast(buffer_t *data, int16 index)
 void handle_quit(buffer_t *data, int16 index)
 {
 	left_game(index);
-
-	clear_user_socket(get_temp_player_socket(index));
+	clear_user_socket(get_temp_player_bufferevent(index));
 }

@@ -9,16 +9,21 @@
 #include "buffer.h"
 #include "bool.h"
 #include "packetenum.h"
+#include "socket.h"
 
-
-//CLOGIN and CNEWACCOUNT are not used in this function.
+/*************************************************************
+CLOGIN and CNEWACCOUNT are not used in this function.
+These 2 are used for clients who have no index yet. Clients
+which have no index yet are not logged in so we can handle 
+them as plain new connections.
+*************************************************************/
 void initpackets(void);
 
-void handle_data(buffer_t *data, uint64 socket_id);
+void handle_data(buffer_t *data, struct bufferevent *bev, void *index);
 
-void handle_login(buffer_t *data, uint64 socket_id);
+void handle_login(buffer_t *data, struct bufferevent *bev);
 
-void handle_new_account(buffer_t *data, uint64 socket_id);
+void handle_new_account(buffer_t *data, struct bufferevent *bev);
 
 void handle_say_message(buffer_t *data, int16 index);
 
