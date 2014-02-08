@@ -37,11 +37,11 @@ void init_temp_player_index(void)
 
 	for(i = 0; i < MAX_PLAYERS; i++){
 		temp_player_array.index[i].loggedin = FALSE;
-		temp_player_array.index[i].sock_id = 0;
+		temp_player_array.index[i].bev = NULL;
 	}
 }
 
-int16 set_temp_player_index(uint64 socket_id)
+int16 set_temp_player_index(struct bufferevent *bev)
 {
 	int16 i = 0;
 
@@ -49,8 +49,9 @@ int16 set_temp_player_index(uint64 socket_id)
 		for( i = 0; i < temp_player_array.count; i++){
 			if(!temp_player_array.index[i].loggedin){
 				temp_player_array.index[i].loggedin = TRUE;
-				temp_player_array.index[i].sock_id = socket_id;
+				temp_player_array.index[i].bev = bev;
 				temp_player_array.used++;
+				bufferevent_setcbarg(bev, &i);
 				return i; //return the index
 			}
 		}
@@ -60,9 +61,10 @@ int16 set_temp_player_index(uint64 socket_id)
 		for( i = temp_player_array.count; i < MAX_PLAYERS; i++){
 			if(!temp_player_array.index[i].loggedin){
 				temp_player_array.index[i].loggedin = TRUE;
-				temp_player_array.index[i].sock_id = socket_id;
+				temp_player_array.index[i].bev = bev;
 				temp_player_array.used++;
 				temp_player_array.count++;
+				bufferevent_setcbarg(bev, &i);
 				return i; //return the index
 			}
 		}
@@ -71,17 +73,15 @@ int16 set_temp_player_index(uint64 socket_id)
 	return TEMP_FULL; //could not find open slot.
 }
 
-sbool clear_temp_player(uint64 socket_id)
+sbool clear_temp_player(struct bufferevent *bev)
 {
-	int16 i = 0;
+	int16 i = get_temp_player_index(bev);
 
-	for( i = 0; i < MAX_PLAYERS; i++){
-		if(temp_player_array.index[i].sock_id == socket_id){
+	if(i != TEMP_NO_MATCH){
 			temp_player_array.index[i].loggedin = FALSE;
-			temp_player_array.index[i].sock_id = 0;
+			temp_player_array.index[i].bev = NULL;
 			temp_player_array.used--;
 			return TRUE;
-		}
 	}
 
 	return TEMP_NO_MATCH;//no player to clear
@@ -90,39 +90,31 @@ sbool clear_temp_player(uint64 socket_id)
 void clear_temp_player_onindex(int16 index)
 {
 	temp_player_array.index[index].loggedin = FALSE;
-	temp_player_array.index[index].sock_id = 0;
+	temp_player_array.index[index].bev = NULL;
 	temp_player_array.used--;
 }
 
-int16 get_temp_player_index(uint64 socket_id)
+int16 get_temp_player_index(struct bufferevent *bev)
 {
-	int16 i = 0;
+	void *i;
 
-	for( i = temp_player_array.count; i < MAX_PLAYERS; i++){
-		if(temp_player_array.index[i].sock_id == socket_id){
-			return i; //return the index
-		}
-	}
-
+	bufferevent_getcb(bev,NULL,NULL,NULL,&i);
+	
+	if(i != NULL)
+	return (int16)i;
+	
 	return TEMP_NO_MATCH; //return -1 if none matched
 }
 
-uint64 get_temp_player_socket(int16 index)
+
+struct bufferevent * get_temp_player_bufferevent(int16 index)
 {
-	return 	temp_player_array.index[index].sock_id;
+	return 	temp_player_array.index[index].bev;
 }
 
 temp_t *get_temp_player(int16 index)
 {
 	return 	&temp_player_array.index[index];
-}
-
-void start_socket(void)
-{
-	thrd_t t1;
-
-	initsocket();
-	thrd_create(&t1, socketlisten, (void*)0);
 }
 
 void send_data(buffer_t *data, int16 index)
@@ -133,10 +125,10 @@ void send_data(buffer_t *data, int16 index)
 	add_buffer(&buff, &data->offset, SIZE32);
 	add_buffer(&buff, &data->buff, data->offset);
 
-	socketsend(&buff, index);
+	socketsend(&buff, get_temp_player_bufferevent(index));
 }
 
-void send_socket_data(buffer_t *data, uint64 id)
+void send_socket_data(buffer_t *data, struct bufferevent *bev)
 {
 	buffer_t buff;
 
@@ -144,7 +136,7 @@ void send_socket_data(buffer_t *data, uint64 id)
 	add_buffer(&buff, &data->offset, SIZE32);
 	add_buffer(&buff, &data->buff, data->offset);
 
-	socketidsend(&buff, id);
+	socketsend(&buff, bev);
 }
 
 void send_data_to_all(buffer_t *data)

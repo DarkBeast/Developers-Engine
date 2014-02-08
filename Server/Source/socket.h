@@ -27,7 +27,7 @@ struct temp_index{
 };
 
 struct temp_t{
-	uint64 sock_id;
+	struct bufferevent *bev; //used for index,sending packets etc.
 	sbool loggedin;
 	double  attacktimer;
 	double  datatimer;
@@ -46,31 +46,29 @@ struct banned_t
 
 temp_index *get_temp_player_array(void);
 
+temp_t *temp_players(void);
+
 temp_t *temp_player(uint16 index);
 
 int32 *temp_player_count(uint16 index);
 
-temp_t *temp_players(void);
-
 void init_temp_player_index(void);
 
-int16 set_temp_player_index(uint64 socket_id);
+int16 set_temp_player_index(struct bufferevent *bev);
 
-sbool clear_temp_player(uint64 socket_id);
+sbool clear_temp_player(struct bufferevent *bev);
 
 void clear_temp_player_onindex(int16 index);
 
-int16 get_temp_player_index(uint64 socket_id);
+int16 get_temp_player_index(struct bufferevent *bev);
 
-uint64 get_temp_player_socket(int16 index);
+struct bufferevent * get_temp_player_bufferevent(int16 index);
 
 temp_t *get_temp_player(int16 index);
 
-void start_socket(void);
-
 void send_data(buffer_t *data, int16 index);
 
-void send_socket_data(buffer_t *data, uint64 id);
+void send_socket_data(buffer_t *data, struct bufferevent *bev);
 
 void send_data_to_all(buffer_t *data);
 
