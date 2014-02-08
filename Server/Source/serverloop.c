@@ -301,6 +301,13 @@ void update_save_players(void)
 	}
 }
 
+
+void set_server_offline(void)
+{
+	server_is_online = FALSE;
+	destroy_server();
+}
+
 void handle_shutdown(void)
 {
 	char *string = NULL;

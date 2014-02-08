@@ -24,5 +24,7 @@ void update_player_vitals(void);
 
 void update_save_players(void);
 
+void set_server_offline(void);
+
 void handle_shutdown(void);
 #endif
