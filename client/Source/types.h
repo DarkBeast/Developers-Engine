@@ -134,19 +134,13 @@ struct vertex_array {
 
 struct sbuffer{
 	GLuint buffer; //texture vertex buffer.
-	uint16 size;  //buffer size.
-	uint16 count; //buffer count.
 	GLuint index; //index buffer.
-	uint16 isize; //index size.
 	vertex_t data[4]; //array of 4 vertex's.
 };
 
 struct line_buffer{
 	GLuint buffer; //texture vertex buffer.
-	uint16 size;  //buffer size.
-	uint16 count; //buffer count.
 	GLuint index; //index buffer.
-	uint16 isize; //index size.
 	line_vertex_t data[2]; //array of 2 vertex's.
 };
 
@@ -157,6 +151,14 @@ struct mbuffer{
 	GLuint index; //index buffer.
 	uint16 isize; //index size.
 	vertex_array *data; //array of vertex's.
+};
+
+
+struct sprite{
+	sbuffer buffer;
+	image *img; //image data
+	float width;
+	float height;
 };
 
 enum vitals_t{
