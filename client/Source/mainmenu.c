@@ -29,7 +29,6 @@ void main_menu(void)
 		widget_manager();
 
 		//Clear information from last draw
-
 		glFlush();
 		glfwSwapBuffers(get_the_window());
 		glfwPollEvents();
