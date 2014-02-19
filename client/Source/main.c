@@ -15,8 +15,11 @@
 #include "general.h"
 #include "status.h"
 
-//#define _DEBUG 1
-//#include <vld.h>
+#define _DEBUG 0
+
+#if _DEBUG
+#include <vld.h>
+#endif
 
 mtx_t gmutex;
 cnd_t gcond;
@@ -47,7 +50,7 @@ int main(void)
 	text_init_font("");//initializes the Font characters for use.
 
 	widget_init_system();//initializes the widget system for storing widgets.
-	mtx_lock(&gmutex);
+
 	//init_status_window(FALSE,100000);
 	//thrd_create(&t1, status, (void*)0);
 	//set_status("UI SYSTEM LOADED...");
@@ -79,8 +82,9 @@ int main(void)
 	//set_status("LOADING MENU...");
 
 	//status_unload();
-	mtx_unlock(&gmutex);
+	
 	menustate();
+
 	unload_functions();
 }
 
@@ -93,5 +97,10 @@ void unload_functions(void)
 	unload_fonts();
 	mtx_destroy(&gmutex);
 	cnd_destroy(&gcond);
+
+#if _DEBUG
+	VLDReportLeaks();
+#endif
+
 	exit(TRUE);// Exit program
 }
