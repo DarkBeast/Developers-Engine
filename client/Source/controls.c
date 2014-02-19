@@ -185,7 +185,7 @@ void create_button(widget *control, widget *parent, uint16 x, uint16 y, uint16 h
 	control->imgpos.x = 0;
 	control->imgpos.y = 0;
 	control->type = CONTROL_BUTTON;
-	control->draw = &draw_buttons;
+	control->controldraw = &draw_buttons;
 	control->controlmousepress = &handle_button_click;
 	control->controlmouserelease = &handle_button_release;
 	control->controlupdatepos = &handle_button_move;
@@ -285,7 +285,7 @@ void create_label(widget *control, widget *parent, uint16 x, uint16 y, uint16 wi
 	control->imgpos.x = 0;
 	control->imgpos.y = 0;
 	control->type = CONTROL_LABEL;
-	control->draw = &draw_label;
+	control->controldraw = &draw_label;
 	control->controlmousepress = &handle_label_click;
 
 	if(multi_lined){
@@ -402,7 +402,7 @@ void create_window(widget *control, widget *parent, uint16 x, uint16 y, uint16 h
 	control->imgpos.x = 0;
 	control->imgpos.y = 0;
 	control->type = CONTROL_WINDOW;
-	control->draw = &draw_windows;
+	control->controldraw = &draw_windows;
 	control->controlmousepress = &handle_window_click;
 	control->controlupdatepos = &handle_windows_move;
 
@@ -442,7 +442,7 @@ void create_window_framed(widget *control, widget *parent, uint16 x, uint16 y, u
 	control->imgpos.x = 0;
 	control->imgpos.y = 0;
 	control->type = CONTROL_WINDOW;
-	control->draw = &draw_windows;;
+	control->controldraw = &draw_windows;;
 	control->controlmousepress = &handle_window_click;
 	control->controlupdatepos = &handle_windows_move;
 	if(clone)
@@ -506,7 +506,7 @@ void create_checkbox(widget *control, widget *parent, uint16 x, uint16 y, uint16
 	control->imgpos.x = 0;
 	control->imgpos.y = control->height;
 	control->type = CONTROL_CHECKBOX;
-	control->draw = &draw_checkbox;
+	control->controldraw = &draw_checkbox;
 	control->controlmousepress = handle_check_click;
 	control->controlupdatepos = &handle_check_move;
 	if(clone)
@@ -594,7 +594,7 @@ void create_radio(widget *control, widget *parent, uint16 x, uint16 y, uint16 he
 	control->imgpos.x = 0;
 	control->imgpos.y = height;
 	control->type = CONTROL_RADIO;
-	control->draw = &draw_radio;
+	control->controldraw = &draw_radio;
 	control->controlmousepress = &handle_radio_click;
 	control->controlupdatepos = &handle_radio_move;
 	if(clone)
@@ -824,7 +824,7 @@ void create_hprogressbar(widget *control, widget *parent, uint16 x, uint16 y, ui
 	control->imgpos.x = 0;
 	control->imgpos.y = 0;
 	control->type = CONTROL_HPROGRESSBAR;
-	control->draw = &draw_hprogressbar;
+	control->controldraw = &draw_hprogressbar;
 	control->controlmousepress = &handle_hprogressbar_click;
 	control->controlupdatepos = &handle_hprogressbar_move;
 
@@ -847,7 +847,7 @@ void create_hprogressbar(widget *control, widget *parent, uint16 x, uint16 y, ui
 	bar->bar.imgpos.x = 0;
 	bar->bar.imgpos.y = 0;
 	bar->bar.type = CONTROL_HPROGRESSBAR;
-	bar->bar.draw = &draw_hprogressbar;
+	bar->bar.controldraw = &draw_hprogressbar;
 	bar->bar.controlmousepress = &handle_hprogressbar_click;
 	bar->bar.controlupdatepos = &handle_hprogressbars_move;
 
@@ -913,7 +913,7 @@ void create_picturebox(widget *control, widget *parent, uint16 x, uint16 y, uint
 	control->imgpos.x = 0;
 	control->imgpos.y = height;
 	control->type = CONTROL_PICTUREBOX;
-	control->draw = &draw_picturebox;
+	control->controldraw = &draw_picturebox;
 	control->controlmousepress = &handle_picturebox_click;
 	control->controlupdatepos = &handle_picturebox_move;
 
@@ -1009,7 +1009,7 @@ void create_hscrollbar(widget *control, widget *parent, uint16 x, uint16 y, uint
 	control->imgpos.x = 0;
 	control->imgpos.y = height;
 	control->type = CONTROL_HSCROLL_BAR;
-	control->draw = &draw_hscrollbar;
+	control->controldraw = &draw_hscrollbar;
 	control->controlmousepress = &handle_hscrollbar_click;
 	control->controlupdatepos = &handle_hscrollbar_move;
 	control->controlmouseover = &handle_hbar_slide;
@@ -1032,7 +1032,7 @@ void create_hscrollbar(widget *control, widget *parent, uint16 x, uint16 y, uint
 	scroll_t->button_1.controlmouseover = &handle_harrowleft_over;
 	scroll_t->button_1.controlmouserelease = &handle_harrowleft_release;
 	scroll_t->button_1.controlmouseexit = &handle_harrowleft_exit;
-	scroll_t->button_1.draw = &draw_hscrollbar;
+	scroll_t->button_1.controldraw = &draw_hscrollbar;
 
 	if(!clone)
 		set_control_image(&scroll_t->button_2, comb_2str(GUI_PATH, buttonright));
@@ -1049,7 +1049,7 @@ void create_hscrollbar(widget *control, widget *parent, uint16 x, uint16 y, uint
 	scroll_t->button_2.controlmouseover = &handle_harrowright_over;
 	scroll_t->button_2.controlmouserelease = &handle_harrowright_release;
 	scroll_t->button_2.controlmouseexit = &handle_harrowright_exit;
-	scroll_t->button_2.draw = &draw_hscrollbar;
+	scroll_t->button_2.controldraw = &draw_hscrollbar;
 
 	if(!clone)
 		set_control_image(&scroll_t->bar, comb_2str(GUI_PATH, scrollbar));
@@ -1081,7 +1081,7 @@ void create_hscrollbar(widget *control, widget *parent, uint16 x, uint16 y, uint
 	scroll_t->bar.controlmouserelease = &handle_hbar_release;
 	scroll_t->bar.controlmouseover = &handle_hbar_over;
 	scroll_t->bar.controlmouseexit = &handle_hbar_exit;
-	scroll_t->bar.draw = &draw_hscrollbar;
+	scroll_t->bar.controldraw = &draw_hscrollbar;
 	control->control = scroll_t;
 
 	widget_add(parent,control);
@@ -1425,7 +1425,7 @@ void create_vscrollbar(widget *control, widget *parent, uint16 x, uint16 y, uint
 	control->imgpos.x = 0;
 	control->imgpos.y = height;
 	control->type = CONTROL_VSCROLL_BAR;
-	control->draw = &draw_vscrollbar;
+	control->controldraw = &draw_vscrollbar;
 	control->controlmousepress = &handle_vscrollbar_click;
 	control->controlupdatepos = &handle_vscrollbar_move;
 	control->controlmouseover = &handle_vbar_slide;
@@ -1444,7 +1444,7 @@ void create_vscrollbar(widget *control, widget *parent, uint16 x, uint16 y, uint
 	scroll_t->button_1.sizex = sizex;
 	scroll_t->button_1.sizey = scroll_t->button_1.img->height;
 	scroll_t->button_1.type = CONTROL_BUTTON;
-	scroll_t->button_1.draw = &draw_vscrollbar;
+	scroll_t->button_1.controldraw = &draw_vscrollbar;
 	scroll_t->button_1.controlmousepress = &handle_varrowtop_click;
 	scroll_t->button_1.controlupdatepos = &handle_vscrollbar_move;
 	scroll_t->button_1.controlmouseover = &handle_varrowtop_over;
@@ -1462,7 +1462,7 @@ void create_vscrollbar(widget *control, widget *parent, uint16 x, uint16 y, uint
 	scroll_t->button_2.pos.y = sizey - scroll_t->button_2.sizey;
 	scroll_t->button_2.imgpos.x = 0;
 	scroll_t->button_2.type = CONTROL_BUTTON;
-	scroll_t->button_2.draw = &draw_vscrollbar;
+	scroll_t->button_2.controldraw = &draw_vscrollbar;
 	scroll_t->button_2.controlmousepress = &handle_varrowbottom_click;
 	scroll_t->button_2.controlupdatepos = &handle_vscrollbar_move;
 	scroll_t->button_2.controlmouseover = &handle_varrowbottom_over;
@@ -1496,7 +1496,7 @@ void create_vscrollbar(widget *control, widget *parent, uint16 x, uint16 y, uint
 	scroll_t->bar.controlmouserelease = &handle_vbar_release;
 	scroll_t->bar.controlmouseexit = &handle_vbar_exit;
 	scroll_t->bar.controlmouseover = &handle_vbar_over;
-	scroll_t->bar.draw = &draw_vscrollbar;
+	scroll_t->bar.controldraw = &draw_vscrollbar;
 
 	control->control = scroll_t;
 	widget_add(parent,control);
@@ -1803,7 +1803,7 @@ void create_vprogressbar(widget *control, widget *parent, uint16 x, uint16 y, ui
 	control->imgpos.x = 0;
 	control->imgpos.y = 0;
 	control->type = CONTROL_VPROGRESSBAR;
-	control->draw = &draw_vprogressbar;
+	control->controldraw = &draw_vprogressbar;
 	control->controlmousepress = &handle_vprogressbar_click;
 	control->controlupdatepos = &handle_vprogressbar_move;
 	if(clone)
@@ -1826,7 +1826,7 @@ void create_vprogressbar(widget *control, widget *parent, uint16 x, uint16 y, ui
 	bar->bar.imgpos.x = 0;
 	bar->bar.imgpos.y = 0;
 	bar->bar.type = CONTROL_VPROGRESSBAR;
-	bar->bar.draw = &draw_vprogressbar;
+	bar->bar.controldraw = &draw_vprogressbar;
 	bar->bar.controlmousepress = &handle_vprogressbar_click;
 	bar->bar.controlupdatepos = &handle_vprogressbars_move;
 
@@ -1878,7 +1878,7 @@ void create_stextbox(widget *control, widget *parent, uint16 x, uint16 y, uint16
 	control->imgpos.x = 0;
 	control->imgpos.y = 0;
 	control->type = CONTROL_TEXTBOX;
-	control->draw = &draw_stextbox;
+	control->controldraw = &draw_stextbox;
 	control->controlmousepress = &handle_stextbox_click;
 	control->controlupdatepos = &handle_stextbox_move;
 	control->controlkeypressed = &handle_stextbox_input;
@@ -1894,7 +1894,7 @@ void create_stextbox(widget *control, widget *parent, uint16 x, uint16 y, uint16
 	init_widget->wstring.imgpos.x = 0;
 	init_widget->wstring.imgpos.y = 0;
 	init_widget->wstring.type = CONTROL_TEXTBOX;
-	init_widget->wstring.draw = &draw_stextbox_text;
+	init_widget->wstring.controldraw = &draw_stextbox_text;
 	init_widget->wstring.controlmousepress = &handle_stextbox_click;
 	init_widget->wstring.controlupdatepos = &handle_stextbox_text_move;
 
@@ -2167,7 +2167,7 @@ void create_mtextbox(widget *control, widget *parent, uint16 x, uint16 y, uint16
 	control->imgpos.x = 0;
 	control->imgpos.y = 0;
 	control->type = CONTROL_TEXTBOX;
-	control->draw = &draw_mtextbox;
+	control->controldraw = &draw_mtextbox;
 	control->controlmousepress = &handle_mtextbox_click;
 	control->controlupdatepos = &handle_mtextbox_move;
 	control->controlkeypressed = &handle_mtextbox_input;
@@ -2182,7 +2182,7 @@ void create_mtextbox(widget *control, widget *parent, uint16 x, uint16 y, uint16
 	init_widget->wstring.imgpos.x = 0;
 	init_widget->wstring.imgpos.y = 0;
 	init_widget->wstring.type = CONTROL_TEXTBOX;
-	init_widget->wstring.draw = &draw_mtextbox_text;
+	init_widget->wstring.controldraw = &draw_mtextbox_text;
 	init_widget->wstring.controlmousepress = &handle_mtextbox_click;
 	init_widget->wstring.controlupdatepos = &handle_mtextbox_text_move;
 	control->action |= WIDGET_IS_MULTI_LINED;
@@ -2350,7 +2350,7 @@ void create_listbox(widget *control, widget *parent, uint16 x, uint16 y, uint16 
 	control->controlmouseexit = &handle_listbox_mouse_exit;
 	control->controlupdatepos = &handle_listbox_move;
 	control->type = CONTROL_LISTBOX;
-	control->draw = &draw_listbox;
+	control->controldraw = &draw_listbox;
 
 	widget_init(list->select);
 	if(!clone)
@@ -2405,7 +2405,7 @@ void create_listbox(widget *control, widget *parent, uint16 x, uint16 y, uint16 
 		list->list[i]->imgpos.x = 0;
 		list->list[i]->imgpos.y = 0;
 		list->list[i]->type = CONTROL_LABEL;
-		list->list[i]->draw = &draw_label;
+		list->list[i]->controldraw = &draw_label;
 		list->list[i]->controlmousepress = &handle_listbox_label_click;
 		list->list[i]->controlmouseover = &handle_listbox_label_mouse_over;
 		list->list[i]->controlmouseexit = &handle_listbox_label_mouse_exit;
@@ -2551,7 +2551,7 @@ void draw_listbox(widget *control)
 		draw_widget(list->selectover);
 
 	for(i = list->voffset; i < list->voffset + list->max; i++){
-		list->list[i]->draw(list->list[i]);
+		list->list[i]->controldraw(list->list[i]);
 	}
 }
 
@@ -2799,3 +2799,45 @@ void handle_frame_move(widget *control)
 	control->actualpos.x = control->pos.x + control->parent->actualpos.x;
 	control->actualpos.y = control->pos.y + control->parent->actualpos.y;
 }
+
+
+//******clip box*******
+
+
+void create_clipbox(widget *control, widget *parent, uint16 x, uint16 y, uint16 height, uint16 width, uint16 sizey, uint16 sizex, uint8 planeid)
+{
+	widget_init(control);
+	control->pos.x = x;
+	control->pos.y = y;
+	control->height = height;
+	control->width = width;
+	control->sizey = sizey;
+	control->sizex = sizex;
+	control->imgpos.x = 0;
+	control->imgpos.y = 0;
+	control->type = CONTROL_BUTTON;
+	control->controldraw = &draw_clipbox;
+	widget_add(parent,control);
+}
+
+void unload_clipbox(widget *control, sbool hidden)
+{
+	free(control->data);
+	free(control->control);
+
+	if(control->shown.data && !hidden){
+		widget_clear_shown(control);
+	}
+	if(control->hidden.data && hidden){
+		widget_clear_hidden(control);
+	}
+	free(control->shown.data);
+	free(control->hidden.data);
+}
+
+void draw_clipbox(widget *control)
+{
+	control->draw(control);
+}
+
+

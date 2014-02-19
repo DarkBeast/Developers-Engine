@@ -19,6 +19,7 @@ typedef struct textbox textbox;
 typedef struct textbox_w textbox_w;
 typedef struct listbox listbox;
 typedef struct progressbar progressbar;
+typedef struct clipbox clipbox;
 
 enum control_types
 {
@@ -36,6 +37,7 @@ enum control_types
 	CONTROL_LISTBOX,
 	CONTROL_TEXTBOX,
 	CONTROL_FRAME,
+	CONTROL_CLIPBOX,
 	CONTROL_ROOT
 };
 
@@ -238,4 +240,9 @@ void create_frame(widget *control, widget *parent, uint16 x, uint16 y, uint16 he
 void handle_frame_click(widget *control, int button, int pressed);
 void handle_frame_move(widget *control);
 void unload_frame(widget *control, sbool hidden);
+
+void create_clipbox(widget *control, widget *parent, uint16 x, uint16 y, uint16 height, uint16 width, uint16 sizey, uint16 sizex);
+void unload_clipbox(widget *control, sbool hidden);
+void draw_clipbox(widget *control, image *img, sbuffer buf);
+
 #endif
