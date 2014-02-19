@@ -45,7 +45,8 @@ enum widget_flags_t
 	WIDGET_BUFFER_RESIZE = (1 << 16),
 	WIDGET_IS_MULTI_LINED = (1 << 17),
 	WIDGET_WINDOW_MOVEABLE = (1 << 18),
-	WIDGET_USED_CLONE = (1 << 19)
+	WIDGET_USED_CLONE = (1 << 19),
+	WIDGET_CLIP_RENDER = (1 << 20)
 };
 
 //A UI control structure.
@@ -79,6 +80,7 @@ struct widget
 	void(*keypressed)(widget *,int,int);
 
 	//system Events.
+	void(*controldraw)(widget *);
 	void(*controlmousepress)(widget *,int,int);
 	void(*controlmouserelease)(widget *,int,int);
 	void(*controlmousewheel)(widget *,int);
@@ -236,6 +238,7 @@ void widget_init_mouse_wheel(widget *control, int moved);
 void widget_init_mouse_over(widget *control);
 void widget_init_mouse_exit(widget *control);
 
+void widget_init_control_draw(widget *control);
 void widget_init_control_mouse_press(widget *control, int button, int pressed);
 void widget_init_control_mouse_release(widget *control, int button, int pressed);
 void widget_init_control_mouse_wheel(widget *control, int moved);

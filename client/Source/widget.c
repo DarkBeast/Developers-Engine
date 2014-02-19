@@ -551,9 +551,6 @@ void widget_init(widget *wgt)//initializes a widget.
 	wgt->type = 0;
 	wgt->buf.buffer = 0;
 	wgt->buf.index = 0;
-	wgt->buf.isize = 0;
-	wgt->buf.size = 0;
-	wgt->buf.count = 0;
 	wgt->draw = &widget_init_draw;
 	wgt->mousepress = &widget_init_mouse_press;
 	wgt->mouserelease = &widget_init_mouse_release;
@@ -561,6 +558,7 @@ void widget_init(widget *wgt)//initializes a widget.
 	wgt->keypressed = &widget_init_key_pressed;
 	wgt->mouseover = &widget_init_mouse_over;
 	wgt->mouseexit = &widget_init_mouse_exit;
+	wgt->controldraw = &widget_init_control_draw;
 	wgt->controlmousepress = &widget_init_control_mouse_press;
 	wgt->controlmouserelease = &widget_init_control_mouse_release;
 	wgt->controlmousewheel = &widget_init_control_mouse_wheel;
@@ -599,9 +597,6 @@ void widget_null(widget *wgt)//initializes a widget.
 	wgt->type = 0;
 	wgt->buf.buffer = 0;
 	wgt->buf.index = 0;
-	wgt->buf.isize = 0;
-	wgt->buf.size = 0;
-	wgt->buf.count = 0;
 	wgt->draw = NULL;
 	wgt->mousepress = NULL;
 	wgt->mouserelease = NULL;
@@ -609,6 +604,7 @@ void widget_null(widget *wgt)//initializes a widget.
 	wgt->keypressed = NULL;
 	wgt->mouseover = NULL;
 	wgt->mouseexit = NULL;
+	wgt->controldraw = NULL;
 	wgt->controlmousepress = NULL;
 	wgt->controlmouserelease = NULL;
 	wgt->controlmousewheel = NULL;
@@ -972,7 +968,7 @@ void widget_manager(void)//used to draw the widgets onto the screen.
 
 	for( index = 0; index < ui.root->shown.count; ++index){
 		child = ui.root->shown.data[index];
-		child->draw(child);//then draw there parent.
+		child->controldraw(child);//then draw there parent.
 
 		if(child->shown.data){
 			id[idindex] = 0;
@@ -988,7 +984,7 @@ void widget_manager(void)//used to draw the widgets onto the screen.
 						if(id[idindex] < child->shown.count){
 							if (child->shown.data[id[idindex]]){
 								child = child->shown.data[id[idindex]];
-								child->draw(child);//then draw the child.
+								child->controldraw(child);//then draw the child.
 								++id[idindex];
 								++idindex;//we set the z buffer index to know which layer we are in
 
@@ -1443,6 +1439,7 @@ void widget_init_draw(widget *control) {}
 void widget_init_mouse_over(widget *control) {}
 void widget_init_mouse_exit(widget *control) {}
 
+void widget_init_control_draw(widget *control) {control->draw(control);}
 void widget_init_control_mouse_press(widget *control, int button, int pressed) {control->mousepress(control,button, pressed);}
 void widget_init_control_mouse_release(widget *control, int button, int pressed) {control->mouserelease(control,button, pressed);}
 void widget_init_control_mouse_wheel(widget *control, int moved) {}
