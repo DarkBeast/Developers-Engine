@@ -43,4 +43,6 @@ void update_widget_vertex_buffer(widget *control);
 
 void create_cursor_vertex(widget *control);
 void draw_cursor(widget *control);
+
+void draw_test(sbuffer *buf, image* image1);
 #endif

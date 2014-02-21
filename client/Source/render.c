@@ -195,8 +195,8 @@ void draw_primitive(image *img, vector2i vecpos, vector2i imgpos,int width, int 
 
 	glTexCoord2f (x1, y2);	glVertex2f (vecpos.x, vecpos.y);
 	glTexCoord2f (x2, y2);	glVertex2f (vecpos.x + width, vecpos.y);
-	glTexCoord2f (x2, y1);	glVertex2f (vecpos.x + width, vecpos.y +height);
-	glTexCoord2f (x1, y1);	glVertex2f (vecpos.x, vecpos.y +height);
+	glTexCoord2f (x2, y1);	glVertex2f (vecpos.x + width, vecpos.y + height);
+	glTexCoord2f (x1, y1);	glVertex2f (vecpos.x, vecpos.y + height);
 
 	glEnd ();//stop drawing to the new frame buffer.
 
@@ -353,6 +353,32 @@ void draw_widget(widget *control)
 	glColorPointer(4, GL_FLOAT, sizeof(struct vertex_t), (GLvoid *)offsetof(struct vertex_t, r));
 
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, control->buf.index);
+	glIndexPointer(GL_UNSIGNED_INT,sizeof(GLuint),0);
+
+	glDrawElements(GL_QUADS,4,GL_UNSIGNED_INT,0); //GL_TRIANGLE_STRIP
+
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+	glBindTexture(GL_TEXTURE_2D, 0);
+	glDisableClientState(GL_COLOR_ARRAY);
+	glDisableClientState(GL_TEXTURE_COORD_ARRAY);
+	glDisableClientState(GL_VERTEX_ARRAY);
+}
+
+void draw_test(sbuffer *buf, image* image1)
+{
+	glEnableClientState(GL_VERTEX_ARRAY);
+	glEnableClientState(GL_TEXTURE_COORD_ARRAY);
+	glEnableClientState(GL_COLOR_ARRAY);
+
+	glBindTexture(GL_TEXTURE_2D, image1->texid);
+
+	glBindBuffer(GL_ARRAY_BUFFER, buf->buffer);
+	glVertexPointer(2, GL_FLOAT, sizeof(struct vertex_t), 0);
+	glTexCoordPointer(2, GL_FLOAT, sizeof(struct vertex_t), (GLvoid *)offsetof(struct vertex_t, u));
+	glColorPointer(4, GL_FLOAT, sizeof(struct vertex_t), (GLvoid *)offsetof(struct vertex_t, r));
+
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, buf->index);
 	glIndexPointer(GL_UNSIGNED_INT,sizeof(GLuint),0);
 
 	glDrawElements(GL_QUADS,4,GL_UNSIGNED_INT,0); //GL_TRIANGLE_STRIP

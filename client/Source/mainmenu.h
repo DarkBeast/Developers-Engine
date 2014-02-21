@@ -16,6 +16,7 @@ struct main_menu_t{
 	widget lblcreate;
 	widget frmmain;
 	widget wndmainmenu;
+	widget testbox;
 };
 
 void main_menu(void);
@@ -24,5 +25,7 @@ void main_btnclose_press(widget *control, int button, int pressed);
 void main_btncredits_press(widget *control, int button, int pressed);
 void main_btnlogin_press(widget *control, int button, int pressed);
 void main_btncreate_press(widget *control, int button, int pressed);
+void render_test(widget *control);
+void test_buffer(void);
 
 #endif
