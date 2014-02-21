@@ -2815,7 +2815,7 @@ void create_clipbox(widget *control, widget *parent, uint16 x, uint16 y, uint16 
 	control->sizex = sizex;
 	control->imgpos.x = 0;
 	control->imgpos.y = 0;
-	control->type = CONTROL_BUTTON;
+	control->type = CONTROL_CLIPBOX;
 	control->controldraw = &draw_clipbox;
 	widget_add(parent,control);
 }
@@ -2837,7 +2837,11 @@ void unload_clipbox(widget *control, sbool hidden)
 
 void draw_clipbox(widget *control)
 {
+	
+	glScissor(control->pos.x,get_screen_height() - control->height - control->pos.y,control->width,control->height);
+	glEnable(GL_SCISSOR_TEST);
 	control->draw(control);
+	glDisable(GL_SCISSOR_TEST);
 }
 
 
