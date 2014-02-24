@@ -11,8 +11,6 @@
 #include "general.h"
 
 main_menu_t gui;
-image *image1;
-sbuffer buf;
 
 void main_menu(void)
 {
@@ -29,7 +27,6 @@ void main_menu(void)
 		clear_screen(0,0,0,255);
 
 		widget_manager();
-
 		//Clear information from last draw
 		glFlush();
 		glfwSwapBuffers(get_the_window());
@@ -56,7 +53,6 @@ void main_menu(void)
 
 void init_main_menu(void)
 {
-	image1 = (image *)calloc(1, sizeof(image));
 	create_window(&gui.wndmainmenu, NULL, 0, 0, 600, 800, 600, 800,"menuback.png", NULL);
 	create_frame(&gui.frmmain, &gui.wndmainmenu,0,0,60,800,FALSE, TRUE);
 	create_button(&gui.btnclose,&gui.frmmain,750,10,34,34,34,34,"closebutton.png", NULL);
@@ -66,8 +62,7 @@ void init_main_menu(void)
 	create_label(&gui.lbllogin, &gui.btnlogin,170,10,80,25,0,0,0,120,FALSE,2,8,FALSE,"LOGIN");
 	create_label(&gui.lblcreate, &gui.btncreate,120,10,80,25,0,0,0,120,FALSE,2,8,FALSE,"NEW ACCOUNT");
 	create_label(&gui.lblcredits, &gui.btncredits,155,10,80,25,0,0,0,120,FALSE,2,8,FALSE,"CREDITS");
-	create_clipbox(&gui.testbox,&gui.wndmainmenu,5,60,34,34,34,34);
-	gui.testbox.draw = &render_test;
+
 	gui.btnclose.mousepress = &main_btnclose_press;
 	gui.btncredits.mousepress = &main_btncredits_press;
 	gui.btnlogin.mousepress = &main_btnlogin_press;
@@ -77,9 +72,6 @@ void init_main_menu(void)
 	gui.lblcredits.action |= WIDGET_CAN_CLICK_BEHIND;
 	gui.btnclose.action |= WIDGET_ALWAYS_USEABLE;
 	widget_manual_focused(&gui.wndmainmenu);
-
-	load_image(".\\images\\gui\\closebutton.png", image1);
-	test_buffer();
 }
 
 void main_btnclose_press(widget *control, int button, int pressed)
@@ -102,43 +94,3 @@ void main_btncreate_press(widget *control, int button, int pressed)
 	set_menu_state(MENU_STATE_CREATE);
 }
 
-void render_test(widget *control)
-{
-	draw_test(&buf,image1);
-}
-
-void test_buffer(void)
-{
-	GLuint index[4] = {0,1,2,3};
-
-	/*index 0*/
-	buf.data[0].u = 0; buf.data[0].v = 1;
-	buf.data[0].x = gui.testbox.pos.x ; buf.data[0].y = gui.testbox.pos.y;
-	buf.data[0].r = 1.0; buf.data[0].b = 0; buf.data[0].g = 0; buf.data[0].a = 1.0;
-
-	/*index 1*/
-	buf.data[1].u = 1; buf.data[1].v = 1;
-	buf.data[1].x = gui.testbox.pos.x + image1->width; buf.data[1].y = gui.testbox.pos.y;
-	buf.data[1].r = 1.0; buf.data[1].b = 0; buf.data[1].g = 0; buf.data[1].a = 1.0;
-
-	/*index 2*/
-	buf.data[2].u = 1; buf.data[2].v = 0;
-	buf.data[2].x = gui.testbox.pos.x + image1->width; buf.data[2].y = gui.testbox.pos.y + image1->height;
-	buf.data[2].r = 1.0; buf.data[2].b = 0; buf.data[2].g = 0; buf.data[2].a = 1.0;
-
-	/*index 3*/
-	buf.data[3].u = 0; buf.data[3].v = 0;
-	buf.data[3].x = gui.testbox.pos.x ; buf.data[3].y = gui.testbox.pos.y + image1->height;
-	buf.data[3].r = 1.0; buf.data[3].b = 0; buf.data[3].g = 0; buf.data[3].a = 1.0;
-
-	glGenBuffers(1,&buf.buffer);
-	glGenBuffers(1,&buf.index);
-
-	glBindBuffer(GL_ARRAY_BUFFER,buf.buffer);
-	glBufferData(GL_ARRAY_BUFFER,sizeof(buf.data),buf.data,GL_STATIC_DRAW);//fill up the array with vertex and color-data
-
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER,buf.index);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER,4 * sizeof(GLuint),index,GL_STATIC_DRAW);
-	glBindBuffer(GL_ARRAY_BUFFER, 0);
-
-}
