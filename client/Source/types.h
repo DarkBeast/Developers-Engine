@@ -33,6 +33,7 @@ typedef enum equipment_t equipment_t;
 typedef enum dir_t dir_t;
 typedef enum movement_t movement_t;
 typedef enum target_type target_type;
+typedef struct sprite sprite;
 
 struct void_array
 {
@@ -153,12 +154,15 @@ struct mbuffer{
 	vertex_array *data; //array of vertex's.
 };
 
-
 struct sprite{
 	sbuffer buffer;
-	image *img; //image data
+	vector2f imgpos; //texture position
+	vector2f pos;
+	image img;
 	float width;
 	float height;
+	float sizex;
+	float sizey;
 };
 
 enum vitals_t{
