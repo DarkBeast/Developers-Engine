@@ -77,6 +77,7 @@ struct widget
 	void(*mousepress)(widget *,int,int);
 	void(*mouserelease)(widget *,int,int);
 	void(*mousewheel)(widget *,int);
+	void(*updatepos)(widget *);
 	void(*keypressed)(widget *,int,int);
 
 	//system Events.
@@ -237,6 +238,7 @@ void widget_init_mouse_release(widget *control, int button, int pressed);
 void widget_init_mouse_wheel(widget *control, int moved);
 void widget_init_mouse_over(widget *control);
 void widget_init_mouse_exit(widget *control);
+void widget_init_update_pos(widget *control);
 
 void widget_init_control_draw(widget *control);
 void widget_init_control_mouse_press(widget *control, int button, int pressed);

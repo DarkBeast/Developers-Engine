@@ -558,6 +558,7 @@ void widget_init(widget *wgt)//initializes a widget.
 	wgt->keypressed = &widget_init_key_pressed;
 	wgt->mouseover = &widget_init_mouse_over;
 	wgt->mouseexit = &widget_init_mouse_exit;
+	wgt->updatepos = &widget_init_update_pos;
 	wgt->controldraw = &widget_init_control_draw;
 	wgt->controlmousepress = &widget_init_control_mouse_press;
 	wgt->controlmouserelease = &widget_init_control_mouse_release;
@@ -604,6 +605,7 @@ void widget_null(widget *wgt)//initializes a widget.
 	wgt->keypressed = NULL;
 	wgt->mouseover = NULL;
 	wgt->mouseexit = NULL;
+	wgt->updatepos = NULL;
 	wgt->controldraw = NULL;
 	wgt->controlmousepress = NULL;
 	wgt->controlmouserelease = NULL;
@@ -1438,12 +1440,13 @@ void widget_init_key_pressed(widget *control, int key, int pressed) {}
 void widget_init_draw(widget *control) {}
 void widget_init_mouse_over(widget *control) {}
 void widget_init_mouse_exit(widget *control) {}
+void widget_init_update_pos(widget *control) {}
 
 void widget_init_control_draw(widget *control) {control->draw(control);}
 void widget_init_control_mouse_press(widget *control, int button, int pressed) {control->mousepress(control,button, pressed);}
 void widget_init_control_mouse_release(widget *control, int button, int pressed) {control->mouserelease(control,button, pressed);}
 void widget_init_control_mouse_wheel(widget *control, int moved) {}
 void widget_init_control_key_pressed(widget *control, int key) {}
-void widget_init_control_update_pos(widget *control) {}
+void widget_init_control_update_pos(widget *control) {control->updatepos(control);}
 void widget_init_control_mouse_over(widget *control) {control->mouseover(control);}
 void widget_init_control_mouse_exit(widget *control) {control->mouseexit(control);}
