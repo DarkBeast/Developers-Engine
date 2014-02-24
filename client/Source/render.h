@@ -17,6 +17,8 @@ struct screen_size
 	int height;
 };
 
+GLuint get_current_texid(void);
+void set_current_texid(GLuint id);
 GLFWwindow *get_the_window(void);
 screen_size get_screen_size(void);
 sbool is_window_open(void);
@@ -44,5 +46,9 @@ void update_widget_vertex_buffer(widget *control);
 void create_cursor_vertex(widget *control);
 void draw_cursor(widget *control);
 
-void draw_test(sbuffer *buf, image* image1);
+void draw_sprite(sprite *s);
+void sprite_update_texture_vector(sprite *s);
+void sprite_update_vector(sprite *s);
+void create_sprite_vertex_buffer(sprite *s);
+
 #endif

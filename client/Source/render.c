@@ -14,6 +14,17 @@
 screen_size the_screen;
 GLFWwindow *the_window;
 sbool window_open;
+GLuint current_texid = 0;
+
+GLuint get_current_texid(void)
+{
+	return current_texid;
+}
+
+void set_current_texid(GLuint id)
+{
+	current_texid = id;
+}
 
 GLFWwindow *get_the_window(void)
 {
@@ -220,6 +231,93 @@ void create_widget_vertex_buffer(widget *control)
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 }
 
+void create_sprite_vertex_buffer(sprite *s)
+{
+	GLuint index[4] = {0,1,2,3};
+	float x2,x1;
+	float y2,y1;
+
+	x1 = s->imgpos.x  / s->img.width;
+	x2 = (s->imgpos.x + s->width) / s->img.width;
+	y1 = s->imgpos.y / s->img.height;
+	y2 = (s->imgpos.y + s->height) / s->img.height;
+
+	/*index 0*/
+	s->buffer.data[0].u = x1; s->buffer.data[0].v = y2;
+	s->buffer.data[0].x = s->pos.x; s->buffer.data[0].y = s->pos.y;
+	s->buffer.data[0].r = 1.0; s->buffer.data[0].b = 1.0; s->buffer.data[0].g = 1.0; s->buffer.data[0].a = 1.0;
+
+	/*index 1*/
+	s->buffer.data[1].u = x2; s->buffer.data[1].v = y2;
+	s->buffer.data[1].x = s->pos.x + s->sizex; s->buffer.data[1].y = s->pos.y;
+	s->buffer.data[1].r = 1.0; s->buffer.data[1].b = 1.0; s->buffer.data[1].g = 1.0; s->buffer.data[1].a = 1.0;
+
+	/*index 2*/
+	s->buffer.data[2].u = x2; s->buffer.data[2].v = y1;
+	s->buffer.data[2].x = s->pos.x + s->sizex; s->buffer.data[2].y = s->pos.y + s->sizey;
+	s->buffer.data[2].r = 1.0; s->buffer.data[2].b = 1.0; s->buffer.data[2].g = 1.0; s->buffer.data[2].a = 1.0;
+
+	/*index 3*/
+	s->buffer.data[3].u = x1; s->buffer.data[3].v = y1;
+	s->buffer.data[3].x = s->pos.x; s->buffer.data[3].y = s->pos.y + s->sizey;
+	s->buffer.data[3].r = 1.0; s->buffer.data[3].b = 1.0; s->buffer.data[3].g = 1.0; s->buffer.data[3].a = 1.0;
+
+	glGenBuffers(1,&s->buffer.buffer);
+	glGenBuffers(1,&s->buffer.index);
+
+	glBindBuffer(GL_ARRAY_BUFFER,s->buffer.buffer);
+	glBufferData(GL_ARRAY_BUFFER,sizeof(s->buffer.data),s->buffer.data,GL_STREAM_DRAW);//fill up the array with vertex and color-data
+
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER,s->buffer.index);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER,4 * sizeof(GLuint),index,GL_STATIC_DRAW);
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
+}
+
+void sprite_update_vector(sprite *s)
+{
+	/*index 0*/
+	s->buffer.data[0].x = s->pos.x; s->buffer.data[0].y = s->pos.y;
+
+	/*index 1*/
+	s->buffer.data[1].x = s->pos.x + s->sizex; s->buffer.data[1].y = s->pos.y;
+
+	/*index 2*/
+	s->buffer.data[2].x = s->pos.x + s->sizex; s->buffer.data[2].y = s->pos.y + s->sizey;
+
+	/*index 3*/
+	s->buffer.data[3].x = s->pos.x; s->buffer.data[3].y = s->pos.y + s->sizey;
+
+	glBindBuffer(GL_ARRAY_BUFFER,s->buffer.buffer);
+	glBufferSubData(GL_ARRAY_BUFFER, 0, 4 * sizeof(struct vertex_t), &s->buffer.data[0]);
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
+}
+
+void sprite_update_texture_vector(sprite *s)
+{
+	float x2,x1;
+	float y2,y1;
+
+	x1 = s->imgpos.x  / s->img.width;
+	x2 = (s->imgpos.x + s->width) / s->img.width;
+	y1 = s->imgpos.y / s->img.height;
+	y2 = (s->imgpos.y + s->height) / s->img.height;
+
+	s->buffer.data[0].u = x1; s->buffer.data[0].v = y2;
+
+	/*index 1*/
+	s->buffer.data[1].u = x2; s->buffer.data[1].v = y2;
+
+	/*index 2*/
+	s->buffer.data[2].u = x2; s->buffer.data[2].v = y1;
+
+	/*index 3*/
+	s->buffer.data[3].u = x1; s->buffer.data[3].v = y1;
+
+	glBindBuffer(GL_ARRAY_BUFFER,s->buffer.buffer);
+	glBufferSubData(GL_ARRAY_BUFFER, 0, 4 * sizeof(struct vertex_t), &s->buffer.data[0]);
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
+}
+
 void widget_update_vector(widget *control)
 {
 	control->actualpos.x = control->pos.x + control->parent->actualpos.x;
@@ -347,6 +445,7 @@ void draw_widget(widget *control)
 
 	glBindTexture(GL_TEXTURE_2D, control->img->texid);
 
+
 	glBindBuffer(GL_ARRAY_BUFFER, control->buf.buffer);
 	glVertexPointer(2, GL_FLOAT, sizeof(struct vertex_t), 0);
 	glTexCoordPointer(2, GL_FLOAT, sizeof(struct vertex_t), (GLvoid *)offsetof(struct vertex_t, u));
@@ -365,20 +464,20 @@ void draw_widget(widget *control)
 	glDisableClientState(GL_VERTEX_ARRAY);
 }
 
-void draw_test(sbuffer *buf, image* image1)
+void draw_sprite(sprite *s)
 {
 	glEnableClientState(GL_VERTEX_ARRAY);
 	glEnableClientState(GL_TEXTURE_COORD_ARRAY);
 	glEnableClientState(GL_COLOR_ARRAY);
 
-	glBindTexture(GL_TEXTURE_2D, image1->texid);
+	glBindTexture(GL_TEXTURE_2D, s->img.texid);
 
-	glBindBuffer(GL_ARRAY_BUFFER, buf->buffer);
+	glBindBuffer(GL_ARRAY_BUFFER, s->buffer.buffer);
 	glVertexPointer(2, GL_FLOAT, sizeof(struct vertex_t), 0);
 	glTexCoordPointer(2, GL_FLOAT, sizeof(struct vertex_t), (GLvoid *)offsetof(struct vertex_t, u));
 	glColorPointer(4, GL_FLOAT, sizeof(struct vertex_t), (GLvoid *)offsetof(struct vertex_t, r));
 
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, buf->index);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER,  s->buffer.index);
 	glIndexPointer(GL_UNSIGNED_INT,sizeof(GLuint),0);
 
 	glDrawElements(GL_QUADS,4,GL_UNSIGNED_INT,0); //GL_TRIANGLE_STRIP
