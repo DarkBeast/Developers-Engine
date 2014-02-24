@@ -12,6 +12,11 @@
 #include "general.h"
 
 new_account_t gui;
+sprite box;
+
+float time;
+float lpstimer = 0;
+uint8 set = 1;
 
 void new_account(void)
 {
@@ -95,16 +100,30 @@ void init_new_account(void)
 	create_radio(&gui.rdmale, &gui.wndnewaccount, 494,372,16,16,16,16,TRUE,"radio.png",NULL,NULL);
 	create_radio(&gui.rdfemale, &gui.wndnewaccount, 494,392,16,16,16,16,FALSE,NULL,&gui.rdmale,&gui.rdmale);
 	//scrollbars
-	create_hscrollbar(&gui.sbjob, &gui.wndnewaccount,494,346,18,100,18,18,18,100,0,3,"sbhback.png","arrowleft.png","arrowright.png","sbhbar.png",NULL);
+	create_hscrollbar(&gui.sbjob, &gui.wndnewaccount,494,346,18,100,18,18,18,100,0,2,"sbhback.png","arrowleft.png","arrowright.png","sbhbar.png",NULL);
 	//picture box's
 	create_picturebox(&gui.picback, &gui.wndnewaccount,219,325,80,80,80,80,comb_2str(GUI_PATH, "spriteback.png"),NULL);
-	//create_picturebox(&gui.picsprite, &gui.picback,8,8,32,32,32,32,get_path(SPRITE_PATH,0,IMAGE_ENDING),NULL);
+	create_clipbox(&gui.clipsprite,&gui.picback,8,8,64,64,32,32);
+
 	//GUI FUNCTION,
+	set_scrollbar_buttons(&gui.sbjob, &sbjob_press);
+	gui.clipsprite.draw = &render_sprite;
 	gui.btnclose.mousepress = &newacc_btnclose_press;
 	gui.btnback.mousepress = &newacc_btnback_press;
 	gui.lblback.action |= WIDGET_CAN_CLICK_BEHIND;
 	gui.lblcreate.action |= WIDGET_CAN_CLICK_BEHIND;
 	widget_manual_focused(&gui.wndnewaccount);
+
+	box.height = 32;
+	box.width = 32;
+	box.imgpos.x = 32 *5;
+	box.imgpos.y = 0;
+	box.sizex = 64;
+	box.sizey = 64;
+	box.pos.x = gui.clipsprite.actualpos.x;
+	box.pos.y = gui.clipsprite.actualpos.y;
+	load_image(get_path(SPRITE_PATH,job(0)->sprite,IMAGE_ENDING), &box.img);
+	create_sprite_vertex_buffer(&box);
 }
 
 void newacc_btnclose_press(widget *control, int button, int pressed)
@@ -115,4 +134,44 @@ void newacc_btnclose_press(widget *control, int button, int pressed)
 void newacc_btnback_press(widget *control, int button, int pressed)
 {
 	set_menu_state(MENU_STATE_MAIN);
+}
+
+void sbjob_press(widget *control, int button, int pressed)
+{
+	update_label_string(&gui.lbljobname, job(control->parent->value)->name);
+	update_label_string(&gui.lblstr, int_to_string(job(control->parent->value)->stat[STAT_STRENGTH]));
+	update_label_string(&gui.lbldef, int_to_string(job(control->parent->value)->stat[STAT_DEFENSE]));
+	update_label_string(&gui.lblmagic, int_to_string(job(control->parent->value)->stat[STAT_MAGIC]));
+	update_label_string(&gui.lblspeed, int_to_string(job(control->parent->value)->stat[STAT_SPEED]));
+
+	load_image(get_path(SPRITE_PATH,job(control->parent->value)->sprite,IMAGE_ENDING), &box.img);
+}
+
+void update_clipsprite_pos(widget *control)
+{
+	box.pos.x = gui.clipsprite.actualpos.x;
+	box.pos.y = gui.clipsprite.actualpos.y;
+
+	sprite_update_vector(&box);
+}
+
+void render_sprite(widget *control)
+{
+	time = glfwGetTime();
+
+	if(lpstimer < time){
+		if(set == 1){
+			set = 2;
+			box.imgpos.x = 32 *3;
+			sprite_update_texture_vector(&box);
+		}
+		else{
+			set = 1;
+			box.imgpos.x = 32 *5;
+			sprite_update_texture_vector(&box);
+		}
+		lpstimer = time + .30;
+	}
+
+	draw_sprite(&box);
 }
