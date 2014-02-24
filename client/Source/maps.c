@@ -5,7 +5,6 @@
 #include <stdio.h>
 #include "path.h"
 #include "error.h"
-#include "types.h"
 #include "socket.h"
 
 map_t map_data;

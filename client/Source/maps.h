@@ -5,6 +5,7 @@
 #define DE_MAPS_H
 
 #include "integer.h"
+#include "types.h"
 #include "globals.h"
 #include "buffer.h"
 #include <stdlib.h>
@@ -14,6 +15,7 @@ typedef struct tile_t tile_t;
 typedef struct map_item_t map_item_t;
 typedef struct map_npc_t map_npc_t;
 typedef struct map_t map_t;
+typedef struct tile_layout tile_layout;
 typedef enum tile_type tile_type;
 typedef enum map_type map_type;
 
@@ -93,6 +95,11 @@ enum tile_type{
 	TILE_TYPE_KEY,
 	TILE_TYPE_KEYOPEN,
 	TILE_TYPE_COUNT
+};
+
+struct tile_layout{
+	sbuffer buffer;
+	image img;
 };
 
 map_t *map(void);
