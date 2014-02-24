@@ -1059,11 +1059,14 @@ void create_hscrollbar(widget *control, widget *parent, uint16 x, uint16 y, uint
 	scroll_t->bar.imgpos.x = 0;
 	scroll_t->bar.imgpos.y = 0;
 	scroll_t->bar.type = CONTROL_HSCROLL_BAR;
-	scroll_t->bar.sizex = (sizex + scroll_t->button_2.sizex  + scroll_t->button_1.sizex) / max_value;
+	scroll_t->bar.sizex = (sizex + scroll_t->button_2.sizex  + scroll_t->button_1.sizex) / max_value + 1;
 	scroll_t->bar.sizey = sizey;
 
 	if(scroll_t->bar.sizex < 2)
 		scroll_t->bar.sizex = 2;
+
+	if(scroll_t->bar.sizex > sizex - (scroll_t->button_2.sizex  + scroll_t->button_1.sizex))
+		scroll_t->bar.sizex = sizex - (scroll_t->button_2.sizex  + scroll_t->button_1.sizex) - max_value;
 
 	scroll_t->bar.pos.x = (scroll_t->button_1.pos.x + scroll_t->button_1.sizex) + (value *(sizex - (scroll_t->button_1.sizex) - 1 ) / max_value);
 
@@ -1479,6 +1482,9 @@ void create_vscrollbar(widget *control, widget *parent, uint16 x, uint16 y, uint
 	scroll_t->bar.sizey = (sizey + scroll_t->button_1.sizey  + scroll_t->button_2.sizey - scroll_t->bar.img->height) / max_value;
 	if(scroll_t->bar.sizey < 2)
 		scroll_t->bar.sizey = 2;
+
+	if(scroll_t->bar.sizey > sizey - (scroll_t->button_2.sizey  + scroll_t->button_1.sizey))
+		scroll_t->bar.sizey = sizey - (scroll_t->button_2.sizey  + scroll_t->button_1.sizey) - max_value;
 
 	scroll_t->bar.pos.y = (scroll_t->button_1.pos.y + scroll_t->button_1.sizey) + (value *(sizey - (scroll_t->button_1.sizey * 2) - 1 ) / max_value);
 
@@ -2817,7 +2823,10 @@ void create_clipbox(widget *control, widget *parent, uint16 x, uint16 y, uint16 
 	control->imgpos.y = 0;
 	control->type = CONTROL_CLIPBOX;
 	control->controldraw = &draw_clipbox;
+	control->controlupdatepos = &handle_clipbox_move;
 	widget_add(parent,control);
+	control->actualpos.x = control->pos.x + control->parent->actualpos.x;
+	control->actualpos.y = control->pos.y + control->parent->actualpos.y;
 }
 
 void unload_clipbox(widget *control, sbool hidden)
@@ -2835,10 +2844,16 @@ void unload_clipbox(widget *control, sbool hidden)
 	free(control->hidden.data);
 }
 
+void handle_clipbox_move(widget *control)
+{
+	control->actualpos.x = control->pos.x + control->parent->actualpos.x;
+	control->actualpos.y = control->pos.y + control->parent->actualpos.y;
+	control->updatepos(control);
+}
+
 void draw_clipbox(widget *control)
 {
-	
-	glScissor(control->pos.x,get_screen_height() - control->height - control->pos.y,control->width,control->height);
+	glScissor(control->actualpos.x,get_screen_height() - control->height - control->actualpos.y,control->width,control->height);
 	glEnable(GL_SCISSOR_TEST);
 	control->draw(control);
 	glDisable(GL_SCISSOR_TEST);

@@ -243,6 +243,7 @@ void unload_frame(widget *control, sbool hidden);
 
 void create_clipbox(widget *control, widget *parent, uint16 x, uint16 y, uint16 height, uint16 width, uint16 sizey, uint16 sizex);
 void unload_clipbox(widget *control, sbool hidden);
+void handle_clipbox_move(widget *control);
 void draw_clipbox(widget *control, image *img, sbuffer buf);
 
 #endif
