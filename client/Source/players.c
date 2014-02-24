@@ -169,7 +169,7 @@ void init_jobs(void)
 	//job mage
 	job_array[1].name = "Mage";
 	job_array[1].type = JOB_TYPE_MAGE;
-	job_array[1].sprite = 1;
+	job_array[1].sprite = 2;
 	job_array[1].stat[STAT_STRENGTH] = 3;
 	job_array[1].stat[STAT_DEFENSE] = 3;
 	job_array[1].stat[STAT_SPEED] = 5;
@@ -178,7 +178,7 @@ void init_jobs(void)
 	//job monk
 	job_array[2].name = "Monk";
 	job_array[2].type = JOB_TYPE_MONK;
-	job_array[2].sprite = 1;
+	job_array[2].sprite = 2;
 	job_array[2].stat[STAT_STRENGTH] = 6;
 	job_array[2].stat[STAT_DEFENSE] = 6;
 	job_array[2].stat[STAT_SPEED] = 5;
