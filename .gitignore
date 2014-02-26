@@ -15,3 +15,4 @@
 *.bsc
 client/Source/XP_debug/Client.vcxprojResolveAssemblyReference.cache
 *.manifest
+*.dat
