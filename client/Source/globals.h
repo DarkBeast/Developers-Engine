@@ -72,11 +72,10 @@
 #define MAX_MAPS   100
 #define MAX_MAPX   15
 #define MAX_MAPY   11
-#define TILE_SIZE_X     32	//magic pixels
-#define TILE_SIZE_Y     32	//magic pixels
+#define TILE_SIZE     32	//magic pixels this is used for both width and height
 
 /*widget defines*/
-#define WIDGET_MAX       64 //max amount of widgets per array.
+#define WIDGET_MAX       32 //max amount of widgets per array.
 #define FONTNAME   "arial.ttf"
 
 /*to use debug commands set debug to TRUE to turn off set debug to FALSE
