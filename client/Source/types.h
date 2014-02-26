@@ -135,7 +135,7 @@ struct vertex_array {
 
 struct sbuffer{
 	GLuint buffer; //texture vertex buffer.
-	GLuint index; //index buffer.
+	GLuint index; //index buffer. 8byte
 	vertex_t data[4]; //array of 4 vertex's.
 };
 
