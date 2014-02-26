@@ -102,7 +102,6 @@ void alert_msg_socket(struct bufferevent *bev, char * msg)
 	add_string(&buffer, msg);
 
 	send_socket_data(&buffer, bev);
-	clear_user_socket(bev);
 }
 
 void hacking_attempt(int16 index, char * msg)
