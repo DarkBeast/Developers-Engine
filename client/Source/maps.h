@@ -5,7 +5,6 @@
 #define DE_MAPS_H
 
 #include "integer.h"
-#include "types.h"
 #include "globals.h"
 #include "buffer.h"
 #include <stdlib.h>
@@ -16,8 +15,12 @@ typedef struct map_item_t map_item_t;
 typedef struct map_npc_t map_npc_t;
 typedef struct map_t map_t;
 typedef struct tile_layout tile_layout;
+typedef struct map_images map_images;
+typedef struct tile_layout_data tile_layout_data;
 typedef enum tile_type tile_type;
 typedef enum map_type map_type;
+
+#include "render.h"
 
 #define GETXY(x, y) ((y << 7) + x) /* GETXY_UNSAFE is faster, but may error */
 #define GETXY_SAFE(x, y, max_x, max_y) ((x < max_x && y < max_y) ? ((y << 7) + x) : 0) /* Safe but slower */
@@ -98,8 +101,23 @@ enum tile_type{
 };
 
 struct tile_layout{
-	sbuffer buffer;
-	image img;
+	tile_layout_data *ground;
+	tile_layout_data *mask;
+	tile_layout_data *anim;
+	tile_layout_data *fringe;
+};
+
+struct tile_layout_data{
+	uint8 imageid;
+	GLuint buffer;
+	GLuint index;
+};
+
+struct map_images{
+	image *img;
+	uint8 *id;
+	uint32 count;
+	uint32 max;
 };
 
 map_t *map(void);
@@ -118,4 +136,15 @@ void clear_map_items(void);
 
 void clear_map_npc(uint8 i);
 
+void map_image_resize(void);
+
+uint8 add_new_map_image(uint8 id);
+
+tile_layout *tile_buffers(void);
+
+void clear_map_img(void);
+
+image *get_map_image(uint8 id);
+
+void preload_map_tiles(void);
 #endif
