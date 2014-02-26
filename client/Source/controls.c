@@ -2806,9 +2806,7 @@ void handle_frame_move(widget *control)
 	control->actualpos.y = control->pos.y + control->parent->actualpos.y;
 }
 
-
 //******clip box*******
-
 
 void create_clipbox(widget *control, widget *parent, uint16 x, uint16 y, uint16 height, uint16 width, uint16 sizey, uint16 sizex, uint8 planeid)
 {
@@ -2858,5 +2856,3 @@ void draw_clipbox(widget *control)
 	control->draw(control);
 	glDisable(GL_SCISSOR_TEST);
 }
-
-
