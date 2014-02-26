@@ -16,13 +16,61 @@ void(*packets[SMSG_COUNT])(buffer_t *);
 void init_packets(void)
 {
 	packets[SLOGINOK] = handle_loginok;
+	packets[SALERTMSG] = &handle_alert_message;
+	packets[SINGAME] = &handle_in_game;
+	packets[SPLAYERINV] = &handle_player_inv;
+	packets[SPLAYERINVUPDATE] = &handle_player_inv_update;
+	packets[SPLAYERWORNEQ] = &handle_player_worn_eq;
+	packets[SPLAYERHP] = &handle_player_hp;
+	packets[SPLAYERMP] = &handle_player_mp;
+	packets[SPLAYERSP] = &handle_player_sp;
+	packets[SPLAYERSTATS] = &handle_player_stats;
+	packets[SPLAYERDATA] = &handle_player_data;
+	packets[SPLAYERMOVE] = &handle_player_move;
+	packets[SNPCMOVE] = &handle_npc_move;
+	packets[SPLAYERDIR] = &handle_player_dir;
+	packets[SNPCDIR] = &handle_npc_dir;
+	packets[SPLAYERXY] = &handle_player_xy;
+	packets[SATTACK] = &handle_attack;
+	packets[SNPCATTACK] = &handle_npc_attack;
+	packets[SCHECKFORMAP] = &handle_check_for_map;
+	packets[SMAPDATA] = &handle_map_data;
+	packets[SMAPITEMDATA] = &handle_map_item_data;
+	packets[SMAPNPCDATA] = &handle_map_npc_data;
+	packets[SMAPDONE] = &handle_map_done;
+	packets[SGLOBALMSG] = &handle_global_msg;
+	packets[SADMINMSG] = &handle_admin_msg;
+	packets[SPLAYERMSG] = &handle_player_msg;
+	packets[SMAPMSG] = &handle_map_msg;
+	packets[SSPAWNITEM] = &handle_spawn_item;
+	packets[SITEMEDITOR] = &handle_item_editor;
+	packets[SUPDATEITEM] = &handle_update_item;
+	packets[SEDITITEM] = &handle_edit_item;
+	packets[SREDITOR] = &handle_refreash;
+	packets[SSPAWNNPC] = &handle_spawn_npc;
+	packets[SNPCDEAD] = &handle_npc_dead;
+	packets[SNPCEDITOR] = &handle_npc_editor;
+	packets[SUPDATENPC] = &handle_update_npc;
+	packets[SEDITNPC] = &handle_edit_npc;
+	packets[SEDITMAP] = &handle_edit_map;
+	packets[SSHOPEDITOR] = &handle_shop_editor;
+	packets[SUPDATESHOP] = &handle_update_shop;
+	packets[SEDITSHOP] = &handle_edit_shop;
+	packets[SSPELLEDITOR] = &handle_spell_editor;
+	packets[SUPDATESPELL] = &handle_update_spell;
+	packets[SEDITSPELL] = &handle_edit_spell;
+	packets[STRADE] = &handle_trade;
+	packets[SSPELLS] = &handle_spells;
+	packets[SLEFT] = &handle_left;
+	packets[SCASTSPELL] = &handle_spell_cast;
+	packets[SHIGHINDEX] = &handle_high_index;
 }
 
 void incomming_packets(buffer_t *data)
 {
 	uint8 id = SNONE;
 
-	if(data->offset == 0){
+	if(data->offset > 0){
 		error_handler(DE_ERROR_INVALID_PACKET_OFFSET);
 		return;
 	}
@@ -57,6 +105,7 @@ void handle_alert_message(buffer_t *data)
 	string = (char *)calloc(size,sizeof(char));
 	take_string(string,data);
 
+	printf("/s",string);
 	//frmSendGetData.Visible = False
 	//frmMainMenu.Visible = True
 
@@ -400,34 +449,6 @@ void handle_map_done(buffer_t *data)
 
 	tempdata()->gettingmap = FALSE;
 	tempdata()->canmovenow = TRUE;
-}
-
-void handle_say_msg(buffer_t *data)
-{
-	char *string = NULL;
-	uint32 size;
-	uint8 color;
-
-	take_buffer(&size,data,SIZE32);
-	string = (char *)calloc(size,sizeof(char));
-	take_string(string,data);
-	take_buffer(&color, data, SIZE8);
-
-	//Call AddText(Msg, Color)
-}
-
-void handle_broadcast_msg(buffer_t *data)
-{
-	char *string = NULL;
-	uint32 size;
-	uint8 color;
-
-	take_buffer(&size,data,SIZE32);
-	string = (char *)calloc(size,sizeof(char));
-	take_string(string,data);
-	take_buffer(&color, data, SIZE8);
-
-	//Call AddText(Msg, Color)
 }
 
 void handle_global_msg(buffer_t *data)
