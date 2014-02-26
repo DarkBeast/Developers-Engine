@@ -177,6 +177,8 @@ void handle_new_account(buffer_t *data, struct bufferevent *bev)
 	char *path;
 
 	if(get_temp_player_index(bev) == TEMP_NO_MATCH){
+
+		decrypt_packet(data);
 		take_string(name, data);
 		take_string(charname, data);
 		take_string(password, data);
