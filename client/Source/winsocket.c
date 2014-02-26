@@ -55,7 +55,7 @@ int socketlisten(void *arg)
 
 		clear_buffer(&buffer);
 
-		if (recv(i, buffer.buff, size, 0) <= 0){
+		if (recv(sock->socket, buffer.buff, size, 0) <= 0){
 			puts("Connection to Server Lost");
 			isconnected_t = FALSE;
 			return FALSE;
