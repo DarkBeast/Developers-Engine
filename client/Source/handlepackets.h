@@ -61,10 +61,6 @@ void handle_map_npc_data(buffer_t *data);
 
 void handle_map_done(buffer_t *data);
 
-void handle_say_msg(buffer_t *data);
-
-void handle_broadcast_msg(buffer_t *data);
-
 void handle_global_msg(buffer_t *data);
 
 void handle_player_msg(buffer_t *data);
