@@ -6,7 +6,6 @@
 #include <stdlib.h>
 #include "error.h"
 #include "globals.h"
-#include "image.h"
 #include "integer.h"
 #include "render.h"
 #include "bool.h"
@@ -273,6 +272,112 @@ void create_sprite_vertex_buffer(sprite *s)
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 }
 
+void create_tile_vertex_buffer(tile_layout_data *s, uint32 x, uint32 y, uint32 tx, uint32 ty)
+{
+	GLuint index[4] = {0,1,2,3};
+	float x2,x1;
+	float y2,y1;
+	vertex_array arr;
+
+	x1 = tx  / get_map_image(s->imageid)->width;
+	x2 = (tx + TILE_SIZE) / get_map_image(s->imageid)->width;
+	y1 = ty / get_map_image(s->imageid)->height;
+	y2 = (ty + TILE_SIZE) / get_map_image(s->imageid)->height;
+
+	/*index 0*/
+	arr.vertex[0].u = x1; arr.vertex[0].v = y2;
+	arr.vertex[0].x = x; arr.vertex[0].y = y;
+	arr.vertex[0].r = 1.0; arr.vertex[0].b = 1.0; arr.vertex[0].g = 1.0; arr.vertex[0].a = 1.0;
+
+	/*index 1*/
+	arr.vertex[1].u = x2; arr.vertex[1].v = y2;
+	arr.vertex[1].x = x + TILE_SIZE; arr.vertex[1].y = y;
+	arr.vertex[1].r = 1.0; arr.vertex[1].b = 1.0; arr.vertex[1].g = 1.0; arr.vertex[1].a = 1.0;
+
+	/*index 2*/
+	arr.vertex[2].u = x2; arr.vertex[2].v = y1;
+	arr.vertex[2].x = x + TILE_SIZE; arr.vertex[2].y = y + TILE_SIZE;
+	arr.vertex[2].r = 1.0; arr.vertex[2].b = 1.0; arr.vertex[2].g = 1.0; arr.vertex[2].a = 1.0;
+
+	/*index 3*/
+	arr.vertex[3].u = x1; arr.vertex[3].v = y1;
+	arr.vertex[3].x = x; arr.vertex[3].y = y + TILE_SIZE;
+	arr.vertex[3].r = 1.0; arr.vertex[3].b = 1.0; arr.vertex[3].g = 1.0; arr.vertex[3].a = 1.0;
+
+	glGenBuffers(1,&s->buffer);
+	glGenBuffers(1,&s->index);
+
+	glBindBuffer(GL_ARRAY_BUFFER,s->buffer);
+	glBufferData(GL_ARRAY_BUFFER,sizeof(arr.vertex),arr.vertex,GL_STREAM_DRAW);//fill up the array with vertex and color-data
+
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER,s->index);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER,4 * sizeof(GLuint),index,GL_STATIC_DRAW);
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
+}
+
+void update_tile_array(tile_layout_data *s, uint32 x, uint32 y, uint32 tx, uint32 ty)
+{
+	GLuint index[4] = {0,1,2,3};
+	float x2,x1;
+	float y2,y1;
+	vertex_array arr;
+
+	x1 = tx  / get_map_image(s->imageid)->width;
+	x2 = (tx + TILE_SIZE) / get_map_image(s->imageid)->width;
+	y1 = ty / get_map_image(s->imageid)->height;
+	y2 = (ty + TILE_SIZE) / get_map_image(s->imageid)->height;
+
+	/*index 0*/
+	arr.vertex[0].u = x1; arr.vertex[0].v = y2;
+	arr.vertex[0].x = x; arr.vertex[0].y = y;
+	arr.vertex[0].r = 1.0; arr.vertex[0].b = 1.0; arr.vertex[0].g = 1.0; arr.vertex[0].a = 1.0;
+
+	/*index 1*/
+	arr.vertex[1].u = x2; arr.vertex[1].v = y2;
+	arr.vertex[1].x = x + TILE_SIZE; arr.vertex[1].y = y;
+	arr.vertex[1].r = 1.0; arr.vertex[1].b = 1.0; arr.vertex[1].g = 1.0; arr.vertex[1].a = 1.0;
+
+	/*index 2*/
+	arr.vertex[2].u = x2; arr.vertex[2].v = y1;
+	arr.vertex[2].x = x + TILE_SIZE; arr.vertex[2].y = y + TILE_SIZE;
+	arr.vertex[2].r = 1.0; arr.vertex[2].b = 1.0; arr.vertex[2].g = 1.0; arr.vertex[2].a = 1.0;
+
+	/*index 3*/
+	arr.vertex[3].u = x1; arr.vertex[3].v = y1;
+	arr.vertex[3].x = x; arr.vertex[3].y = y + TILE_SIZE;
+	arr.vertex[3].r = 1.0; arr.vertex[3].b = 1.0; arr.vertex[3].g = 1.0; arr.vertex[3].a = 1.0;
+
+	glBindBuffer(GL_ARRAY_BUFFER,s->buffer);
+	glBufferSubData(GL_ARRAY_BUFFER, 0, 4 * sizeof(struct vertex_t), &arr.vertex[0]);
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
+}
+
+void draw_tile(tile_layout_data *s)
+{
+	glEnableClientState(GL_VERTEX_ARRAY);
+	glEnableClientState(GL_TEXTURE_COORD_ARRAY);
+	glEnableClientState(GL_COLOR_ARRAY);
+
+	glBindTexture(GL_TEXTURE_2D, get_map_image(s->imageid)->texid);
+
+	glBindBuffer(GL_ARRAY_BUFFER, s->buffer);
+	glVertexPointer(2, GL_FLOAT, sizeof(struct vertex_t), 0);
+	glTexCoordPointer(2, GL_FLOAT, sizeof(struct vertex_t), (GLvoid *)offsetof(struct vertex_t, u));
+	glColorPointer(4, GL_FLOAT, sizeof(struct vertex_t), (GLvoid *)offsetof(struct vertex_t, r));
+
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER,  s->index);
+	glIndexPointer(GL_UNSIGNED_INT,sizeof(GLuint),0);
+
+	glDrawElements(GL_QUADS,4,GL_UNSIGNED_INT,0); //GL_TRIANGLE_STRIP
+
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+	glBindTexture(GL_TEXTURE_2D, 0);
+	glDisableClientState(GL_COLOR_ARRAY);
+	glDisableClientState(GL_TEXTURE_COORD_ARRAY);
+	glDisableClientState(GL_VERTEX_ARRAY);
+}
+
 void sprite_update_vector(sprite *s)
 {
 	/*index 0*/
@@ -444,7 +549,6 @@ void draw_widget(widget *control)
 	glEnableClientState(GL_COLOR_ARRAY);
 
 	glBindTexture(GL_TEXTURE_2D, control->img->texid);
-
 
 	glBindBuffer(GL_ARRAY_BUFFER, control->buf.buffer);
 	glVertexPointer(2, GL_FLOAT, sizeof(struct vertex_t), 0);

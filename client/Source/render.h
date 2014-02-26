@@ -8,6 +8,8 @@
 #include "types.h"
 #include "widget.h"
 #include "controls.h"
+#include "maps.h"
+#include "image.h"
 
 typedef struct screen_size screen_size;
 
@@ -50,5 +52,9 @@ void draw_sprite(sprite *s);
 void sprite_update_texture_vector(sprite *s);
 void sprite_update_vector(sprite *s);
 void create_sprite_vertex_buffer(sprite *s);
+
+void create_tile_vertex_buffer(tile_layout_data *s, uint32 x, uint32 y, uint32 tx, uint32 ty);
+void update_tile_array(tile_layout_data *s, uint32 x, uint32 y, uint32 tx, uint32 ty);
+void draw_tile(tile_layout_data *s);
 
 #endif
