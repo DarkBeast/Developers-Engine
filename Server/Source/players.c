@@ -432,6 +432,9 @@ void add_account(char *name, char *password, char *charname, uint8 sex, uint8 ty
 	player_t temp;
 	char *path;
 
+	temp.inv = (inventory_t *)calloc(MAX_INV,sizeof(inventory_t));
+	temp.equipment = (uint16 *)calloc(EQUIPMENT_COUNT, sizeof(uint16));
+	temp.spells = (uint16 *)calloc(MAX_PLAYER_SPELLS, sizeof(uint16));
 	temp.stat = (uint8 *)calloc(STAT_COUNT, sizeof(uint8));
 	temp.vitals = (uint16 *)calloc(VITAL_COUNT, sizeof(uint16));
 	temp.username = name;
