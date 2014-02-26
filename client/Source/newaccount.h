@@ -47,4 +47,5 @@ void newacc_btnclose_press(widget *control, int button, int pressed);
 void newacc_btnback_press(widget *control, int button, int pressed);
 void render_sprite(widget *control);
 void sbjob_press(widget *control, int button, int pressed);
+void newacc_btncreate_press(widget *control, int button, int pressed);
 #endif

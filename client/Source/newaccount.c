@@ -10,25 +10,29 @@
 #include "bool.h"
 #include "globals.h"
 #include "general.h"
+#include "function.h"
+#include "winsocket.h"
+#include "tinycthread.h"
 
 new_account_t gui;
 sprite box;
 
-float time;
+float time1;
 float lpstimer = 0;
 uint8 set = 1;
+thrd_t t1;
 
 void new_account(void)
 {
-	//uint32 time;
-	//uint32 lpstimer = 0;
-	//uint32 lps = 0;
+	uint32 time1;
+	uint32 lpstimer1 = 0;
+	uint32 lps = 0;
 	int running = TRUE;
 
 	draw_state_reset();
 
 	while(running){
-		//time = (uint32 )glfwGetTime();
+		time1 = (uint32 )glfwGetTime();
 
 		clear_screen(0,0,0,255);
 
@@ -40,14 +44,14 @@ void new_account(void)
 		glfwSwapBuffers(get_the_window());
 		glfwPollEvents();
 
-		//if(lpstimer < time){//calculates the loops per second the code does, through everything
-		//	printf("%i\n",lps);
-		//	lpstimer = time + 1;
+		if(lpstimer1 < time1){//calculates the loops per second the code does, through everything
+			printf("%i\n",lps);
+			lpstimer1 = time1 + 1;
 
-		//	lps = 0;
-		//}
+			lps = 0;
+		}
 
-		//lps += 1;
+		lps += 1;
 
 		//_sleep(20);
 
@@ -60,6 +64,7 @@ void new_account(void)
 
 void init_new_account(void)
 {
+
 	//window
 	create_window(&gui.wndnewaccount, NULL, 0, 0, 600, 800, 600, 800,"menuback.png", NULL);
 	create_frame(&gui.frmmain, &gui.wndnewaccount,0,0,60,800,FALSE, TRUE);
@@ -110,6 +115,7 @@ void init_new_account(void)
 	gui.clipsprite.draw = &render_sprite;
 	gui.btnclose.mousepress = &newacc_btnclose_press;
 	gui.btnback.mousepress = &newacc_btnback_press;
+	gui.btncreate.mousepress = &newacc_btncreate_press;
 	gui.lblback.action |= WIDGET_CAN_CLICK_BEHIND;
 	gui.lblcreate.action |= WIDGET_CAN_CLICK_BEHIND;
 	widget_manual_focused(&gui.wndnewaccount);
@@ -124,16 +130,45 @@ void init_new_account(void)
 	box.pos.y = gui.clipsprite.actualpos.y;
 	load_image(get_path(SPRITE_PATH,job(0)->sprite,IMAGE_ENDING), &box.img);
 	create_sprite_vertex_buffer(&box);
+
+	if(socketconnect()){ //just to test for server connection.
+	 thrd_create(&t1, socketlisten, (void*)0);
+	}
 }
 
 void newacc_btnclose_press(widget *control, int button, int pressed)
 {
+	TerminateThread(t1,0);
 	set_menu_state(MENU_STATE_EXIT);
 }
 
 void newacc_btnback_press(widget *control, int button, int pressed)
 {
+	TerminateThread(t1,0);
 	set_menu_state(MENU_STATE_MAIN);
+}
+
+void newacc_btncreate_press(widget *control, int button, int pressed)
+{
+	textbox *name = (textbox *)gui.txtname.shown.data[0]->control;
+    textbox *password = (textbox *)gui.txtpass.shown.data[0]->control;
+	textbox *password2 = (textbox *)gui.txtrepass.shown.data[0]->control;
+    textbox *charname = (textbox *)gui.txtusername.shown.data[0]->control;
+	uint8 sex;
+
+	if(!comp_str(password->string->data,password2->string->data)){
+		return;
+	}
+
+	if(gui.rdmale.action |= WIDGET_CHECKED)
+		sex = 0;
+
+	if(gui.rdfemale.action |= WIDGET_CHECKED)
+		sex = 1;
+
+	send_new_account(name->string->data,charname->string->data,password->string->data,gui.sbjob.value,sex);
+
+	//set_menu_state(MENU_STATE_MAIN);
 }
 
 void sbjob_press(widget *control, int button, int pressed)
@@ -157,9 +192,9 @@ void update_clipsprite_pos(widget *control)
 
 void render_sprite(widget *control)
 {
-	time = glfwGetTime();
+	time1 = glfwGetTime();
 
-	if(lpstimer < time){
+	if(lpstimer < time1){
 		if(set == 1){
 			set = 2;
 			box.imgpos.x = 32 *3;
@@ -170,7 +205,7 @@ void render_sprite(widget *control)
 			box.imgpos.x = 32 *5;
 			sprite_update_texture_vector(&box);
 		}
-		lpstimer = time + .30;
+		lpstimer = time1 + .60;
 	}
 
 	draw_sprite(&box);
