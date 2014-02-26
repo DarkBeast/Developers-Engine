@@ -93,4 +93,3 @@ void main_btncreate_press(widget *control, int button, int pressed)
 {
 	set_menu_state(MENU_STATE_CREATE);
 }
-
