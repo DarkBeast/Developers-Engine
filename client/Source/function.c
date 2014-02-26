@@ -27,20 +27,23 @@ sbool comp_str(char *string1, char *string2)
 {
 	uint32 i = 1;
 
-	while(*string2){
-		if(*(string1 + i) == *(string2++)){
-			if(*(string1 + i) == ' ' || *(string1 + i) == '\n')
-				return TRUE;
+	if(*(string1) != *(string2))
+		return FALSE;
 
+	while(*string2){
+		if(*(string1 + i) == *(string2 + i)){
+			if(*(string1 + i + 1) == ' ' || *(string1 + i + 1) == '\n' || *(string1 + i + 1) == NULL ){
+				return TRUE;
+			}
 			i++;
 		}
 		else{
-			if(*(string1 + i) == ' ' || *(string1 + i) == '\n')
+			if(*(string1 + i) == ' ' || *(string1 + i) == '\n'){
 				return TRUE;
-
+			}
 			return FALSE;
-		}
-		return FALSE;
+		}	
 	}
+
 	return FALSE;
 }
