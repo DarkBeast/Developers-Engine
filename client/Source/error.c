@@ -92,6 +92,6 @@ void error_handler(int error_flag)
 
 void shut_down(void)
 {
-	widget_unload(widget_get_uip().root);
+	widget_unload(widget_get_uip()->root);
 	unload_functions();
 }
