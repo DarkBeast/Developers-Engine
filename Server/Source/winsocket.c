@@ -86,7 +86,6 @@ void socket_read(struct bufferevent *bev, void *index)
 
 		handle_data(&buffer, bev, index);
 	}
-	puts("lost connection?");
 }
 
 void socket_event(struct bufferevent *bev, short events, void *index)
