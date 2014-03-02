@@ -432,7 +432,6 @@
     <ClInclude Include="integer.h" />
     <ClInclude Include="path.h" />
     <ClInclude Include="spells.h" />
-    <ClInclude Include="status.h" />
     <ClInclude Include="text.h" />
     <ClInclude Include="tinycthread.h" />
     <ClInclude Include="types.h" />
@@ -465,7 +464,6 @@
     <ClCompile Include="path.c" />
     <ClCompile Include="shops.c" />
     <ClCompile Include="spells.c" />
-    <ClCompile Include="status.c" />
     <ClCompile Include="text.c" />
     <ClCompile Include="tinycthread.c" />
     <ClCompile Include="widget.c" />
