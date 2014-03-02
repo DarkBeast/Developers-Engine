@@ -13,7 +13,7 @@
 #include "handlepackets.h"
 #include "winsocket.h"
 #include "general.h"
-#include "status.h"
+
 
 #define _DEBUG 0
 
@@ -49,29 +49,9 @@ int main(void)
 	text_init_font("");//initializes the Font characters for use.
 
 	widget_init_system();//initializes the widget system for storing widgets.
-
-	//init_status_window(FALSE,100000);
-	//thrd_create(&t1, status, (void*)0);
-	//set_status("UI SYSTEM LOADED...");
-
-	//set_status("INITIALIZING PACKETS...");
 	init_packets();
-	//set_status("INITIALIZING RESOURCES...");
 	init_client();
-	//set_status("INITIALIZING SOCKET...");
 	initsocket();
-	//set_status("CONNECTING SOCKET...");
-	//if(socketconnect()){ //just to test for server connection.
-	// thrd_create(&t1, socketlisten, (void*)0);
-	//}
-	//set_status("CONNECTION SUCCESSFUL...");
-	//else
-	//	set_status("CONNECTION UNSUCCESSFUL...");
-
-	//set_status("LOADING MENU...");
-
-	//status_unload();
-
 	menustate();
 
 	unload_functions();
