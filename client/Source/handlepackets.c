@@ -10,6 +10,7 @@
 #include "general.h"
 #include "function.h"
 #include "path.h"
+#include "newaccount.h"
 
 void(*packets[SMSG_COUNT])(buffer_t *);
 
@@ -100,16 +101,27 @@ void handle_alert_message(buffer_t *data)
 {
 	char *string;
 	uint32 size;
+	widget *statusbox1 = (widget *)calloc(1,sizeof(widget));
 
 	take_buffer(&size,data,SIZE32);
 	string = (char *)calloc(size,sizeof(char));
 	take_string(string,data);
 
-	printf("/s",string);
-	//frmSendGetData.Visible = False
-	//frmMainMenu.Visible = True
-
-	//Call MsgBox(Msg, vbOKOnly, GAME_NAME)
+	printf("%s \n",string);
+	
+	switch(get_menu_state()){
+		case MENU_STATE_MAIN:
+			break;
+		case MENU_STATE_CREDITS:
+			break;
+		case MENU_STATE_LOGIN:
+			break;
+		case MENU_STATE_CREATE:
+			//newacc_status_box_open(string);
+			break;
+		case MENU_STATE_EXIT:
+			break;
+		}
 }
 
 void handle_in_game(buffer_t *data)
