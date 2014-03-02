@@ -178,8 +178,8 @@ void menustate(void)
 	sbool run = TRUE;
 
 	while(run){
-		if(widget_get_uip().root->shown.count > 0 || widget_get_uip().root->hidden.count > 0)
-			widget_unload(widget_get_uip().root);
+		if(widget_get_uip()->root->shown.count > 0 || widget_get_uip()->root->hidden.count > 0)
+			widget_unload(widget_get_uip()->root);
 
 		switch(menu_state){
 		case MENU_STATE_MAIN:
