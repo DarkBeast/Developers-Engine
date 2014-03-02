@@ -14,7 +14,7 @@ typedef struct widget widget;
 typedef struct canvas canvas;
 typedef struct user_interface user_interface;
 
-//the Void array to store widgets via pointer
+//the widget array to store widgets via double pointer
 struct widget_array
 {
 	widget **data;
@@ -22,8 +22,7 @@ struct widget_array
 	uint16 count;
 };
 
-//toggles for the action.
-
+//widget action flags.
 enum widget_flags_t
 {
 	WIDGET_IS_FOCUSED = (1 << 0),
@@ -45,11 +44,10 @@ enum widget_flags_t
 	WIDGET_BUFFER_RESIZE = (1 << 16),
 	WIDGET_IS_MULTI_LINED = (1 << 17),
 	WIDGET_WINDOW_MOVEABLE = (1 << 18),
-	WIDGET_USED_CLONE = (1 << 19),
-	WIDGET_CLIP_RENDER = (1 << 20)
+	WIDGET_USED_CLONE = (1 << 19)
 };
 
-//A UI control structure.
+//The UI control structure.
 struct widget
 {
 	widget *parent;
@@ -69,6 +67,7 @@ struct widget
 	lbool action;//widget_flags_t
 	void *control; //special control data
 	void *data; //holding unique data.
+	uint32 index; //used to keep track of index it was added to in the array.
 
 	//User Events
 	void(*draw)(widget *);
@@ -109,16 +108,13 @@ struct user_interface
 	sbool moving;
 };
 
-void set_gui(void *ui);
-
-void *get_gui(void);
-
 //used to Obtain the UI system.
 user_interface widget_get_ui(void);
-user_interface widget_get_uip(void);
-void widget_set_disabled(sbool disabled);
-sbool widget_is_disabled(void);
 
+//used to Obtain the UI system via pointer.
+user_interface *widget_get_uip(void);
+
+//returns the focused widget
 widget *widget_get_focused(void);
 
 //nulls the widgets data.
@@ -126,9 +122,17 @@ void widget_null(widget *wgt);
 
 //changes the moving widgets position via mouse position.
 void widget_move(int16 x, int16 y);
+
+//checks if mouse is over widget
 void widget_mouse_over(widget *control);
+
+//updates widgets position.
 void widget_position_update(widget *parent);
+
+//checks if widget can be used.
 sbool widget_usable(widget *control);
+
+//checks to see if mouse exited widget.
 void widget_has_exited(widget *control);
 
 //checks if the parent is focused to do click events.
@@ -158,14 +162,15 @@ void widget_init_system(void);
 void widget_switch(widget_array *wgt, uint32 a, uint32 b);
 
 //moves a shown widget to the hidden array
-void widget_hide(widget *parent, uint16 index);
+void widget_hide(widget *control);
 
 //moves a hidden widget to the shown array
-void widget_show(widget *parent, uint16 index);
+void widget_show(widget *control);
 
-//adds a widget to a Parent in either the hidden or shown array.
+//adds a widget to a Parent in the shown array.
 void widget_add(widget *parent, widget *child);
 
+//adds a widget to a Parent in the hidden array.
 void widget_add_hidden(widget *parent, widget *child);
 
 //initializes a widgets Data before use.
@@ -182,10 +187,14 @@ void widget_init_shown(widget *parent);
 
 void widget_init_hidden(widget *parent);
 
-//resizes a widgets arrays Max to allow more widgets.
-void widget_hidden_resize(widget *parent, uint16 size);//for dynamic widget arrays up to 65,535, the system currently uses static.
+/*resizes a widgets arrays Max to allow more widgets.
+for dynamic widget arrays up to 65,535, the system currently uses static.*/
+void widget_hidden_resize(widget *parent, uint16 size);
 
-void widget_shown_resize(widget *parent, uint16 size);//for dynamic widget arrays up to 65,535, the system currently uses static.
+/*resizes a widgets arrays Max to allow more widgets.
+for dynamic widget arrays up to 65,535, the system currently uses static.*/
+void widget_shown_resize(widget *parent, uint16 size);
+
 // clears the widgets arrays
 sbool widget_clear_parent(widget *parent);
 
@@ -211,7 +220,7 @@ sbool widget_rect_contains(widget *control);
 sbool widget_has_mouse_over(widget *control);
 
 //focuses a widget manually
-void widget_manual_focused(widget * control);
+void widget_manual_focused(widget *control);
 
 //Used to set if a widget can be focused or not.
 void widget_set_focusable(widget *control, int8 boolean);
@@ -223,6 +232,8 @@ void widget_set_clicked(widget *control);
 
 //Mouse events
 void widget_mouse_release(widget * control);
+
+//Mouse events
 void widget_mouse_press(widget * control);
 
 //default initiates. ignore these.//

@@ -14,27 +14,15 @@
 user_interface ui;
 widget *focused; //holds the widget currently focused on.
 widget *lastmouseover; //holds data for proper mouse exit sequences.
-sbool disable_controls = FALSE;
-
-//default get Main ui, probably never needed but there if someone needs everything.
-sbool widget_is_disabled(void)
-{
-	return disable_controls;
-}
-
-void widget_set_disabled(sbool disabled)
-{
-	disable_controls = disabled;
-}
 
 user_interface widget_get_ui(void)
 {
 	return ui;
 }
 
-user_interface widget_get_uip(void)
+user_interface *widget_get_uip(void)
 {
-	return ui;
+	return &ui;
 }
 
 widget *widget_get_focused(void)
@@ -340,12 +328,10 @@ void widget_init_system(void)
 
 	//sets the show widget array
 	ui.root->shown.data  = (widget **)calloc(1, WIDGET_MAX * sizeof (widget)); //set the size of the widget array
-	ui.root->shown.count = (ui.root->shown.count > WIDGET_MAX) ? WIDGET_MAX : ui.root->shown.count;
 	ui.root->shown.size = WIDGET_MAX;
 
 	//sets the hidden widget array
 	ui.root->hidden.data  = (widget **)calloc(1, WIDGET_MAX * sizeof (widget)); //set the size of the widget array
-	ui.root->hidden.count = (ui.root->hidden.count > WIDGET_MAX) ? WIDGET_MAX : ui.root->hidden.count;
 	ui.root->hidden.size = WIDGET_MAX;
 	ui.root->type = CONTROL_ROOT;
 }
@@ -355,122 +341,141 @@ void widget_switch(widget_array *wgt, uint32 a, uint32 b)//switch's widget posit
 {
 	widget *clone;
 
-	if(wgt == NULL || a >= wgt->size || b >= wgt->size)
+	if(wgt == NULL || a >= wgt->size || b >= wgt->size || wgt->data[a] == NULL || wgt->data[b] == NULL)
 		return;
 
 	clone = wgt->data[a];
 	wgt->data[a] = wgt->data[b];
 	wgt->data[b] = clone;
+	wgt->data[a]->index = a;
+	wgt->data[b]->index = b;
 }
 
 //takes a shown widget and hides it.
-void widget_hide(widget *parent, uint16 index)// Parent: the holder of the widgets to be moved, Index the widget to be moved.
+void widget_hide(widget *control)// Parent: the holder of the widgets to be moved, Index the widget to be moved.
 {
 	uint16 i;
 
-	if( parent == NULL || parent->shown.data[index] == NULL)
+	if( control == NULL || control->parent == NULL || control->type == CONTROL_ROOT)
 		return;
 
-	if(parent->hidden.size == 0){
-		widget_init_hidden(parent);
+	if(control->index != control->parent->shown.count - 1)
+		widget_switch(&control->parent->shown, control->index, control->parent->shown.count - 1);
+
+	if(control->parent->hidden.size == 0)
+		widget_init_hidden(control->parent);
+
+	if(control->parent->hidden.count == 0){//if we are starting a new array then create the first object.
+		control->parent->hidden.data[0] = control;
+		control->index = 0;
+		control->parent->hidden.count++;
+		goto unload;
 	}
 
-	if(parent->hidden.count == 0){//if we are starting a new array then create the first object.
-		parent->hidden.data[0] = parent->shown.data[index];
-		parent->hidden.count += 1;
-		parent->shown.data[index] = NULL;
-		return;
-	}
-
-	for( i = 0; i < parent->hidden.count; i++){//search through existing count for Nulled data if Null then use.
-		if(parent->hidden.data[i] == NULL){
-			parent->hidden.data[i] = parent->shown.data[index];
-			parent->shown.data[index] = NULL;
-			return;
+	for( i = 0; i < control->parent->hidden.count; i++){//search through existing count for Nulled data if Null then use.
+		if(control->parent->hidden.data[i] == NULL){
+			control->parent->hidden.data[i] = control;
+			control->index = i;
+			goto unload;
 		}
 	}
 
-	if( parent->hidden.count < parent->hidden.size){// if none are nulled then check to see if we reach limit if not add to the count.
-		parent->hidden.data[parent->hidden.count] = parent->shown.data[index];
-		parent->hidden.count += 1;
-		parent->shown.data[index] = NULL;
-		return;
+	if( control->parent->hidden.count < control->parent->hidden.size){// if none are nulled then check to see if we reach limit if not add to the count.
+		control->parent->hidden.data[control->parent->hidden.count] = control;
+		control->index = control->parent->hidden.count;
+		control->parent->hidden.count++;
+	}
+
+unload:
+	control->parent->shown.data[control->parent->shown.count - 1] = NULL;
+	control->parent->shown.count--;
+
+	if(control->parent->shown.count == 0){
+		free(control->parent->shown.data);
+		control->parent->shown.size = 0;
 	}
 }
 
 //takes a hidden widget and shows it
-void widget_show(widget *parent, uint16 index) // Parent: the holder of the widgets to be moved, Index the widget to be moved.
+void widget_show(widget *control) // Parent: the holder of the widgets to be moved, Index the widget to be moved.
 {
 	uint16 i;
 
-	if(parent == NULL || parent->hidden.data[index] == NULL)
+	if( control == NULL || control->parent == NULL || control->type == CONTROL_ROOT)
 		return;
 
-	if(parent->shown.size == 0){
-		widget_init_shown(parent);
+	if(control->index != control->parent->hidden.count - 1)
+		widget_switch(&control->parent->hidden, control->index, control->parent->hidden.count - 1);
+
+	if(control->parent->shown.size == 0)
+		widget_init_shown(control->parent);
+
+	if(control->parent->shown.count == 0){
+		control->parent->shown.data[0] = control;
+		control->index = 0;
+		control->parent->shown.count++;
+		goto unload;
 	}
 
-	if(parent->shown.count == 0){
-		parent->shown.data[0] = parent->hidden.data[index];
-		parent->shown.count += 1;
-		parent->hidden.data[index] = NULL;
-		return;
-	}
-
-	for( i = 0; i < parent->shown.count; i++){
-		if(parent->shown.data[i] == NULL){
-			parent->shown.data[i] = parent->hidden.data[index];
-			parent->hidden.data[index] = NULL;
-			return;
+	for( i = 0; i < control->parent->shown.count; i++){
+		if(control->parent->shown.data[i] == NULL){
+			control->parent->shown.data[i] = control;
+			control->index = i;
+			goto unload;
 		}
 	}
 
-	if( parent->shown.count < parent->shown.size){
-		parent->shown.data[parent->shown.count] = parent->hidden.data[index];
-		parent->shown.count += 1;
-		parent->hidden.data[index] = NULL;
-		return;
+	if( control->parent->shown.count < control->parent->shown.size){
+		control->parent->shown.data[control->parent->shown.count] = control;
+		control->index = control->parent->shown.count;
+		control->parent->shown.count++;
+	}
+
+unload:
+	control->parent->hidden.data[control->parent->hidden.count - 1] = NULL;
+	control->parent->hidden.count--;
+
+	if(control->parent->hidden.count == 0){
+		free(control->parent->hidden.data);
+		control->parent->hidden.size = 0;
 	}
 }
 
 //adds a widget to another widgets array either Roots or another widget.
-void widget_add(widget *container, widget *child)
+void widget_add(widget *parent, widget *child)
 {
 	uint16 i;
-	widget *parent;
 
 	if(child == NULL)
 		return;
 
-	if(container == NULL){
+	if(parent == NULL)
 		parent = ui.root;
-	}
-	else{
-		parent = container;
-	}
 
 	child->parent = parent;
 
-	if(parent->shown.size == 0){
+	if(parent->shown.size == 0)
 		widget_init_shown(parent);
-	}
 
 	if(parent->shown.count == 0){
 		parent->shown.data[0] = child;
-		parent->shown.count += 1;
+		child->index = 0;
+		parent->shown.count++;
 		return;
 	}
 
 	for( i = 0; i < parent->shown.count; i++){
 		if(parent->shown.data[i] == NULL){
 			parent->shown.data[i] = child;
+			child->index = i;
 			return;
 		}
 	}
 
-	if( parent->shown.count +1 < parent->shown.size){
+	if( parent->shown.count < parent->shown.size){
 		parent->shown.data[parent->shown.count] = child;
-		parent->shown.count += 1;
+		child->index = parent->shown.count;
+		parent->shown.count++;
 		return;
 	}
 	else{
@@ -478,43 +483,40 @@ void widget_add(widget *container, widget *child)
 	}
 }
 
-void widget_add_hidden(widget *container, widget *child)
+void widget_add_hidden(widget *parent, widget *child)
 {
 	uint16 i;
-	widget *parent;
 
 	if(child == NULL)
 		return;
 
-	if(container == NULL){
+	if(parent == NULL)
 		parent = ui.root;
-	}
-	else{
-		parent = container;
-	}
 
 	child->parent = parent;
 
-	if(parent->hidden.size == 0){
+	if(parent->hidden.size == 0)
 		widget_init_hidden(parent);
-	}
 
 	if(parent->hidden.count == 0){//if we are starting a new array then create the first object.
 		parent->hidden.data[0] = child;
-		parent->hidden.count += 1;
+		child->index = 0;
+		parent->hidden.count++;
 		return;
 	}
 
 	for( i = 0; i < parent->hidden.count; ++i){//search through existing count for Nulled data if Null then use.
 		if(parent->hidden.data[i] == NULL){
 			parent->hidden.data[i] = child;
+			child->index = i;
 			return;
 		}
 	}
 
-	if( parent->hidden.count +1 < parent->hidden.size){// if none are nulled then check to see if we reach limit if not add to the count.
+	if( parent->hidden.count < parent->hidden.size){// if none are nulled then check to see if we reach limit if not add to the count.
 		parent->hidden.data[parent->hidden.count] = child;
-		parent->hidden.count += 1;
+		child->index = parent->hidden.count;
+		parent->hidden.count++;
 		return;
 	}
 	else{
@@ -642,7 +644,7 @@ void widget_unload(widget *parent)
 void widget_init_shown(widget *parent)// only use once and if only we wanted to add a widget to a Array with no size.
 {
 	parent->shown.data  = (widget **)calloc(1, WIDGET_MAX * sizeof (widget)); //set the size of the widget array
-	parent->shown.count = (parent->shown.count > WIDGET_MAX) ? WIDGET_MAX : parent->shown.count;
+	parent->shown.count = 0;
 	parent->shown.size = WIDGET_MAX;
 }
 
@@ -650,7 +652,7 @@ void widget_init_shown(widget *parent)// only use once and if only we wanted to 
 void widget_init_hidden(widget *parent)// only use once and if only we wanted to add a widget to a Array with no size.
 {
 	parent->hidden.data  = (widget **)calloc(1, WIDGET_MAX * sizeof (widget)); //set the size of the widget array
-	parent->hidden.count = (parent->hidden.count > WIDGET_MAX) ? WIDGET_MAX : parent->hidden.count;
+	parent->hidden.count = 0;
 	parent->hidden.size = WIDGET_MAX;
 }
 
@@ -969,6 +971,7 @@ void widget_manager(void)//used to draw the widgets onto the screen.
 	id[idindex] = 0;
 
 	for( index = 0; index < ui.root->shown.count; ++index){
+
 		child = ui.root->shown.data[index];
 		child->controldraw(child);//then draw there parent.
 
@@ -1172,26 +1175,21 @@ sbool widget_usable(widget *control)
 }
 
 //Manually sets a widget to Focus
-void widget_manual_focused(widget * control)
+void widget_manual_focused(widget *control)
 {
-	if(control != ui.root){
-		widget *parent = control->parent;
-		uint16 i = 0;
-		if(control->action & WIDGET_CAN_FOCUS){
-			for (i = 0; i < parent->shown.count; i++){
-				if(control == parent->shown.data[i] && i != parent->shown.count -1){
-					widget_switch(&parent->shown, i, parent->shown.count - 1);
-					break;
-				}
-			}
+	if(control == ui.root || control == NULL)
+		return;
 
-			if(focused){
-				focused->action &= ~(WIDGET_IS_FOCUSED);
-			}
-
-			control->action |= WIDGET_IS_FOCUSED;
-			focused = control;
+	if(control->action & WIDGET_CAN_FOCUS){
+		if(control->index != control->parent->shown.count - 1){
+			widget_switch(&control->parent->shown, control->index, control->parent->shown.count - 1);
 		}
+
+		if(focused)
+			focused->action &= ~(WIDGET_IS_FOCUSED);
+
+		control->action |= WIDGET_IS_FOCUSED;
+		focused = control;
 	}
 }
 
