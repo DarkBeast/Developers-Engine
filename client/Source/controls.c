@@ -1251,7 +1251,7 @@ void handle_harrowright_over(widget *control)
 void handle_hbar_slide(widget *control)
 {
 	if(control->shown.data[2]->action & WIDGET_MOVING){
-		float temppos = (widget_get_uip().screen.newmousepos.x - control->actualpos.x - control->shown.data[0]->sizex - (control->shown.data[2]->sizex /2));
+		float temppos = (widget_get_uip()->screen.newmousepos.x - control->actualpos.x - control->shown.data[0]->sizex - (control->shown.data[2]->sizex /2));
 		float tempsize = ( control->sizex - (control->shown.data[0]->sizex * 2) - (control->shown.data[2]->sizex));
 
 		if(temppos < 0)
@@ -1283,7 +1283,7 @@ void handle_hbar_slide(widget *control)
 void handle_hscrollbar_click(widget *control, int button, int pressed)
 {
 	if(button == 0){
-		float temppos = (widget_get_uip().screen.newmousepos.x - control->actualpos.x - control->shown.data[0]->sizex - (control->shown.data[2]->sizex /2));
+		float temppos = (widget_get_uip()->screen.newmousepos.x - control->actualpos.x - control->shown.data[0]->sizex - (control->shown.data[2]->sizex /2));
 		float tempsize = ( control->sizex - (control->shown.data[0]->sizex * 2) - (control->shown.data[2]->sizex));
 
 		if(temppos < 0)
@@ -1612,7 +1612,7 @@ void handle_varrowbottom_over(widget *control)
 void handle_vbar_slide(widget *control)
 {
 	if(control->shown.data[2]->action & WIDGET_MOVING){
-		float temppos = (widget_get_uip().screen.newmousepos.y - control->actualpos.y - control->shown.data[0]->sizey - (control->shown.data[2]->sizey /2));
+		float temppos = (widget_get_uip()->screen.newmousepos.y - control->actualpos.y - control->shown.data[0]->sizey - (control->shown.data[2]->sizey /2));
 		float tempsize = ( control->sizey - (control->shown.data[0]->sizey * 2) - (control->shown.data[2]->sizey));
 
 		if(temppos < 0)
@@ -1644,7 +1644,7 @@ void handle_vbar_slide(widget *control)
 void handle_vscrollbar_click(widget *control, int button, int pressed)
 {
 	if(button == 0){
-		float temppos = (widget_get_uip().screen.newmousepos.y - control->actualpos.y - control->shown.data[0]->sizey - (control->shown.data[2]->sizey /2));
+		float temppos = (widget_get_uip()->screen.newmousepos.y - control->actualpos.y - control->shown.data[0]->sizey - (control->shown.data[2]->sizey /2));
 		float tempsize = ( control->sizey - (control->shown.data[0]->sizey * 2) - (control->shown.data[2]->sizey));
 
 		if(temppos < 0)
@@ -2808,7 +2808,7 @@ void handle_frame_move(widget *control)
 
 //******clip box*******
 
-void create_clipbox(widget *control, widget *parent, uint16 x, uint16 y, uint16 height, uint16 width, uint16 sizey, uint16 sizex, uint8 planeid)
+void create_clipbox(widget *control, widget *parent, uint16 x, uint16 y, uint16 height, uint16 width, uint16 sizey, uint16 sizex)
 {
 	widget_init(control);
 	control->pos.x = x;
@@ -2855,4 +2855,34 @@ void draw_clipbox(widget *control)
 	glEnable(GL_SCISSOR_TEST);
 	control->draw(control);
 	glDisable(GL_SCISSOR_TEST);
+}
+
+void create_statusbox(widget *control, widget *parent, uint16 x, uint16 y, uint16 height, uint16 width, uint16 sizey, uint16 sizex, char *text)
+{
+	widget *hide = (widget *)calloc(1, sizeof(widget));
+	widget *btnok = (widget *)calloc(1, sizeof(widget));
+	widget *lbltext= (widget *)calloc(1, sizeof(widget));
+	widget *lblok= (widget *)calloc(1, sizeof(widget));
+
+	if(btnok == NULL || lbltext == NULL || lblok == NULL || hide == NULL){
+		error_handler(DE_ERROR_POINTER_NULL);
+		return;
+	}
+	create_picturebox(control,NULL,0,0,32,32,get_screen_height(),get_screen_width(),comb_2str(GUI_PATH, "hide.png"), NULL);
+	create_window(hide,control,x,y,height,width,sizey,sizex,"statuswidget.png",NULL);
+	create_label(lbltext,hide,50,95,200,100,0,0,0,120,FALSE,2,12,FALSE,text); //0
+	create_button(btnok,hide,22,290,50,405,50,405,"smallbutton.png", NULL); //1
+	create_label(lblok, btnok,170,10,80,25,0,0,0,120,FALSE,2,8,FALSE,"OK"); //2
+	lblok->action |= WIDGET_CAN_CLICK_BEHIND;
+	control->action |= WIDGET_CAN_FOCUS;
+}
+
+void status_box_set_click_event(widget *control, void(*mousepress)(widget *,int,int))
+{
+	control->shown.data[0]->shown.data[1]->mousepress = mousepress;
+}
+
+void status_box_text(widget *control, char *text)
+{
+	update_label_string(control->shown.data[0]->shown.data[0], text);
 }

@@ -20,6 +20,7 @@ typedef struct textbox_w textbox_w;
 typedef struct listbox listbox;
 typedef struct progressbar progressbar;
 typedef struct clipbox clipbox;
+typedef struct statusbox statusbox;
 
 enum control_types
 {
@@ -38,6 +39,7 @@ enum control_types
 	CONTROL_TEXTBOX,
 	CONTROL_FRAME,
 	CONTROL_CLIPBOX,
+	CONTROL_STATUSBOX,
 	CONTROL_ROOT
 };
 
@@ -72,6 +74,14 @@ struct textbox{
 	uint16 cursorwidth;
 	vector2i cursorpos;
 	line_buffer cursorbuffer;
+};
+
+struct statusbox{
+	sbool accepted;
+	sbool canaccept;
+	double counter;
+	double timer;
+	widget *lbltext;
 };
 
 struct textbox_w{
@@ -245,5 +255,9 @@ void create_clipbox(widget *control, widget *parent, uint16 x, uint16 y, uint16 
 void unload_clipbox(widget *control, sbool hidden);
 void handle_clipbox_move(widget *control);
 void draw_clipbox(widget *control, image *img, sbuffer buf);
+
+void create_statusbox(widget *control, widget *parent, uint16 x, uint16 y, uint16 height, uint16 width, uint16 sizey, uint16 sizex, char *text);
+void status_box_text(widget *control, char *text);
+void status_box_set_click_event(widget *control, void(*mousepress)(widget *,int,int));
 
 #endif
