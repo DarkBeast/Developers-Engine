@@ -64,7 +64,6 @@ void new_account(void)
 
 void init_new_account(void)
 {
-
 	//window
 	create_window(&gui.wndnewaccount, NULL, 0, 0, 600, 800, 600, 800,"menuback.png", NULL);
 	create_frame(&gui.frmmain, &gui.wndnewaccount,0,0,60,800,FALSE, TRUE);
@@ -132,7 +131,13 @@ void init_new_account(void)
 	create_sprite_vertex_buffer(&box);
 
 	if(socketconnect()){ //just to test for server connection.
-	 thrd_create(&t1, socketlisten, (void*)0);
+		thrd_create(&t1, socketlisten, (void*)0);
+	}
+	else{
+		initsocket();
+		if(socketconnect()){ //just to test for server connection.
+			thrd_create(&t1, socketlisten, (void*)0);
+		}
 	}
 }
 
@@ -151,9 +156,9 @@ void newacc_btnback_press(widget *control, int button, int pressed)
 void newacc_btncreate_press(widget *control, int button, int pressed)
 {
 	textbox *name = (textbox *)gui.txtname.shown.data[0]->control;
-    textbox *password = (textbox *)gui.txtpass.shown.data[0]->control;
+	textbox *password = (textbox *)gui.txtpass.shown.data[0]->control;
 	textbox *password2 = (textbox *)gui.txtrepass.shown.data[0]->control;
-    textbox *charname = (textbox *)gui.txtusername.shown.data[0]->control;
+	textbox *charname = (textbox *)gui.txtusername.shown.data[0]->control;
 	uint8 sex;
 
 	if(!comp_str(password->string->data,password2->string->data)){
@@ -167,8 +172,6 @@ void newacc_btncreate_press(widget *control, int button, int pressed)
 		sex = 1;
 
 	send_new_account(name->string->data,charname->string->data,password->string->data,gui.sbjob.value,sex);
-
-	//set_menu_state(MENU_STATE_MAIN);
 }
 
 void sbjob_press(widget *control, int button, int pressed)

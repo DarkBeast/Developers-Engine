@@ -39,6 +39,7 @@ struct new_account_t{
 	widget picback;
 	widget clipsprite;
 	widget sbjob;
+	widget status;
 };
 
 void new_account(void);
