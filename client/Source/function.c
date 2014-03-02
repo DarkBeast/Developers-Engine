@@ -27,6 +27,9 @@ sbool comp_str(char *string1, char *string2)
 {
 	uint32 i = 1;
 
+	if(string1 == NULL || string2 == NULL)
+		return FALSE;
+
 	if(*(string1) != *(string2))
 		return FALSE;
 
