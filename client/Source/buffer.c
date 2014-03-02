@@ -93,4 +93,5 @@ void decrypt_packet(buffer_t* buffer)
 	}
 	clear_buffer(buffer);
 	add_buffer(buffer, decrypted, buffersize);
+	buffer->offset = 0;
 }
