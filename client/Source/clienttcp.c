@@ -15,20 +15,15 @@ void send_data(buffer_t *data)
 void send_new_account(char *name, char *charname, char *password, uint8 job, uint8 sex)
 {
 	buffer_t buffer;
-	buffer_t buffer2;
 
 	clear_buffer(&buffer);
-	clear_buffer(&buffer2);
 	add_opcode(&buffer,CNEWACCOUNT);
+	add_string(&buffer, name);
+	add_string(&buffer, charname);
+	add_string(&buffer, password);
+	add_buffer(&buffer, &job, SIZE8);
+	add_buffer(&buffer, &sex, SIZE8);
 
-	add_string(&buffer2, name);
-	add_string(&buffer2, charname);
-	add_string(&buffer2, password);
-	add_buffer(&buffer2, &job, SIZE8);
-	add_buffer(&buffer2, &sex, SIZE8);
-    encrypt_packet(&buffer2);
-
-	add_buffer(&buffer, buffer2.buff, buffer2.offset);
 	send_data(&buffer);
 }
 
