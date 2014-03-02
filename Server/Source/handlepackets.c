@@ -83,6 +83,7 @@ void handle_data(buffer_t *data, struct bufferevent *bev, void *index)
 
 	switch(id){
 	case CLOGIN:
+
 		handle_login(data, bev); break;
 	case CNEWACCOUNT:
 		handle_new_account(data, bev); break;
@@ -178,7 +179,6 @@ void handle_new_account(buffer_t *data, struct bufferevent *bev)
 
 	if(get_temp_player_index(bev) == TEMP_NO_MATCH){
 
-		decrypt_packet(data);
 		take_string(name, data);
 		take_string(charname, data);
 		take_string(password, data);
