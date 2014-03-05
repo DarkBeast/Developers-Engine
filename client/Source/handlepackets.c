@@ -117,7 +117,7 @@ void handle_alert_message(buffer_t *data)
 		case MENU_STATE_LOGIN:
 			break;
 		case MENU_STATE_CREATE:
-			//newacc_status_box_open(string);
+			newacc_status_message(string);
 			break;
 		case MENU_STATE_EXIT:
 			break;
