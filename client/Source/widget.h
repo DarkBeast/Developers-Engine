@@ -67,7 +67,7 @@ struct widget
 	lbool action;//widget_flags_t
 	void *control; //special control data
 	void *data; //holding unique data.
-	uint32 index; //used to keep track of index it was added to in the array.
+	uint16 index; //used to keep track of index it was added to in the array.
 
 	//User Events
 	void(*draw)(widget *);
