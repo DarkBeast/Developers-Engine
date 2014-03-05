@@ -96,6 +96,10 @@ void init_path(void)
 
 void path_destroy(void)
 {
+	string = NULL;
+	number_string = NULL;
+	path = NULL;
+
 	free(string);
 	free(number_string);
 	free(path);
@@ -535,6 +539,16 @@ char *trim_string(char *str)
 	}
 
 	return str;
+}
+
+
+uint32 get_str_size(char *string)
+{
+	size_t i;
+
+	for(i = 0; string[i] != '\0' ; i++){}
+
+	return i;
 }
 
 sbool is_space(char c)

@@ -24,4 +24,6 @@ char *comb_7str(char *a, char *b, char *c, char *d, char *e, char *f, char *g);
 char* int_to_string(int64 number);
 char *trim_string(char * str) ;
 sbool is_space(char c);
+uint32 get_str_size(char *string);
+
 #endif
