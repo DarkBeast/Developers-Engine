@@ -65,10 +65,10 @@ void handle_mouse_press(GLFWwindow * screen, int button, int pressed, int mods)
 	}
 	else{
 		if(pressed == 1){
-			widget_mouse_press(widget_get_ui().root);
+			widget_mouse_press(widget_get_uip()->root);
 		}
 		else{
-			widget_mouse_release(widget_get_ui().root);
+			widget_mouse_release(widget_get_uip()->root);
 		}
 	}
 }
