@@ -73,6 +73,7 @@ void unload_fonts(void);
 
 void text_resize_buffer(vertex_array **buffer, size_t size);
 void create_text_vertex(text *str, widget *control);
+void update_text_vertex(text *str, widget *control);
 void text_position_supdate(text *str, widget *parent);
 void text_position_mupdate(text *str, widget *parent);
 void string_resize(text *str, uint32 size);
