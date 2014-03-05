@@ -353,7 +353,10 @@ void unload_label(widget *control, sbool hidden)
 void draw_label(widget *control)
 {
 	label *data = (label *)control->control;
-	text_draw(data->string);
+
+	if(data->string->buf.isize > 0){
+		text_draw(data->string);
+	}
 }
 
 void handle_label_click(widget *control, int button, int pressed)
@@ -366,9 +369,19 @@ void handle_label_click(widget *control, int button, int pressed)
 void update_label_string(widget *control, char *string)
 {
 	label *data = (label *)control->control;
+	sbool sizechange = FALSE;
+	uint32 size = get_str_size(string) + 1;
+
+	while( size >= data->string->size){
+		data->string->size = data->string->size * 2;
+		sizechange = TRUE;
+	}
+
+	if(sizechange)
+		control->action |= WIDGET_BUFFER_RESIZE;
 
 	data->string->data = string;
-	create_text_vertex(data->string, control);
+	update_text_vertex(data->string, control);
 }
 
 void handle_slabel_move(widget *control)
@@ -950,7 +963,6 @@ void unload_picturebox(widget *control, sbool hidden)
 void update_picturebox(widget *control, uint16 x, uint16 y, uint16 imgposx, uint16 imgposy, uint16 height, uint16 width, uint16 sizex, uint16 sizey, char *imagepath, widget *clone)
 {
 	if(imagepath != NULL){
-		control->img->pixels = NULL;
 		free(control->img);
 		load_image(imagepath, control->img );
 	}
@@ -2857,7 +2869,7 @@ void draw_clipbox(widget *control)
 	glDisable(GL_SCISSOR_TEST);
 }
 
-void create_statusbox(widget *control, widget *parent, uint16 x, uint16 y, uint16 height, uint16 width, uint16 sizey, uint16 sizex, char *text)
+void create_statusbox(widget *control, widget *parent, uint16 x, uint16 y, char *text, widget *stsclone, widget *btnclone)
 {
 	widget *hide = (widget *)calloc(1, sizeof(widget));
 	widget *btnok = (widget *)calloc(1, sizeof(widget));
@@ -2869,10 +2881,10 @@ void create_statusbox(widget *control, widget *parent, uint16 x, uint16 y, uint1
 		return;
 	}
 	create_picturebox(control,NULL,0,0,32,32,get_screen_height(),get_screen_width(),comb_2str(GUI_PATH, "hide.png"), NULL);
-	create_window(hide,control,x,y,height,width,sizey,sizex,"statuswidget.png",NULL);
-	create_label(lbltext,hide,50,95,200,100,0,0,0,120,FALSE,2,12,FALSE,text); //0
-	create_button(btnok,hide,22,290,50,405,50,405,"smallbutton.png", NULL); //1
-	create_label(lblok, btnok,170,10,80,25,0,0,0,120,FALSE,2,8,FALSE,"OK"); //2
+	create_window(hide,control,x,y,170,378,170,378,"statuswidget.png",stsclone);
+	create_label(lbltext,hide,15,70,200,100,0,0,0,120,FALSE,1,30,FALSE,text); //0
+	create_button(btnok,hide,105,110,50,180,50,180,"smallbutton.png", btnclone); //1
+	create_label(lblok, btnok,75,10,80,25,0,0,0,120,FALSE,2,8,FALSE,"OK"); //2
 	lblok->action |= WIDGET_CAN_CLICK_BEHIND;
 	control->action |= WIDGET_CAN_FOCUS;
 }
