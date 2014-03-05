@@ -21,10 +21,12 @@ float time1;
 float lpstimer = 0;
 uint8 set = 1;
 thrd_t t1;
+char *string;
+sbool update_status = FALSE;
 
 void new_account(void)
 {
-	uint32 time1;
+	uint32 time;
 	uint32 lpstimer1 = 0;
 	uint32 lps = 0;
 	int running = TRUE;
@@ -32,7 +34,7 @@ void new_account(void)
 	draw_state_reset();
 
 	while(running){
-		time1 = (uint32 )glfwGetTime();
+		time = (uint32 )glfwGetTime();
 
 		clear_screen(0,0,0,255);
 
@@ -44,21 +46,30 @@ void new_account(void)
 		glfwSwapBuffers(get_the_window());
 		glfwPollEvents();
 
-		if(lpstimer1 < time1){//calculates the loops per second the code does, through everything
+		if(update_status){
+			status_box_text(&gui.status,string);
+			widget_show(&gui.status);
+			widget_manual_focused(&gui.status);
+			update_status = FALSE;
+		}
+
+		if(lpstimer1 < time){//calculates the loops per second the code does, through everything
 			printf("%i\n",lps);
-			lpstimer1 = time1 + 1;
+			lpstimer1 = time + 1;
 
 			lps = 0;
 		}
 
-		lps += 1;
+		lps++;
 
-		//_sleep(20);
+		//_sleep(32);
 
 		// Check if ESC key was pressed or window was closed
 		running = is_window_open();
-		if(get_menu_state() != MENU_STATE_CREATE)
+		if(get_menu_state() != MENU_STATE_CREATE){
+			TerminateThread(&t1,0);
 			break;
+		}
 	}
 }
 
@@ -108,16 +119,18 @@ void init_new_account(void)
 	//picture box's
 	create_picturebox(&gui.picback, &gui.wndnewaccount,219,325,80,80,80,80,comb_2str(GUI_PATH, "spriteback.png"),NULL);
 	create_clipbox(&gui.clipsprite,&gui.picback,8,8,64,64,32,32);
-
+	create_statusbox(&gui.status,NULL,(get_screen_width()/2) - 189,(get_screen_height()/2) - 85,"test",NULL, NULL);
+	status_box_set_click_event(&gui.status,&newacc_status_button_press);
 	//GUI FUNCTION,
-	set_scrollbar_buttons(&gui.sbjob, &sbjob_press);
-	gui.clipsprite.draw = &render_sprite;
+	set_scrollbar_buttons(&gui.sbjob, &newacc_sbjob_press);
+	gui.clipsprite.draw = &newacc_render_sprite;
 	gui.btnclose.mousepress = &newacc_btnclose_press;
 	gui.btnback.mousepress = &newacc_btnback_press;
 	gui.btncreate.mousepress = &newacc_btncreate_press;
 	gui.lblback.action |= WIDGET_CAN_CLICK_BEHIND;
 	gui.lblcreate.action |= WIDGET_CAN_CLICK_BEHIND;
 	widget_manual_focused(&gui.wndnewaccount);
+	widget_hide(&gui.status);
 
 	box.height = 32;
 	box.width = 32;
@@ -174,7 +187,7 @@ void newacc_btncreate_press(widget *control, int button, int pressed)
 	send_new_account(name->string->data,charname->string->data,password->string->data,gui.sbjob.value,sex);
 }
 
-void sbjob_press(widget *control, int button, int pressed)
+void newacc_sbjob_press(widget *control, int button, int pressed)
 {
 	update_label_string(&gui.lbljobname, job(control->parent->value)->name);
 	update_label_string(&gui.lblstr, int_to_string(job(control->parent->value)->stat[STAT_STRENGTH]));
@@ -185,7 +198,7 @@ void sbjob_press(widget *control, int button, int pressed)
 	load_image(get_path(SPRITE_PATH,job(control->parent->value)->sprite,IMAGE_ENDING), &box.img);
 }
 
-void update_clipsprite_pos(widget *control)
+void newacc_update_clipsprite_pos(widget *control)
 {
 	box.pos.x = gui.clipsprite.actualpos.x;
 	box.pos.y = gui.clipsprite.actualpos.y;
@@ -193,7 +206,7 @@ void update_clipsprite_pos(widget *control)
 	sprite_update_vector(&box);
 }
 
-void render_sprite(widget *control)
+void newacc_render_sprite(widget *control)
 {
 	time1 = glfwGetTime();
 
@@ -212,4 +225,16 @@ void render_sprite(widget *control)
 	}
 
 	draw_sprite(&box);
+}
+
+void newacc_status_button_press(widget *control, int button, int pressed)
+{
+	widget_hide(&gui.status);
+	widget_manual_focused(&gui.wndnewaccount);
+}
+
+void newacc_status_message(char *text)
+{
+	string = text;
+	update_status = TRUE;
 }

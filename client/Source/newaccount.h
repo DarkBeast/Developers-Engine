@@ -46,7 +46,10 @@ void new_account(void);
 void init_new_account(void);
 void newacc_btnclose_press(widget *control, int button, int pressed);
 void newacc_btnback_press(widget *control, int button, int pressed);
-void render_sprite(widget *control);
-void sbjob_press(widget *control, int button, int pressed);
+void newacc_render_sprite(widget *control);
+void newacc_sbjob_press(widget *control, int button, int pressed);
 void newacc_btncreate_press(widget *control, int button, int pressed);
+
+void newacc_status_button_press(widget *control, int button, int pressed);
+void newacc_status_message(char *text);
 #endif
