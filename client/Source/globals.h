@@ -65,7 +65,9 @@
 /* player defines*/
 #define MAX_PLAYERS        64  // # of players the server can support
 #define MAX_PASS_LENGTH  32
+#define MIN_PASS_LENGTH  4
 #define MAX_NAME_LENGTH  32  // Let's have a reasonable size for user names, npc names etc.
+#define MIN_NAME_LENGTH  4
 #define MAX_SAY_LENGTH  100  // Let's have a reasonable size for user names, npc names etc.
 
 /* map defines*/
