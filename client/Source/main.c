@@ -13,7 +13,7 @@
 #include "handlepackets.h"
 #include "winsocket.h"
 #include "general.h"
-
+#include "status.h"
 
 #define _DEBUG 0
 
@@ -38,7 +38,7 @@ int main(void)
 	init_path(); //allocates the path size.
 
 	init_screen(800,600,NULL,NULL);//initializes the program window.
-
+	glfwSetWindowPos(get_the_window(),400,400);
 	glfwSetWindowCloseCallback(get_the_window(),handle_window_close);//checks if the window closed or not.
 	//glfwSetWindowSizeCallback(get_the_window(),handle_resize);//handles Window resize calls
 	glfwSetCharCallback(get_the_window(),handle_char_callback);//handles character presses
@@ -49,12 +49,28 @@ int main(void)
 	text_init_font("");//initializes the Font characters for use.
 
 	widget_init_system();//initializes the widget system for storing widgets.
-	init_packets();
-	init_client();
-	initsocket();
+
+	set_status_type(STATUS_TYPE_LOADER);
+	thrd_create(&t1, load_data, (void*)0);
 	menustate();
 
 	unload_functions();
+}
+
+int load_data(void *arg)
+{
+	_sleep(700);
+	status_message("Loading Packet Cache");
+	init_packets();
+	_sleep(700);
+	status_message("Loading Client Resources");
+	init_client();
+	_sleep(700);
+	status_message("Loading Sockets");
+	initsocket();
+	_sleep(700);
+	set_menu_state(MENU_STATE_MAIN);
+	return TRUE;
 }
 
 void unload_functions(void)
@@ -73,4 +89,3 @@ void unload_functions(void)
 
 	exit(TRUE);// Exit program
 }
-
