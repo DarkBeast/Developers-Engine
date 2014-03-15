@@ -47,13 +47,11 @@ void widget_move(int16 x, int16 y)
 				int16 tempx = x - ui.screen.mousepos.x ;
 				int16 tempy = y - ui.screen.mousepos.y ;
 
-				if(focused->pos.x + tempx <= 0 || focused->pos.y + tempy <= 0){
+				if(focused->pos.x + tempx <= 0 || focused->pos.y + tempy <= 0)
 					return;
-				}
 
-				if(focused->pos.x + focused->width + tempx>= get_screen_width() || focused->pos.y + focused->height + tempy >= get_screen_height()){
+				if(focused->pos.x + focused->width + tempx>= get_screen_width() +400|| focused->pos.y + focused->height + tempy >= get_screen_height() + 400)
 					return;
-				}
 
 				focused->pos.x = focused->pos.x + tempx ;
 
@@ -65,9 +63,8 @@ void widget_move(int16 x, int16 y)
 				widget_mouse_over(focused);
 		}
 		else{
-			if(ui.root){
+			if(ui.root)
 				widget_mouse_over(ui.root);
-			}
 		}
 	}
 }
@@ -93,105 +90,32 @@ void widget_has_exited(widget *control)
 void widget_mouse_over(widget *control)
 {
 	widget *child;
-	widget *child2; // used to determine if focusable
-	int16 index = ui.root->shown.count -1;
-	int16 index2 = 0;
-	int16 last = 0;
-	uint8 moveup = 0;
+	int16 index = 0;
 
-	if(control->shown.data){
-		for( index = control->shown.count -1; index >= 0; --index){
-			child = control->shown.data[index];
+	for( index = control->shown.count -1; index >= 0; --index){
+		child = control->shown.data[index];
 
-			if(widget_rect_contains(child)){// if focusable check if in range
-				if(child->shown.data){
-					index2 = child->shown.count -1;
-					last = index2;
-
-					if(index2 >= 0){
-						while(index2 >= 0){
-							child2 = child->shown.data[index2];
-
-							if(widget_rect_contains(child2)){
-								if(child2->shown.data == NULL && widget_usable(child2)){//if in range check if widget array is null or not.
-									widget_has_exited(child2);
-									child2->action |= WIDGET_MOUSE_OVER;
-									child2->controlmouseover(child2);
-									return;
-								}
-
-								if(child2->shown.data == NULL){
-									return;
-								}
-
-								index2 = child2->shown.count - 1;
-								last = index2;
-								moveup = 0;
-								child = child2->shown.data[index2];
-
-								if(child->shown.data){
-									index2 = child->shown.count -1;
-								}
-								else{
-									if(widget_rect_contains(child) && widget_usable(child)){
-										widget_has_exited(child);
-										child->action |= WIDGET_MOUSE_OVER;
-										child->controlmouseover(child);
-										return;
-									}
-									else{
-										if(moveup == 0){
-											child = child->parent;
-											index2 = last;
-											moveup = 1;
-										}
-										--index2;
-									}
-								}
-								continue;
-							}
-
-							if(moveup == 0){
-								child = child2->parent;
-								index2 = last;
-								moveup = 1;
-							}
-							--index2;
-
-							if(index2 == -1){
-								if(widget_usable(child)){
-									widget_has_exited(child);
-									child->action |= WIDGET_MOUSE_OVER;
-									child->controlmouseover(child);
-								}
-								return;
-							}
-						}
-
-						if(widget_usable(child)){
-							widget_has_exited(child);
-							child->action |= WIDGET_MOUSE_OVER;
-							child->controlmouseover(child);
-						}
-						return;
-					}
-				}
-				else{
-					if(widget_usable(child)){
-						child->action |= WIDGET_MOUSE_OVER;
-						child->controlmouseover(child);
-					}
+		if(widget_rect_contains(child)){
+			if(child->shown.count){
+				widget_mouse_over(child);
+				return;
+			}
+			else{
+				if(widget_usable(child)){
+					widget_has_exited(child);
+					child->action |= WIDGET_MOUSE_OVER;
+					child->controlmouseover(child);
 					return;
 				}
 			}
-			else{
-				widget_has_exited(child);
-			}
 		}
+		else
+			widget_has_exited(child);
 	}
 
 	if(widget_usable(control)){
 		widget_has_exited(control);
+		control->action |= WIDGET_MOUSE_OVER;
 		control->controlmouseover(control);
 	}
 }
@@ -199,84 +123,29 @@ void widget_mouse_over(widget *control)
 void widget_position_update(widget *parent)//used to update the parent widgets position and its children's positions.
 {
 	widget *child;
-	uint16 *id = (uint16 *)calloc(1, 32 * sizeof(uint16));
 	uint16 index = 0;
-	uint16 idindex;
-	uint16 idsize;
-
-	if(id == NULL){
-		error_handler(DE_ERROR_POINTER_NULL);
-		return;
-	}
-
-	idsize = 32;
-	idindex = 0;
-	id[idindex] = 0;
 
 	parent->controlupdatepos(parent);
 
 	for( index = 0; index < parent->shown.count; ++index){
 		child = parent->shown.data[index];
-		child->controlupdatepos(child);
 
-		if(child->shown.data){
-			id[idindex] = 0;
-			while(id[idindex] <= child->shown.count){
-				if(child->shown.data){
-					if(id[idindex]  >= child->shown.count && idindex != 0){
-						id[idindex] = 0;
-
-						--idindex;
-						child = child->parent;
-					}
-					else{
-						if(id[idindex] < child->shown.count){
-							if (child->shown.data[id[idindex]]){
-								child = child->shown.data[id[idindex]];
-								child->controlupdatepos(child);
-								++id[idindex];
-								++idindex;//we set the z buffer index to know which layer we are in
-
-								if(idindex + 1 >= idsize){//make sure there is not too many layers for the id array.
-									idsize = (uint16)next_power_of_two(idsize);
-									widget_resize_id(&id,idsize);
-								}
-								id[idindex] = 0;//set the new ID index to 0
-							}
-						}
-						else{
-							++id[idindex];
-						}
-					}
-				}
-				else{
-					if(idindex != 0){
-						id[idindex] = 0;
-						--idindex;
-						child = child->parent;
-					}
-					else{
-						break;
-					}
-				}
-			}
-		}
+		if(child->shown.count)
+			widget_position_update(child);
+		else
+			child->controlupdatepos(child);
 	}
-
-	free(id);
 }
 
 //Pre-checked if we are on a focused object to decide if we should check inside it or not.
 sbool widget_check_focus(void)
 {
 	if(focused){
-		if(focused->action & WIDGET_MOVING){
+		if(focused->action & WIDGET_MOVING)
 			focused->action &= ~(WIDGET_MOVING);
-		}
 
-		if(widget_rect_contains(focused)){
+		if(widget_rect_contains(focused))
 			return TRUE;
-		}
 	}
 	return FALSE;
 }
@@ -398,11 +267,9 @@ unload:
 		control->parent->shown.size = 0;
 	}
 	else{
-		if(old_index < control->parent->shown.count && control->parent->shown.data[old_index]->action & WIDGET_IS_FOCUSED && changed)
+		if(old_index < control->parent->shown.count - 1 && control->parent->shown.data[old_index]->action & WIDGET_IS_FOCUSED && changed)
 			widget_switch(&control->parent->shown, old_index, control->parent->shown.count - 1);
 	}
-	
-	
 }
 
 //takes a hidden widget and shows it
@@ -489,9 +356,8 @@ void widget_add(widget *parent, widget *child)
 		child->index = parent->shown.count;
 		parent->shown.count++;
 	}
-	else{
+	else
 		widget_shown_resize(parent,parent->shown.size * 2);
-	}
 }
 
 void widget_add_hidden(widget *parent, widget *child)
@@ -530,9 +396,8 @@ void widget_add_hidden(widget *parent, widget *child)
 		parent->hidden.count++;
 		return;
 	}
-	else{
+	else
 		widget_hidden_resize(parent,parent->hidden.size * 2);
-	}
 }
 
 void widget_init(widget *wgt)//initializes a widget.
@@ -632,16 +497,14 @@ void widget_null(widget *wgt)//initializes a widget.
 void widget_unload_system(void)
 {
 	widget_unload(ui.root);
-	widget_null(ui.root);
 	free(ui.root);
+	ui.root = NULL;
 }
 
 //unloads a widget from memory
 void widget_unload(widget *parent)
 {
-	if(!widget_clear_parent(parent))
-		return;// add error message
-
+	widget_clear_parent(parent);
 	free(parent->data);
 	free(parent->control);
 	free(parent->img);
@@ -696,241 +559,80 @@ void widget_hidden_resize(widget *parent, uint16 size)
 	parent->hidden.size =  size;
 }
 
-void widget_free_widget(widget *control, sbool hidden)
+void widget_free_widget(widget *control)
 {
 	switch(control->type){
-	case CONTROL_LISTBOX: unload_listbox(control,hidden); break;
-	case CONTROL_LABEL: unload_label(control,hidden); break;
-	case CONTROL_TEXTBOX: unload_textbox(control,hidden); break;
-	case CONTROL_RADIO: unload_radio(control,hidden); break;
-	case CONTROL_BUTTON: unload_button(control, hidden); break;
-	case CONTROL_CHECKBOX: unload_checkbox(control,hidden); break;
-	case CONTROL_FRAME: unload_frame(control, hidden); break;
-	case CONTROL_HPROGRESSBAR:
-	case CONTROL_VPROGRESSBAR: unload_progressbar(control,hidden);
-	case CONTROL_HSCROLL_BAR:
-	case CONTROL_VSCROLL_BAR: unload_scrollbar(control, hidden); break;
-	case CONTROL_PICTUREBOX: unload_picturebox(control, hidden); break;
-	case CONTROL_WINDOW: unload_window(control, hidden); break;
-	default: return;
+	case CONTROL_LISTBOX: unload_listbox(control); break;
+	case CONTROL_LABEL: unload_label(control); break;
+	case CONTROL_TEXTBOX: unload_textbox(control); break;
+	case CONTROL_RADIO: unload_radio(control); break;
+	case CONTROL_CLIPBOX:
+	case CONTROL_FRAME: unload_base2(control); break;
+	default: unload_base(control); break;
 	}
 }
 
-void widget_clear_shown(widget *parent)//used to draw the widgets onto the screen.
+void widget_clear_shown(widget *parent)
 {
 	widget *child;
-	uint16 *id = (uint16 *)calloc(1, 32 * sizeof(uint16));
 	uint16 index = 0;
-	uint16 idindex;
-	uint16 idsize;
-
-	if(id == NULL){
-		error_handler(DE_ERROR_POINTER_NULL);
-		return;
-	}
-
-	idsize = 32;
-	idindex = 0;
-	id[idindex] = 0;
 
 	for( index = 0; index < parent->shown.count; ++index){
 		child = parent->shown.data[index];
 
-		if(child->shown.data){
-			id[idindex] = 0;
-			while(id[idindex] <= child->shown.count){
-				if(child->shown.data){
-					if(id[idindex]  >= child->shown.count){
-						if(idindex != 0){
-							id[idindex] = 0;
-							--idindex;
+		if(child == NULL)
+			continue;
 
-							widget_free_widget(child, TRUE);
-							child = child->parent;
-							if(id[idindex]  < child->shown.count)
-								widget_null(child->shown.data[id[idindex]]);
-							child->shown.data[id[idindex]] = NULL;
+		if(child->shown.count)
+			widget_clear_shown(child);
 
-							++id[idindex];
-						}
-						else{
-							widget_free_widget(child, TRUE);
-							child = child->parent;
-							if(index < child->shown.count)
-								widget_null(child->shown.data[index]);
-							child->shown.data[index] = NULL;
-							break;
-						}
-					}
-					else{
-						if(id[idindex] < child->shown.count){
-							if (child->shown.data[id[idindex]]){
-								child = child->shown.data[id[idindex]];
+		if(child->hidden.count)
+			widget_clear_hidden(child);
 
-								++idindex;//we set the z buffer index to know which layer we are in
-
-								if(idindex + 1 >= idsize){//make sure there is not too many layers for the id array.
-									idsize = (uint16)next_power_of_two(idsize);
-									widget_resize_id(&id,idsize);
-								}
-								id[idindex] = 0;//set the new ID index to 0
-							}
-							else{
-								widget_free_widget(child, TRUE);
-								child = child->parent;
-								if(id[idindex]  < child->shown.count)
-									widget_null(child->shown.data[id[idindex]]);
-								child->shown.data[id[idindex]] = NULL;
-								++id[idindex];
-							}
-						}
-						else{
-							++id[idindex];
-						}
-					}
-				}
-				else{
-					if(idindex != 0){
-						id[idindex] = 0;
-						--idindex;
-						widget_free_widget(child, TRUE);
-						child = child->parent;
-						if(id[idindex]  < child->shown.count)
-							widget_null(child->shown.data[id[idindex]]);
-						child->shown.data[id[idindex]] = NULL;
-						++id[idindex];
-					}
-					else{
-						widget_free_widget(child, TRUE);
-						child = child->parent;
-						if(index  < child->shown.count)
-							widget_null(child->shown.data[index]);
-						child->shown.data[index] = NULL;
-						break;
-					}
-				}
-			}
+		if(child->type != CONTROL_ROOT){
+			widget_free_widget(child);
+			parent->shown.data[child->index] = NULL;
+			widget_null(child);
 		}
 	}
-
-	free(id);
 }
 
-//frees just the widgets in the hidden array under the parent.
-void widget_clear_hidden(widget *parent)//used to draw the widgets onto the screen.
+void widget_clear_hidden(widget *parent)
 {
 	widget *child;
-	uint16 *id = (uint16 *)calloc(1, 32 * sizeof(uint16));
 	uint16 index = 0;
-	uint16 idindex;
-	uint16 idsize;
-
-	if(id == NULL){
-		error_handler(DE_ERROR_POINTER_NULL);
-		return;
-	}
-
-	idsize = 32;
-	idindex = 0;
-	id[idindex] = 0;
 
 	for( index = 0; index < parent->hidden.count; ++index){
 		child = parent->hidden.data[index];
 
-		if(child->hidden.data){
-			id[idindex] = 0;
-			while(id[idindex] <= child->hidden.count){
-				if(child->hidden.data){
-					if(id[idindex]  >= child->hidden.count){
-						if(idindex != 0){
-							id[idindex] = 0;
-							--idindex;
+		if(child == NULL)
+			continue;
 
-							widget_free_widget(child, FALSE);
-							child = child->parent;
-							if(id[idindex] < child->hidden.count){
-								free(child->hidden.data[id[idindex]]);
-								child->hidden.data[id[idindex]] = NULL;
-							}
-							++id[idindex];
-						}
-						else{
-							widget_free_widget(child, FALSE);
-							child = child->parent;
-							if(index < child->hidden.count)
-								free(child->hidden.data[index]);
-							child->hidden.data[index] = NULL;
-							break;
-						}
-					}
-					else{
-						if(id[idindex] < child->hidden.count){
-							if (child->hidden.data[id[idindex]]){
-								child = child->hidden.data[id[idindex]];
+		if(child->hidden.count)
+			widget_clear_hidden(child);
 
-								++idindex;//we set the z buffer index to know which layer we are in
+		if(child->shown.count)
+			widget_clear_shown(child);
 
-								if(idindex + 1 >= idsize){//make sure there is not too many layers for the id array.
-									idsize = (uint16)next_power_of_two(idsize);
-									widget_resize_id(&id,idsize);
-								}
-								id[idindex] = 0;//set the new ID index to 0
-							}
-							else{
-								widget_free_widget(child, FALSE);
-								child = child->parent;
-								if(id[idindex] < child->hidden.count){
-									free(child->hidden.data[id[idindex]]);
-									child->hidden.data[id[idindex]] = NULL;
-								}
-								++id[idindex];
-							}
-						}
-						else{
-							++id[idindex];
-						}
-					}
-				}
-				else{
-					if(idindex != 0){
-						id[idindex] = 0;
-						--idindex;
-						widget_free_widget(child, FALSE);
-						child = child->parent;
-						if(id[idindex] < child->hidden.count){
-							free(child->hidden.data[id[idindex]]);
-							child->hidden.data[id[idindex]] = NULL;
-						}
-						++id[idindex];
-					}
-					else{
-						widget_free_widget(child, FALSE);
-						child = child->parent;
-						if(index < child->hidden.count)
-							free(child->hidden.data[index]);
-						child->hidden.data[index] = NULL;
-						break;
-					}
-				}
-			}
+		if(child->type != CONTROL_ROOT){
+			widget_free_widget(child);
+			parent->hidden.data[child->index] = NULL;
+			widget_null(child);
 		}
 	}
-
-	free(id);
 }
 
 //Frees all the widgets in the widget arrays shown/hidden so we can free the parent.
-sbool widget_clear_parent(widget *parent)
+void widget_clear_parent(widget *parent)
 {
-	if (parent == NULL) {return FALSE;}
+	if (parent == NULL)
+		return;
 
-	if (parent->hidden.data){
+	if (parent->hidden.data != NULL && parent->hidden.count > 0)
 		widget_clear_hidden(parent);
-	}
 
-	if (parent->shown.data){
+	if (parent->shown.data != NULL && parent->shown.count > 0)
 		widget_clear_shown(parent);
-	}
 
 	free(parent->hidden.data);
 	free(parent->shown.data);
@@ -942,7 +644,6 @@ sbool widget_clear_parent(widget *parent)
 	parent->shown.size = 0;
 	parent->hidden.count = 0;
 	parent->shown.count = 0;
-	return TRUE;
 }
 
 //resizes the ID for the widget manager when handling deep UI systems, default Z is 32.
@@ -962,72 +663,18 @@ void widget_resize_id(uint16 **id, uint16 size)
 }
 
 //This is the Main widget That displays All the widgets in the Widget array aka shown. it Displays them via Tree branch style.
-void widget_manager(void)//used to draw the widgets onto the screen.
+void widget_manager(widget *parent)
 {
 	widget *child;
-	uint16 *id = (uint16 *)calloc(1, 32 * sizeof(uint16));
 	uint16 index = 0;
-	uint16 idindex;
-	uint16 idsize;
 
-	if(id == NULL){
-		error_handler(DE_ERROR_POINTER_NULL);
-		return;
-	}
-
-	idsize = 32;
-	idindex = 0;
-	id[idindex] = 0;
-
-	for( index = 0; index < ui.root->shown.count; ++index){
-		child = ui.root->shown.data[index];
+	for( index = 0; index < parent->shown.count; ++index){
+		child = parent->shown.data[index];
 		child->controldraw(child);//then draw there parent.
 
-		if(child->shown.data){
-			id[idindex] = 0;
-			while(id[idindex] <= child->shown.count){
-				if(child->shown.data){
-					if(id[idindex]  >= child->shown.count && idindex != 0){
-						id[idindex] = 0;
-
-						--idindex;
-						child = child->parent;
-					}
-					else{
-						if(id[idindex] < child->shown.count){
-							if (child->shown.data[id[idindex]]){
-								child = child->shown.data[id[idindex]];
-								child->controldraw(child);//then draw the child.
-								++id[idindex];
-								++idindex;//we set the z buffer index to know which layer we are in
-
-								if(idindex + 1 >= idsize){//make sure there is not too many layers for the id array.
-									idsize = (uint16)next_power_of_two(idsize);
-									widget_resize_id(&id,idsize);
-								}
-								id[idindex] = 0;//set the new ID index to 0
-							}
-						}
-						else{
-							++id[idindex];
-						}
-					}
-				}
-				else{
-					if(idindex != 0){
-						id[idindex] = 0;
-						--idindex;
-						child = child->parent;
-					}
-					else{
-						break;
-					}
-				}
-			}
-		}
+		if(child->shown.data)
+			widget_manager(child);
 	}
-
-	free(id);
 }
 
 //checks if the widget is in the area the mouse clicked.
@@ -1042,13 +689,12 @@ sbool widget_rect_contains(widget *control)
 		if(ui.screen.mousepos.y > control->actualpos.y + data->frame.h) return FALSE;
 		return TRUE;
 	}
-	
-		if(ui.screen.mousepos.x < control->actualpos.x ) return FALSE;
-		if(ui.screen.mousepos.x > control->actualpos.x + control->sizex) return FALSE;
-		if(ui.screen.mousepos.y < control->actualpos.y ) return FALSE;
-		if(ui.screen.mousepos.y > control->actualpos.y + control->sizey) return FALSE;
-		return TRUE;
-	
+
+	if(ui.screen.mousepos.x < control->actualpos.x ) return FALSE;
+	if(ui.screen.mousepos.x > control->actualpos.x + control->sizex) return FALSE;
+	if(ui.screen.mousepos.y < control->actualpos.y ) return FALSE;
+	if(ui.screen.mousepos.y > control->actualpos.y + control->sizey) return FALSE;
+	return TRUE;
 }
 
 sbool widget_is_parent_focused(widget *control)
@@ -1056,16 +702,13 @@ sbool widget_is_parent_focused(widget *control)
 	widget *parent;
 	int8 i = TRUE;
 
-	if(control->parent){
+	if(control->parent)
 		parent = control->parent;
-	}
-	else{
+	else
 		return FALSE;
-	}
 
-	if(control->action & WIDGET_ALWAYS_USEABLE){
+	if(control->action & WIDGET_ALWAYS_USEABLE)
 		return TRUE;
-	}
 
 	while(i){
 		if(parent->type != CONTROL_ROOT){
@@ -1086,9 +729,8 @@ sbool widget_is_parent_focused(widget *control)
 					return TRUE;
 				}
 			}
-			else{
+			else
 				parent = parent->parent;
-			}
 		}
 		else{
 			i = FALSE;
@@ -1104,20 +746,16 @@ sbool widget_has_mouse_over(widget *control)
 	widget *parent;
 	int8 i = TRUE;
 
-	if(control->parent){
+	if(control->parent)
 		parent = control->parent;
-	}
-	else{
+	else
 		return FALSE;
-	}
 
-	if(!widget_rect_contains(control)){
+	if(!widget_rect_contains(control))
 		return FALSE;
-	}
 
-	if(control->action & WIDGET_ALWAYS_USEABLE){
+	if(control->action & WIDGET_ALWAYS_USEABLE)
 		return TRUE;
-	}
 
 	if(!(control->action & WIDGET_IS_FOCUSED)){
 		while(i){
@@ -1126,9 +764,8 @@ sbool widget_has_mouse_over(widget *control)
 					i = FALSE;
 					return TRUE;
 				}
-				else{
+				else
 					parent = parent->parent;
-				}
 			}
 			else{
 				i = FALSE;
@@ -1136,9 +773,8 @@ sbool widget_has_mouse_over(widget *control)
 			}
 		}
 	}
-	else{
+	else
 		return TRUE;
-	}
 
 	return FALSE; //if can't find any then FALSE
 }
@@ -1148,16 +784,13 @@ sbool widget_usable(widget *control)
 	widget *parent;
 	int8 i = TRUE;
 
-	if(control->parent){
+	if(control->parent)
 		parent = control->parent;
-	}
-	else{
+	else
 		return FALSE;
-	}
 
-	if(control->action & WIDGET_ALWAYS_USEABLE){
+	if(control->action & WIDGET_ALWAYS_USEABLE)
 		return TRUE;
-	}
 
 	if(!(control->action & WIDGET_IS_FOCUSED)){
 		while(i){
@@ -1166,9 +799,8 @@ sbool widget_usable(widget *control)
 					i = FALSE;
 					return TRUE;
 				}
-				else{
+				else
 					parent = parent->parent;
-				}
 			}
 			else{
 				i = FALSE;
@@ -1176,9 +808,8 @@ sbool widget_usable(widget *control)
 			}
 		}
 	}
-	else{
+	else
 		return TRUE;
-	}
 
 	return FALSE; //if can't find any then FALSE
 }
@@ -1190,9 +821,8 @@ void widget_manual_focused(widget *control)
 		return;
 
 	if(control->action & WIDGET_CAN_FOCUS){
-		if(control->index != control->parent->shown.count - 1){
+		if(control->index != control->parent->shown.count - 1)
 			widget_switch(&control->parent->shown, control->index, control->parent->shown.count - 1);
-		}
 
 		if(focused)
 			focused->action &= ~(WIDGET_IS_FOCUSED);
@@ -1205,194 +835,88 @@ void widget_manual_focused(widget *control)
 //function to allow change of focus ability not needed but helpful to some. Default is FALSE.
 void widget_set_focusable(widget *control, int8 boolean)
 {
-	if(boolean){
+	if(boolean)
 		control->action |= WIDGET_CAN_FOCUS;
-	}
-	else{
+	else
 		control->action &= ~(WIDGET_CAN_FOCUS);
-	}
 }
 
 //allows you to set the widget to drag able stat or to not drag, Default is FALSE.
 void widget_set_moveable(widget *control, int8 boolean)
 {
-	if(boolean){
+	if(boolean)
 		control->action |= WIDGET_MOVEABLE;
-	}
-	else{
+	else
 		control->action &= ~(WIDGET_MOVEABLE);
-	}
 }
 
 void widget_mouse_release(widget * control)
 {
 	widget *child;
-	widget *child2; // used to determine if focusable
-	int16 index = control->shown.count -1;
-	int16 index2 = 0;
-	int16 last = 0;
-	uint8 moveup = 0;
+	int32 index = 0;
 
-	if(control->shown.data){
-		for( index = control->shown.count -1; index >= 0; --index){
-			child = control->shown.data[index];
+	for( index = control->shown.count -1; index >= 0; --index){
+		child = control->shown.data[index];
 
-			if(widget_rect_contains(child)){// if focusable check if in range
-				if(child->shown.data){
-					index2 = child->shown.count -1;
-					last = index2;
-
-					while(index2 >= 0){
-						child2 = child->shown.data[index2];
-
-						if(widget_rect_contains(child2)){
-							if(child2->shown.data == NULL){//if in range check if widget array is null or not.
-								widget_set_release(child2);
-								return;
-							}
-
-							index2 = child2->shown.count - 1;
-							last = index2;
-							moveup = 0;
-							child = child2->shown.data[index2];
-
-							if(child->shown.data){
-								index2 = child->shown.count -1;
-							}
-							else{
-								if(widget_rect_contains(child)){
-									widget_set_release(child);
-									return;
-								}
-								else{
-									if(moveup == 0){
-										child = child->parent;
-										index2 = last;
-										moveup = 1;
-									}
-									--index2;
-								}
-							}
-							continue;
-						}
-
-						if(moveup == 0){
-							child = child2->parent;
-							index2 = last;
-							moveup = 1;
-						}
-						--index2;
-					}
-					widget_set_release(child);
-					return;
-				}
-				else{
-					widget_set_release(child);
-					return;
-				}
+		if(widget_rect_contains(child)){
+			if(child->shown.count){
+				widget_mouse_release(child);
+				return;
+			}
+			else{
+				widget_set_release(child);
+				return;
 			}
 		}
 	}
-
 	widget_set_release(control);
 }
 
-//checks if the widget was clicked Default, if clicked set as focused if focusable or set parent if click able then do event.
 void widget_mouse_press(widget * control)
 {
 	widget *child;
-	widget *child2; // used to determine if focusable
-	int16 index = control->shown.count -1;
-	int16 index2 = 0;
-	int16 last = 0;
-	uint8 moveup = 0;
+	int32 index = 0;
 
-	if(control->shown.data){
-		for( index = control->shown.count -1; index >= 0; --index){
-			child = control->shown.data[index];
+	for( index = control->shown.count -1; index >= 0; --index){
+		child = control->shown.data[index];
 
-			if(widget_rect_contains(child)){// if focusable check if in range
-				if(child->shown.data){
-					index2 = child->shown.count -1;
-					last = index2;
+		if(widget_rect_contains(child)){
+			if(child->shown.count){
+				widget_mouse_press(child);
+				return;
+			}
+			else{
+				if(child->action & WIDGET_MOVEABLE)
+					control->action |= WIDGET_MOVING;
 
-					while(index2 >= 0){
-						child2 = child->shown.data[index2];
-
-						if(widget_rect_contains(child2)){
-							if(child2->shown.data == NULL){//if in range check if widget array is null or not.
-								set_widget_mouse_press_event(child2,index2);
-								return;
-							}
-
-							index2 = child2->shown.count - 1;
-							last = index2;
-							moveup = 0;
-							child = child2->shown.data[index2];
-
-							if(child->shown.data){
-								index2 = child->shown.count -1;
-							}
-							else{
-								if(widget_rect_contains(child)){
-									set_widget_mouse_press_event(child,index2);
-									return;
-								}
-								else{
-									if(moveup == 0){
-										child = child->parent;
-										index2 = last;
-										moveup = 1;
-									}
-									--index2;
-								}
-							}
-							continue;
-						}
-
-						if(moveup == 0){
-							child = child2->parent;
-							index2 = last;
-							moveup = 1;
-						}
-						--index2;
-					}
-					set_widget_mouse_press_event(child,index);
-					return;
-				}
-				else{
-					set_widget_mouse_press_event(child,index);
-					return;
-				}
+				set_widget_mouse_press_event(child);
+				return;
 			}
 		}
 	}
+
 	if(control->action & WIDGET_MOVEABLE){
-		if(widget_rect_contains(control)){
+		if(widget_rect_contains(control))
 			control->action |= WIDGET_MOVING;
-		}
 	}
 
-	widget_set_clicked(control);
+	set_widget_mouse_press_event(control);
 }
 
-void set_widget_mouse_press_event(widget *control,uint16 index)
+void set_widget_mouse_press_event(widget *control)
 {
-	if(control->action & WIDGET_CAN_FOCUS){
-		widget_set_focused(control,index);
-	}
+	if(control->action & WIDGET_CAN_FOCUS)
+		widget_set_focused(control);
 	else{
-		if(widget_is_parent_focused(control)){
+		if(widget_is_parent_focused(control) || control->type == CONTROL_ROOT)
 			widget_set_clicked(control);
-		}
 	}
 }
 
 void widget_set_release(widget *control)
 {
-	if(control->action & WIDGET_WINDOW_MOVEABLE){
+	if(control->action & WIDGET_WINDOW_MOVEABLE)
 		ui.moving = FALSE;
-	}
 
 	control->action &= ~(WIDGET_CLICKED);
 	control->controlmouserelease(control,ui.screen.button, ui.screen.clicked);
@@ -1400,33 +924,30 @@ void widget_set_release(widget *control)
 
 void widget_set_clicked(widget *control)
 {
-	if(control->action & WIDGET_WINDOW_MOVEABLE){
+	if(control->action & WIDGET_WINDOW_MOVEABLE)
 		ui.moving = TRUE;
-	}
 
 	control->action |= WIDGET_CLICKED;
 	control->controlmousepress(control,ui.screen.button, ui.screen.clicked);
 }
 
-void widget_set_focused(widget *control, uint32 index)
+void widget_set_focused(widget *control)
 {
-	if(control != control->parent->shown.data[control->parent->shown.count - 1]){
-		widget_switch(&control->parent->shown,index,control->parent->shown.count - 1);
-	}
+	if(control != control->parent->shown.data[control->parent->shown.count - 1])
+		widget_switch(&control->parent->shown,control->index,control->parent->shown.count - 1);
 
-	if(focused){
+	if(focused)
 		focused->action &= ~(WIDGET_IS_FOCUSED);
-	}
 
 	control->action |= WIDGET_IS_FOCUSED;
 	focused = control;
 	control->action |= WIDGET_CLICKED;
 
 	if(control->action & WIDGET_MOVEABLE){
-		if(widget_rect_contains(control)){
+		if(widget_rect_contains(control))
 			control->action |= WIDGET_MOVING;
-		}
 	}
+
 	control->controlmousepress(control,ui.screen.button, ui.screen.clicked);
 }
 

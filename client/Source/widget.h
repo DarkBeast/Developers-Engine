@@ -138,10 +138,10 @@ void widget_has_exited(widget *control);
 //checks if the parent is focused to do click events.
 sbool widget_is_parent_focused(widget *control);
 
-void set_widget_mouse_press_event(widget *control,uint16 index);
+void set_widget_mouse_press_event(widget *control);
 
 //sets the is on controls to focus and does action.
-void widget_set_focused(widget *control, uint32 index);
+void widget_set_focused(widget *control);
 
 //sets the is on release control release and does action.
 void widget_set_release(widget *control);
@@ -196,7 +196,7 @@ for dynamic widget arrays up to 65,535, the system currently uses static.*/
 void widget_shown_resize(widget *parent, uint16 size);
 
 // clears the widgets arrays
-sbool widget_clear_parent(widget *parent);
+void widget_clear_parent(widget *parent);
 
 //clears the hidden array
 void widget_clear_hidden(widget *parent);
@@ -205,13 +205,13 @@ void widget_clear_hidden(widget *parent);
 void widget_clear_shown(widget *parent);
 
 //free's the widgets inner data;
-void widget_free_widget(widget *control, sbool hidden);
+void widget_free_widget(widget *control);
 
 //resizes the ID for more Z depth of Deep user interface systems for widget manager.
 void widget_resize_id(uint16 **id, uint16 size);
 
 //Draws all the shown widgets to the screen.
-void widget_manager(void);
+void widget_manager(widget *parent);
 
 //checks if widget is in the mouse's location when click event happens
 sbool widget_rect_contains(widget *control);
