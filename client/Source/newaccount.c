@@ -21,7 +21,7 @@ float time1;
 float lpstimer = 0;
 uint8 set = 1;
 thrd_t t1;
-char *string;
+char *string_newacc;
 sbool update_status = FALSE;
 
 void new_account(void)
@@ -34,35 +34,23 @@ void new_account(void)
 	draw_state_reset();
 
 	while(running){
-		time = (uint32 )glfwGetTime();
-
 		clear_screen(0,0,0,255);
 
-		widget_manager();
+		widget_manager(widget_get_uip()->root);
 
 		//Clear information from last draw
-
 		glFlush();
 		glfwSwapBuffers(get_the_window());
 		glfwPollEvents();
 
 		if(update_status){
-			status_box_text(&gui.status,string);
+			status_box_text(&gui.status,string_newacc);
 			widget_show(&gui.status);
 			widget_manual_focused(&gui.status);
 			update_status = FALSE;
 		}
 
-		if(lpstimer1 < time){//calculates the loops per second the code does, through everything
-			printf("%i\n",lps);
-			lpstimer1 = time + 1;
-
-			lps = 0;
-		}
-
-		lps++;
-
-		//_sleep(32);
+		_sleep(30);
 
 		// Check if ESC key was pressed or window was closed
 		running = is_window_open();
@@ -146,12 +134,6 @@ void init_new_account(void)
 	if(socketconnect()){ //just to test for server connection.
 		thrd_create(&t1, socketlisten, (void*)0);
 	}
-	else{
-		initsocket();
-		if(socketconnect()){ //just to test for server connection.
-			thrd_create(&t1, socketlisten, (void*)0);
-		}
-	}
 }
 
 void newacc_btnclose_press(widget *control, int button, int pressed)
@@ -174,7 +156,28 @@ void newacc_btncreate_press(widget *control, int button, int pressed)
 	textbox *charname = (textbox *)gui.txtusername.shown.data[0]->control;
 	uint8 sex;
 
+	if(get_str_size(name->string->data) < MIN_NAME_LENGTH){
+		newacc_status_message("Username Name must be 4 or more syllables");
+		return;
+	}
+
+	if(get_str_size(password->string->data) < MIN_PASS_LENGTH){
+		newacc_status_message("Password Name must be 4 or more syllables");
+		return;
+	}
+
+	if(get_str_size(password2->string->data) < MIN_PASS_LENGTH){
+		newacc_status_message("Passwords Must Both be filled in.");
+		return;
+	}
+
 	if(!comp_str(password->string->data,password2->string->data)){
+		newacc_status_message("Passwords Do Not Match.");
+		return;
+	}
+
+	if(get_str_size(charname->string->data) < MIN_NAME_LENGTH){
+		newacc_status_message("Character Name must be 4 or more syllables");
 		return;
 	}
 
@@ -184,7 +187,10 @@ void newacc_btncreate_press(widget *control, int button, int pressed)
 	if(gui.rdfemale.action |= WIDGET_CHECKED)
 		sex = 1;
 
-	send_new_account(name->string->data,charname->string->data,password->string->data,gui.sbjob.value,sex);
+	if(isconnected())
+		send_new_account(name->string->data,charname->string->data,password->string->data,gui.sbjob.value,sex);
+	else
+		newacc_status_message("Not Connected To The Server");
 }
 
 void newacc_sbjob_press(widget *control, int button, int pressed)
@@ -235,6 +241,8 @@ void newacc_status_button_press(widget *control, int button, int pressed)
 
 void newacc_status_message(char *text)
 {
-	string = text;
-	update_status = TRUE;
+	if(update_status == FALSE){
+		string_newacc = text;
+		update_status = TRUE;
+	}
 }
