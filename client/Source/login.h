@@ -18,10 +18,13 @@ struct login_t{
 	widget txtpass;
 	widget frmmain;
 	widget wndlogin;
+	widget status;
 };
 
 void login(void);
 void init_login(void);
 void login_btnclose_press(widget *control, int button, int pressed);
 void login_btnback_press(widget *control, int button, int pressed);
+void login_status_button_press(widget *control, int button, int pressed);
+void login_status_message(char *text);
 #endif
