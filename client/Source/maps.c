@@ -28,7 +28,6 @@ void preload_map_tiles(void)
 
 	for(x = 0; x < MAX_MAPX; x++){
 		for(y = 0; y < MAX_MAPY; y++){
-
 			uint32 x2 = x * TILE_SIZE, y2 = y * TILE_SIZE;
 
 			if(x == 0)
@@ -153,7 +152,7 @@ void write_map(char *path)
 	FILE *fp;
 
 	if((fp = fopen(path, "wb")) == NULL)
-		error_handler(DE_ERROR_FILE_ERROR);
+		error_handler(DE_ERROR_FILE_ERROR,"Could Not Write Map.\n");
 
 	fwrite(map_data.name, sizeof(char), MAX_NAME_LENGTH, fp);
 	fwrite(&map_data.revision, sizeof(uint32), 1, fp);
@@ -177,7 +176,7 @@ void read_map(char *path)
 	FILE *fp;
 
 	if((fp = fopen(path, "rb")) == NULL)
-		error_handler(DE_ERROR_FILE_ERROR);
+		error_handler(DE_ERROR_FILE_ERROR,"Map Could not be Read.\n");
 
 	fread(map_data.name, sizeof(char), MAX_NAME_LENGTH, fp);
 	fread(&map_data.revision, sizeof(uint32), 1, fp);
@@ -207,6 +206,12 @@ void unload_maps(void)
 	free(map_data.npc);
 	free(map_data.items);
 	free(map_data.tile);
+	free(tile_buffer_t.ground);
+	free(tile_buffer_t.mask);
+	free(tile_buffer_t.anim);
+	free(tile_buffer_t.fringe);
+	free(map_img.img);
+	free(map_img.id);
 }
 
 void clear_map_npcs(void)
