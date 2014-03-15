@@ -19,6 +19,7 @@ enum menustates{
 	MENU_STATE_LOGIN,
 	MENU_STATE_CREATE,
 	MENU_STATE_EXIT,
+	MENU_STATE_STATUS,
 	MENU_STATE_MAX
 };
 
@@ -39,8 +40,6 @@ uint32 spell_max(void);
 uint32 item_max(void);
 
 void init_client(void);
-
-void add_log(char *string, char *path);
 
 void destroy_client(void);
 

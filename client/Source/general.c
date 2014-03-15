@@ -2,11 +2,8 @@
 * Credits:  Andrew Wheeler/Genusis
 ******************************************************************************/
 #include "general.h"
-#include <stdio.h>
 #include "error.h"
 #include "path.h"
-#include <time.h>
-#include <string.h>
 #include "socket.h"
 #include "widget.h"
 #include "mainmenu.h"
@@ -14,13 +11,14 @@
 #include "main.h"
 #include "login.h"
 #include "newaccount.h"
+#include "status.h"
 
 uint32 tileset_count = 0;
 uint32 sprite_count = 0;
 uint32 spell_count = 0;
 uint32 item_count = 0;
 uint8 editor_t;
-uint8 menu_state = MENU_STATE_MAIN;
+uint8 menu_state = MENU_STATE_STATUS;
 
 void set_menu_state(uint8 state)
 {
@@ -80,32 +78,6 @@ void init_client(void)
 	init_players();
 
 	printf("Data Initialized. \n");
-}
-
-void add_log(char *string, char *path)
-{
-	FILE *fp;
-	time_t current_time;
-	char* c_time_string;
-	current_time = time(NULL);
-
-	c_time_string = ctime(&current_time);
-
-	if(!file_exists(path)){
-		if((fp = fopen(path, "w")) == NULL)
-			error_handler(DE_ERROR_FILE_ERROR);
-		fclose(fp);
-	}
-
-	if((fp = fopen(path, "r+")) == NULL)
-		error_handler(DE_ERROR_FILE_ERROR);
-
-	c_time_string[strlen(c_time_string) - 1] = '\0';
-
-	fseek(fp, 0, SEEK_END);
-	fprintf(fp, "\n %s: %s", c_time_string, string);
-
-	fclose(fp);
 }
 
 void destroy_client(void)
@@ -197,6 +169,14 @@ void menustate(void)
 		case MENU_STATE_CREATE:
 			init_new_account();
 			new_account();
+			break;
+		case MENU_STATE_STATUS:
+			if(get_status_type() == STATUS_TYPE_SOCKET)
+				init_status("");
+			else
+				init_status_loader("");
+
+			status();
 			break;
 		case MENU_STATE_EXIT:
 			run = FALSE;
