@@ -15,36 +15,21 @@ credits_t gui;
 
 void credits(void)
 {
-	//uint32 time;
-	//uint32 lpstimer = 0;
-	//uint32 lps = 0;
 	int running = TRUE;
 
 	draw_state_reset();
 
 	while(running){
-		//time = (uint32 )glfwGetTime();
-
 		clear_screen(0,0,0,255);
 
-		widget_manager();
+		widget_manager(widget_get_uip()->root);
 
 		//Clear information from last draw
-
 		glFlush();
 		glfwSwapBuffers(get_the_window());
 		glfwPollEvents();
 
-		//if(lpstimer < time){//calculates the loops per second the code does, through everything
-		//	printf("%i\n",lps);
-		//	lpstimer = time + 1;
-
-		//	lps = 0;
-		//}
-
-		//lps += 1;
-
-		//_sleep(20);
+		_sleep(30);
 
 		// Check if ESC key was pressed or window was closed
 		running = is_window_open();
