@@ -35,6 +35,6 @@ enum error_flags_t
 	DE_ERROR_INVALID_PACKET_OFFSET
 };
 
-void error_handler(int error_flag);
-void shut_down(void);
+void error_handler(int error_flag, const char *string);
+void add_error_log(char *string);
 #endif
