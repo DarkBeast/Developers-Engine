@@ -110,14 +110,14 @@ void init_screen(int swidth, int sheight, GLFWmonitor *monitor, GLFWwindow *shar
 	GLenum err = 0;
 
 	if(glfwInit() == FALSE)
-		error_handler(DE_ERROR_GLFWINIT_ERROR);
+		error_handler(DE_ERROR_GLFWINIT_ERROR, NULL);
 
 	// Finally we can Open an OpenGL window
 	glfwWindowHint(GLFW_DECORATED, GL_FALSE);
 	the_window = glfwCreateWindow( swidth, sheight, TITLE, monitor, shared);
 
 	if(the_window == NULL)
-		error_handler(DE_ERROR_GLFWWIN_ERROR);
+		error_handler(DE_ERROR_GLFWWIN_ERROR, "the_window in init_screen()\n");
 
 	glfwMakeContextCurrent(the_window);
 
@@ -127,7 +127,7 @@ void init_screen(int swidth, int sheight, GLFWmonitor *monitor, GLFWwindow *shar
 	if(err!=GLEW_OK)
 	{
 		//Problem: glewInit failed, something is seriously wrong.
-		error_handler(DE_ERROR_GLEWINIT_ERROR);
+		error_handler(DE_ERROR_GLEWINIT_ERROR, NULL);
 	}
 	handle_resize(the_window,swidth,sheight);
 }

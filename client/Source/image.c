@@ -26,27 +26,27 @@ void load_png(const char *path, image *image)
 
 	FILE *png_file = fopen(path, "rb");
 
-	if (!png_file)
-		error_handler(DE_ERROR_FILE_ERROR);
-
+	if (!png_file){
+		error_handler(DE_ERROR_FILE_ERROR, "error in load_png(), image not found.\n");
+	}
 	fread(header, 1, PNGSIGBYTES, png_file);
 	if(png_sig_cmp(header, 0, PNGSIGBYTES))
-		error_handler(DE_ERROR_FILE_ERROR);
+		error_handler(DE_ERROR_FILE_ERROR, "libpng error\n");
 
 	png_ptr = png_create_read_struct(PNG_LIBPNG_VER_STRING, NULL, NULL, NULL);
 	if (!png_ptr)
-		error_handler(DE_ERROR_MISC_ERROR);
+		error_handler(DE_ERROR_MISC_ERROR, "libpng error\n");
 
 	info_ptr = png_create_info_struct(png_ptr);
 	if (!info_ptr)
-		error_handler(DE_ERROR_MISC_ERROR);
+		error_handler(DE_ERROR_MISC_ERROR, "libpng error\n");
 
 	end_info = png_create_info_struct(png_ptr);
 	if (!end_info)
-		error_handler(DE_ERROR_MISC_ERROR);
+		error_handler(DE_ERROR_MISC_ERROR, "libpng error\n");
 
 	if(setjmp(png_jmpbuf(png_ptr)))
-		error_handler(DE_ERROR_IO_ERROR);
+		error_handler(DE_ERROR_IO_ERROR, "libpng jump error\n");
 
 	png_init_io(png_ptr, png_file);
 	png_set_sig_bytes(png_ptr, PNGSIGBYTES);
@@ -86,7 +86,7 @@ void load_png(const char *path, image *image)
 	row_ptrs = (png_byte**)malloc((image->height) * sizeof(png_byte*));
 
 	if(row_ptrs == NULL || pixelz == NULL){
-		error_handler(DE_ERROR_POINTER_NULL);
+		error_handler(DE_ERROR_POINTER_NULL, "row_ptrs or pixelz in load_png()\n");
 		return;
 	}
 
@@ -98,7 +98,7 @@ void load_png(const char *path, image *image)
 	image->pixels = (unsigned char *)calloc(1, numbytes);
 
 	if(image->pixels == NULL){
-		error_handler(DE_ERROR_POINTER_NULL);
+		error_handler(DE_ERROR_POINTER_NULL, "image->pixels in load_png()\n");
 		return;
 	}
 

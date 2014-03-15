@@ -16,7 +16,7 @@ sbool file_readable(char *path);
 sbool file_rw(char *path);
 void check_dir(char *path);
 // use "" for anything you do not need to insert.
-char *comb_2str(char *a, char *b);
+char *comb_2str(char *a, const char *b);
 char *comb_3str(char *a, char *b, char *c);
 char *comb_4str(char *a, char *b, char *c, char *d);
 char *comb_5str(char *a, char *b, char *c, char *d, char *e);

@@ -31,7 +31,7 @@ char* get_path(char *file_path, int32 file_number, char *file_type)
 		temp = (char *)realloc(string, path_size);
 
 		if(temp == NULL){
-			error_handler(DE_ERROR_POINTER_NULL);
+			error_handler(DE_ERROR_POINTER_NULL,",Variable temp in comb_7str()\n");
 			return NULL;
 		}
 
@@ -39,7 +39,7 @@ char* get_path(char *file_path, int32 file_number, char *file_type)
 	}
 
 	if(path == NULL){
-		error_handler(DE_ERROR_POINTER_NULL);
+		error_handler(DE_ERROR_POINTER_NULL,",Variable path in comb_7str()\n");
 		return NULL;
 	}
 
@@ -65,7 +65,7 @@ char* get_path_name(char *file_path, char *file_name, char *file_type)
 		temp = (char *)realloc(string, path_size);
 
 		if(temp == NULL){
-			error_handler(DE_ERROR_POINTER_NULL);
+			error_handler(DE_ERROR_POINTER_NULL,",Variable temp in get_path_name()\n");
 			return NULL;
 		}
 
@@ -73,7 +73,7 @@ char* get_path_name(char *file_path, char *file_name, char *file_type)
 	}
 
 	if(path == NULL){
-		error_handler(DE_ERROR_POINTER_NULL);
+		error_handler(DE_ERROR_POINTER_NULL,",Variable path in get_path_name()\n");
 		return NULL;
 	}
 
@@ -96,10 +96,6 @@ void init_path(void)
 
 void path_destroy(void)
 {
-	string = NULL;
-	number_string = NULL;
-	path = NULL;
-
 	free(string);
 	free(number_string);
 	free(path);
@@ -141,7 +137,7 @@ void check_dir(char *path)
 {
 	if(!file_exists(path)){
 		if(_mkdir(path))
-			error_handler(DE_ERROR_FILE_ERROR);
+			error_handler(DE_ERROR_FILE_ERROR,path);
 	}
 }
 
@@ -177,7 +173,7 @@ char *comb_str(char *a, char *b, char *c, char *d, char *e, char *f, char *g)
 		temp = (char *)realloc(string, string_size);
 
 		if(temp == NULL){
-			error_handler(DE_ERROR_POINTER_NULL);
+			error_handler(DE_ERROR_POINTER_NULL,",Variable temp in comb_str()\n");
 			return NULL;
 		}
 
@@ -185,7 +181,7 @@ char *comb_str(char *a, char *b, char *c, char *d, char *e, char *f, char *g)
 	}
 
 	if(string == NULL){
-		error_handler(DE_ERROR_POINTER_NULL);
+		error_handler(DE_ERROR_POINTER_NULL,",Variable string in comb_str()\n");
 		return NULL;
 	}
 
@@ -229,7 +225,7 @@ char *comb_2str(char *a, char *b)
 		temp = (char *)realloc(string, string_size);
 
 		if(temp == NULL){
-			error_handler(DE_ERROR_POINTER_NULL);
+			error_handler(DE_ERROR_POINTER_NULL,",Variable temp in comb_2str()\n");
 			return NULL;
 		}
 
@@ -237,7 +233,7 @@ char *comb_2str(char *a, char *b)
 	}
 
 	if(string == NULL){
-		error_handler(DE_ERROR_POINTER_NULL);
+		error_handler(DE_ERROR_POINTER_NULL,",Variable string in comb_2str()\n");
 		return NULL;
 	}
 
@@ -269,7 +265,7 @@ char *comb_3str(char *a, char *b, char *c)
 		temp = (char *)realloc(string, string_size);
 
 		if(temp == NULL){
-			error_handler(DE_ERROR_POINTER_NULL);
+			error_handler(DE_ERROR_POINTER_NULL,",Variable temp in comb_3str()\n");
 			return NULL;
 		}
 
@@ -277,7 +273,7 @@ char *comb_3str(char *a, char *b, char *c)
 	}
 
 	if(string == NULL){
-		error_handler(DE_ERROR_POINTER_NULL);
+		error_handler(DE_ERROR_POINTER_NULL,",Variable string in comb_3str()\n");
 		return NULL;
 	}
 
@@ -315,7 +311,7 @@ char *comb_4str(char *a, char *b, char *c, char *d)
 		temp = (char *)realloc(string, string_size);
 
 		if(temp == NULL){
-			error_handler(DE_ERROR_POINTER_NULL);
+			error_handler(DE_ERROR_POINTER_NULL,",Variable temp in comb_4str()\n");
 			return NULL;
 		}
 
@@ -323,7 +319,7 @@ char *comb_4str(char *a, char *b, char *c, char *d)
 	}
 
 	if(string == NULL){
-		error_handler(DE_ERROR_POINTER_NULL);
+		error_handler(DE_ERROR_POINTER_NULL,",Variable string in comb_4str()\n");
 		return NULL;
 	}
 
@@ -367,7 +363,7 @@ char *comb_5str(char *a, char *b, char *c, char *d, char *e)
 		temp = (char *)realloc(string, string_size);
 
 		if(temp == NULL){
-			error_handler(DE_ERROR_POINTER_NULL);
+			error_handler(DE_ERROR_POINTER_NULL,",Variable temp in comb_5str()\n");
 			return NULL;
 		}
 
@@ -375,7 +371,7 @@ char *comb_5str(char *a, char *b, char *c, char *d, char *e)
 	}
 
 	if(string == NULL){
-		error_handler(DE_ERROR_POINTER_NULL);
+		error_handler(DE_ERROR_POINTER_NULL,",Variable string in comb_5str()\n");
 		return NULL;
 	}
 
@@ -428,7 +424,7 @@ char *comb_7str(char *a, char *b, char *c, char *d, char *e, char *f, char *g)
 		temp = (char *)realloc(string, string_size);
 
 		if(temp == NULL){
-			error_handler(DE_ERROR_POINTER_NULL);
+			error_handler(DE_ERROR_POINTER_NULL,",Variable temp in comb_7str()\n");
 			return NULL;
 		}
 
@@ -436,7 +432,7 @@ char *comb_7str(char *a, char *b, char *c, char *d, char *e, char *f, char *g)
 	}
 
 	if(string == NULL){
-		error_handler(DE_ERROR_POINTER_NULL);
+		error_handler(DE_ERROR_POINTER_NULL,",Variable string in comb_7str()\n");
 		return NULL;
 	}
 
@@ -541,10 +537,12 @@ char *trim_string(char *str)
 	return str;
 }
 
-
 uint32 get_str_size(char *string)
 {
 	size_t i;
+
+	if(string == NULL)
+		return 0;
 
 	for(i = 0; string[i] != '\0' ; i++){}
 

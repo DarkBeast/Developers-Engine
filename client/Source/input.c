@@ -14,7 +14,7 @@ void handle_char_callback(GLFWwindow *screen, unsigned int key) //The character 
 {
 	if(widget_get_focused()->type == CONTROL_TEXTBOX ){
 		if(key > 128){
-			error_handler(DE_ERROR_NONE_ACSII);
+			error_handler(DE_ERROR_NONE_ACSII,"\n");
 			return;
 		}
 		widget_get_focused()->controlkeypressed(widget_get_focused(),key);
