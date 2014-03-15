@@ -5,6 +5,10 @@
 
 #include "function.h"
 #include <glfw3.h>
+#include <time.h>
+#include <string.h>
+#include <stdio.h>
+#include "path.h"
 
 //does not need initialization client side due to client already init it during window load up.
 double gettickcount(void)
@@ -45,8 +49,34 @@ sbool comp_str(char *string1, char *string2)
 				return TRUE;
 			}
 			return FALSE;
-		}	
+		}
 	}
 
 	return FALSE;
+}
+
+void add_log(char *string, char *path)
+{
+	FILE *fp;
+	time_t current_time;
+	char* c_time_string;
+	current_time = time(NULL);
+
+	c_time_string = ctime(&current_time);
+
+	if(!file_exists(path)){
+		if((fp = fopen(path, "w")) == NULL)
+			fputs("ERROR: File Error!\n", stderr);
+		fclose(fp);
+	}
+
+	if((fp = fopen(path, "r+")) == NULL)
+		fputs("ERROR: File Error!\n", stderr);
+
+	c_time_string[strlen(c_time_string) - 1] = '\0';
+
+	fseek(fp, 0, SEEK_END);
+	fprintf(fp, "\n %s: %s", c_time_string, string);
+
+	fclose(fp);
 }
