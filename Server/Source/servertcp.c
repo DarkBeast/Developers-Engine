@@ -73,6 +73,21 @@ void map_msg(uint16 mapnum, char * msg, uint8 color)
 	send_data_to_map(&buffer, mapnum);
 }
 
+void status_msg(struct bufferevent *bev, char * msg)
+{
+	buffer_t buffer;
+	uint32 len;
+
+	clear_buffer(&buffer);
+	add_opcode(&buffer, SSTATUS);
+
+	len = strlen(msg);
+	add_buffer(&buffer, &len, SIZE32);
+	add_string(&buffer, msg);
+
+	send_socket_data(&buffer, bev);
+}
+
 void alert_msg(int16 index, char * msg)
 {
 	buffer_t buffer;
