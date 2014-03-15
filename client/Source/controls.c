@@ -172,6 +172,29 @@ void set_control_alpha(widget *control, uint8 alpha)
 	update_widget_vertex_buffer(control);
 }
 
+void unload_base(widget *control)
+{
+	free(control->data);
+	free(control->control);
+
+	if(!(control->action & WIDGET_USED_CLONE))
+		free(control->img);
+
+	free(control->shown.data);
+	free(control->hidden.data);
+
+	glDeleteBuffers(1, &control->buf.buffer);
+	glDeleteBuffers(1, &control->buf.index);
+}
+
+void unload_base2(widget *control)
+{
+	free(control->data);
+	free(control->control);
+	free(control->shown.data);
+	free(control->hidden.data);
+}
+
 //Buttons
 void create_button(widget *control, widget *parent, uint16 x, uint16 y, uint16 height, uint16 width, uint16 sizey, uint16 sizex, char *path, widget *clone)
 {
@@ -198,27 +221,6 @@ void create_button(widget *control, widget *parent, uint16 x, uint16 y, uint16 h
 
 	widget_add(parent,control);
 	create_widget_vertex_buffer(control);
-}
-
-void unload_button(widget *control, sbool hidden)
-{
-	free(control->data);
-	free(control->control);
-
-	if(!(control->action & WIDGET_USED_CLONE))
-		free(control->img);
-
-	if(control->shown.data && !hidden){
-		widget_clear_shown(control);
-	}
-	if(control->hidden.data && hidden){
-		widget_clear_hidden(control);
-	}
-	free(control->shown.data);
-	free(control->hidden.data);
-
-	glDeleteBuffers(1, &control->buf.buffer);
-	glDeleteBuffers(1, &control->buf.index);
 }
 
 void draw_buttons(widget *control)
@@ -303,14 +305,14 @@ void create_label(widget *control, widget *parent, uint16 x, uint16 y, uint16 wi
 	init_text = (label *)calloc(1,sizeof(label));
 
 	if(init_text == NULL){
-		error_handler(DE_ERROR_POINTER_NULL);
+		error_handler(DE_ERROR_POINTER_NULL,",init_text in create_label()\n");
 		return;
 	}
 
 	init_text->string = (text *)calloc(1,sizeof(text));
 
 	if(init_text->string == NULL){
-		error_handler(DE_ERROR_POINTER_NULL);
+		error_handler(DE_ERROR_POINTER_NULL,",init_text->string in create_label()\n");
 		return;
 	}
 
@@ -324,11 +326,10 @@ void create_label(widget *control, widget *parent, uint16 x, uint16 y, uint16 wi
 	create_text_vertex(init_text->string, control);
 }
 
-void unload_label(widget *control, sbool hidden)
+void unload_label(widget *control)
 {
 	label *init_text = (label *)control->control;
 
-	init_text->string->data = NULL;
 	free(init_text->string->buf.data);
 	glDeleteBuffers(1, &init_text->string->buf.buffer);
 	glDeleteBuffers(1, &init_text->string->buf.index);
@@ -340,12 +341,6 @@ void unload_label(widget *control, sbool hidden)
 	if(!(control->action & WIDGET_USED_CLONE))
 		free(control->img);
 
-	if(control->shown.data && !hidden){
-		widget_clear_shown(control);
-	}
-	if(control->hidden.data && hidden){
-		widget_clear_hidden(control);
-	}
 	free(control->shown.data);
 	free(control->hidden.data);
 }
@@ -401,7 +396,7 @@ void create_window(widget *control, widget *parent, uint16 x, uint16 y, uint16 h
 	window *init_window = (window *)calloc(1,sizeof(window));
 
 	if(init_window == NULL){
-		error_handler(DE_ERROR_POINTER_NULL);
+		error_handler(DE_ERROR_POINTER_NULL,",init_window in create_window()\n");
 		return;
 	}
 
@@ -441,7 +436,7 @@ void create_window_framed(widget *control, widget *parent, uint16 x, uint16 y, u
 	window *init_window = (window *)calloc(1,sizeof(window));
 
 	if(init_window == NULL){
-		error_handler(DE_ERROR_POINTER_NULL);
+		error_handler(DE_ERROR_POINTER_NULL,",init_window in create_window_framed()\n");
 		return;
 	}
 
@@ -475,26 +470,6 @@ void create_window_framed(widget *control, widget *parent, uint16 x, uint16 y, u
 	create_widget_vertex_buffer(control); // must be called after widget add to get the correct Parent.
 }
 
-void unload_window(widget *control, sbool hidden)
-{
-	free(control->data);
-	free(control->control);
-
-	if(!(control->action & WIDGET_USED_CLONE))
-		free(control->img);
-
-	if(control->shown.data && !hidden){
-		widget_clear_shown(control);
-	}
-	if(control->hidden.data && hidden){
-		widget_clear_hidden(control);
-	}
-	free(control->shown.data);
-	free(control->hidden.data);
-
-	glDeleteBuffers(1, &control->buf.buffer);
-	glDeleteBuffers(1, &control->buf.index);
-}
 void draw_windows(widget *control)
 {
 	draw_widget(control);
@@ -530,27 +505,6 @@ void create_checkbox(widget *control, widget *parent, uint16 x, uint16 y, uint16
 	widget_add(parent,control);
 
 	create_widget_vertex_buffer(control);
-}
-
-void unload_checkbox(widget *control, sbool hidden)
-{
-	free(control->data);
-	free(control->control);
-
-	if(!(control->action & WIDGET_USED_CLONE))
-		free(control->img);
-
-	if(control->shown.data && !hidden){
-		widget_clear_shown(control);
-	}
-	if(control->hidden.data && hidden){
-		widget_clear_hidden(control);
-	}
-	free(control->shown.data);
-	free(control->hidden.data);
-
-	glDeleteBuffers(1, &control->buf.buffer);
-	glDeleteBuffers(1, &control->buf.index);
 }
 
 void draw_checkbox(widget *control)
@@ -593,7 +547,7 @@ void create_radio(widget *control, widget *parent, uint16 x, uint16 y, uint16 he
 	radio *init_radio = (radio *)calloc(1,sizeof(radio));
 
 	if(init_radio == NULL){
-		error_handler(DE_ERROR_POINTER_NULL);
+		error_handler(DE_ERROR_POINTER_NULL,",init_radio in create_radio()\n");
 		return;
 	}
 
@@ -632,7 +586,7 @@ void create_radio(widget *control, widget *parent, uint16 x, uint16 y, uint16 he
 		link_radio(linkparent,control);
 }
 
-void unload_radio(widget *control, sbool hidden)
+void unload_radio(widget *control)
 {
 	radio *init_radio = (radio *)control->control;
 	uint32 i = 0;
@@ -651,12 +605,6 @@ void unload_radio(widget *control, sbool hidden)
 	if(!(control->action & WIDGET_USED_CLONE))
 		free(control->img);
 
-	if(control->shown.data && !hidden){
-		widget_clear_shown(control);
-	}
-	if(control->hidden.data && hidden){
-		widget_clear_hidden(control);
-	}
 	free(control->shown.data);
 	free(control->hidden.data);
 
@@ -699,7 +647,7 @@ void link_radio(widget *main, widget *control)
 		data->list = (widget **)calloc(1,8 * sizeof(widget));
 
 		if(data->list == NULL){
-			error_handler(DE_ERROR_POINTER_NULL);
+			error_handler(DE_ERROR_POINTER_NULL,",data->list in link_radio()\n");
 			return;
 		}
 
@@ -821,7 +769,7 @@ void create_hprogressbar(widget *control, widget *parent, uint16 x, uint16 y, ui
 	progressbar *bar = (progressbar *)calloc(1, sizeof(progressbar));
 
 	if(bar == NULL){
-		error_handler(DE_ERROR_POINTER_NULL);
+		error_handler(DE_ERROR_POINTER_NULL,",bar in create_hprogressbar()\n");
 		return;
 	}
 
@@ -874,26 +822,6 @@ void create_hprogressbar(widget *control, widget *parent, uint16 x, uint16 y, ui
 	widget_update_progressbars_vector(&bar->bar);
 }
 
-void unload_progressbar(widget *control, sbool hidden)
-{
-	free(control->data);
-	free(control->control);
-
-	if(!(control->action & WIDGET_USED_CLONE))
-		free(control->img);
-
-	if(control->shown.data && !hidden){
-		widget_clear_shown(control);
-	}
-	if(control->hidden.data && hidden){
-		widget_clear_hidden(control);
-	}
-	free(control->shown.data);
-	free(control->hidden.data);
-
-	glDeleteBuffers(1, &control->buf.buffer);
-	glDeleteBuffers(1, &control->buf.index);
-}
 void draw_hprogressbar(widget *control)
 {
 	draw_widget(control);
@@ -939,31 +867,12 @@ void create_picturebox(widget *control, widget *parent, uint16 x, uint16 y, uint
 	create_widget_vertex_buffer(control);
 }
 
-void unload_picturebox(widget *control, sbool hidden)
-{
-	free(control->data);
-	free(control->control);
-
-	if(!(control->action & WIDGET_USED_CLONE))
-		free(control->img);
-
-	if(control->shown.data && !hidden){
-		widget_clear_shown(control);
-	}
-	if(control->hidden.data && hidden){
-		widget_clear_hidden(control);
-	}
-	free(control->shown.data);
-	free(control->hidden.data);
-
-	glDeleteBuffers(1, &control->buf.buffer);
-	glDeleteBuffers(1, &control->buf.index);
-}
-
 void update_picturebox(widget *control, uint16 x, uint16 y, uint16 imgposx, uint16 imgposy, uint16 height, uint16 width, uint16 sizex, uint16 sizey, char *imagepath, widget *clone)
 {
 	if(imagepath != NULL){
-		free(control->img);
+		if(!(control->action & WIDGET_USED_CLONE))
+			free(control->img);
+
 		load_image(imagepath, control->img );
 	}
 	control->pos.x = x;
@@ -998,7 +907,7 @@ void create_hscrollbar(widget *control, widget *parent, uint16 x, uint16 y, uint
 	scrollbar_t *scroll_t = (scrollbar_t *)calloc(1, sizeof(scrollbar_t));
 
 	if(scroll_t == NULL ){
-		error_handler(DE_ERROR_POINTER_NULL);
+		error_handler(DE_ERROR_POINTER_NULL,",scroll_t in create_hscrollbar()\n");
 		return;
 	}
 
@@ -1108,29 +1017,6 @@ void create_hscrollbar(widget *control, widget *parent, uint16 x, uint16 y, uint
 	create_widget_vertex_buffer(&scroll_t->button_1);
 	create_widget_vertex_buffer(&scroll_t->button_2);
 	create_widget_vertex_buffer(&scroll_t->bar);
-}
-
-void unload_scrollbar(widget *control, sbool hidden)
-{
-	scrollbar_t *scroll_t = (scrollbar_t *)control->control;
-
-	free(control->data);
-	free(control->control);
-
-	if(!(control->action & WIDGET_USED_CLONE))
-		free(control->img);
-
-	if(control->shown.data && !hidden){
-		widget_clear_shown(control);
-	}
-	if(control->hidden.data && hidden){
-		widget_clear_hidden(control);
-	}
-	free(control->shown.data);
-	free(control->hidden.data);
-
-	glDeleteBuffers(1, &control->buf.buffer);
-	glDeleteBuffers(1, &control->buf.index);
 }
 
 void draw_hscrollbar(widget *control)
@@ -1418,7 +1304,7 @@ void create_vscrollbar(widget *control, widget *parent, uint16 x, uint16 y, uint
 	scrollbar_t *scroll_t = (scrollbar_t *)calloc(1, sizeof(scrollbar_t));
 
 	if(scroll_t == NULL){
-		error_handler(DE_ERROR_POINTER_NULL);
+		error_handler(DE_ERROR_POINTER_NULL,",scroll_t in create_vscrollbar()\n");
 		return;
 	}
 
@@ -1807,7 +1693,7 @@ void create_vprogressbar(widget *control, widget *parent, uint16 x, uint16 y, ui
 	progressbar *bar = (progressbar *)calloc(1, sizeof(progressbar));
 
 	if(bar == NULL){
-		error_handler(DE_ERROR_POINTER_NULL);
+		error_handler(DE_ERROR_POINTER_NULL,",bar in create_vprogressbar()\n");
 		return;
 	}
 
@@ -1884,7 +1770,7 @@ void create_stextbox(widget *control, widget *parent, uint16 x, uint16 y, uint16
 	textbox_w *init_widget = (textbox_w *)calloc(1,sizeof(textbox_w));
 
 	if(init_text == NULL || init_widget == NULL){
-		error_handler(DE_ERROR_POINTER_NULL);
+		error_handler(DE_ERROR_POINTER_NULL,",init_text or init_widget in create_stextbox()\n");
 		return;
 	}
 
@@ -1923,7 +1809,7 @@ void create_stextbox(widget *control, widget *parent, uint16 x, uint16 y, uint16
 	init_text->string = (text *)calloc(1,sizeof(text));
 
 	if(init_text->string == NULL){
-		error_handler(DE_ERROR_POINTER_NULL);
+		error_handler(DE_ERROR_POINTER_NULL, ",init_text->string in create_stextbox()\n");
 		return;
 	}
 
@@ -1954,7 +1840,7 @@ void draw_stextbox(widget *control)
 	draw_widget(control);
 }
 
-void unload_textbox(widget *control, sbool hidden)
+void unload_textbox(widget *control)
 {
 	textbox *init_text;
 
@@ -1981,12 +1867,6 @@ void unload_textbox(widget *control, sbool hidden)
 	if(!(control->action & WIDGET_USED_CLONE))
 		free(control->img);
 
-	if(control->shown.data && !hidden){
-		widget_clear_shown(control);
-	}
-	if(control->hidden.data && hidden){
-		widget_clear_hidden(control);
-	}
 	free(control->shown.data);
 	free(control->hidden.data);
 }
@@ -2071,7 +1951,7 @@ void handle_stextbox_input(widget *control, int key)
 					}
 					data->string->count--;
 				}
-				data->string->data[data->string->count] = NULL;
+				data->string->data[data->string->count] = '\0';
 
 				stextbox_text_update(data->string, control->shown.data[0]);
 			}
@@ -2173,7 +2053,7 @@ void create_mtextbox(widget *control, widget *parent, uint16 x, uint16 y, uint16
 	textbox_w *init_widget = (textbox_w *)calloc(1,sizeof(textbox_w));
 
 	if(init_text == NULL || init_widget == NULL){
-		error_handler(DE_ERROR_POINTER_NULL);
+		error_handler(DE_ERROR_POINTER_NULL,",init_text or init_widget in create_mtextbox()\n");
 		return;
 	}
 
@@ -2209,8 +2089,8 @@ void create_mtextbox(widget *control, widget *parent, uint16 x, uint16 y, uint16
 
 	init_text->string = (text *)calloc(1,sizeof(text));
 
-	if(init_text == NULL || init_text->string == NULL){
-		error_handler(DE_ERROR_POINTER_NULL);
+	if(init_text->string == NULL){
+		error_handler(DE_ERROR_POINTER_NULL, ",init_text->string in create_mtextbox()\n");
 		return;
 	}
 
@@ -2305,7 +2185,7 @@ void handle_mtextbox_input(widget *control, int key)
 				if(data->string->count > 0){
 					data->string->count--;
 				}
-				data->string->data[data->string->count] = NULL;
+				data->string->data[data->string->count] = '\0';
 
 				mtextbox_text_update(data->string, control->shown.data[0]);
 			}
@@ -2343,7 +2223,7 @@ void create_listbox(widget *control, widget *parent, uint16 x, uint16 y, uint16 
 	list->selectover = (widget *)calloc(1,sizeof(widget));
 
 	if(list == NULL || list->list == NULL || list->select == NULL || list->selectover == NULL){
-		error_handler(DE_ERROR_POINTER_NULL);
+		error_handler(DE_ERROR_POINTER_NULL, ",list, list->list,list->select or list->selectover in create_listbox()\n");
 		return;
 	}
 
@@ -2414,7 +2294,7 @@ void create_listbox(widget *control, widget *parent, uint16 x, uint16 y, uint16 
 		list->list[i] = (widget *)calloc(1,sizeof(widget));
 
 		if(init_text == NULL || list->list[i] == NULL){
-			error_handler(DE_ERROR_POINTER_NULL);
+			error_handler(DE_ERROR_POINTER_NULL,"init_text or list->list[i] in create_listbox()\n");
 			return;
 		}
 
@@ -2434,7 +2314,7 @@ void create_listbox(widget *control, widget *parent, uint16 x, uint16 y, uint16 
 		init_text->string = (text *)calloc(1,sizeof(text));
 
 		if(init_text->string == NULL){
-			error_handler(DE_ERROR_POINTER_NULL);
+			error_handler(DE_ERROR_POINTER_NULL,"init_text->string in create_listbox()\n");
 			return;
 		}
 
@@ -2478,7 +2358,7 @@ void create_listbox(widget *control, widget *parent, uint16 x, uint16 y, uint16 
 	set_scrollbar_buttons(&list->vbar, &handle_listbox_scroll);
 }
 
-void unload_listbox(widget *control, sbool hidden)
+void unload_listbox(widget *control)
 {
 	uint32 i = 0;
 	listbox *list = (listbox *)control->control;
@@ -2543,12 +2423,6 @@ void unload_listbox(widget *control, sbool hidden)
 	if(!(control->action & WIDGET_USED_CLONE))
 		free(control->img);
 
-	if(control->shown.data && !hidden){
-		widget_clear_shown(control);
-	}
-	if(control->hidden.data && hidden){
-		widget_clear_hidden(control);
-	}
 	free(control->shown.data);
 	free(control->hidden.data);
 	glDeleteBuffers(1, &control->buf.buffer);
@@ -2778,20 +2652,10 @@ void create_frame(widget *control, widget *parent, uint16 x, uint16 y, uint16 he
 	control->actualpos.y = control->pos.y + control->parent->actualpos.y;
 }
 
-void unload_frame(widget *control, sbool hidden)
+void unload_frame(widget *control)
 {
 	free(control->data);
 	free(control->control);
-
-	if(!(control->action & WIDGET_USED_CLONE))
-		free(control->img);
-
-	if(control->shown.data && !hidden){
-		widget_clear_shown(control);
-	}
-	if(control->hidden.data && hidden){
-		widget_clear_hidden(control);
-	}
 	free(control->shown.data);
 	free(control->hidden.data);
 }
@@ -2839,21 +2703,6 @@ void create_clipbox(widget *control, widget *parent, uint16 x, uint16 y, uint16 
 	control->actualpos.y = control->pos.y + control->parent->actualpos.y;
 }
 
-void unload_clipbox(widget *control, sbool hidden)
-{
-	free(control->data);
-	free(control->control);
-
-	if(control->shown.data && !hidden){
-		widget_clear_shown(control);
-	}
-	if(control->hidden.data && hidden){
-		widget_clear_hidden(control);
-	}
-	free(control->shown.data);
-	free(control->hidden.data);
-}
-
 void handle_clipbox_move(widget *control)
 {
 	control->actualpos.x = control->pos.x + control->parent->actualpos.x;
@@ -2871,30 +2720,30 @@ void draw_clipbox(widget *control)
 
 void create_statusbox(widget *control, widget *parent, uint16 x, uint16 y, char *text, widget *stsclone, widget *btnclone)
 {
-	widget *hide = (widget *)calloc(1, sizeof(widget));
-	widget *btnok = (widget *)calloc(1, sizeof(widget));
-	widget *lbltext= (widget *)calloc(1, sizeof(widget));
-	widget *lblok= (widget *)calloc(1, sizeof(widget));
+	statusbox_t *gui = (statusbox_t *)calloc(1, sizeof(statusbox_t));
 
-	if(btnok == NULL || lbltext == NULL || lblok == NULL || hide == NULL){
-		error_handler(DE_ERROR_POINTER_NULL);
-		return;
+	if(gui == NULL){
+		error_handler(DE_ERROR_POINTER_NULL,"status box is NULL in create_statusbox"); return;
 	}
+
 	create_picturebox(control,NULL,0,0,32,32,get_screen_height(),get_screen_width(),comb_2str(GUI_PATH, "hide.png"), NULL);
-	create_window(hide,control,x,y,170,378,170,378,"statuswidget.png",stsclone);
-	create_label(lbltext,hide,15,70,200,100,0,0,0,120,FALSE,1,30,FALSE,text); //0
-	create_button(btnok,hide,105,110,50,180,50,180,"smallbutton.png", btnclone); //1
-	create_label(lblok, btnok,75,10,80,25,0,0,0,120,FALSE,2,8,FALSE,"OK"); //2
-	lblok->action |= WIDGET_CAN_CLICK_BEHIND;
+	create_window(&gui->hide,control,x,y,170,378,170,378,"statuswidget.png",stsclone);
+	create_label(&gui->lbltext,&gui->hide,15,70,200,100,0,0,0,120,FALSE,1,30,FALSE,text); //0
+	create_button(&gui->btnok,&gui->hide,105,110,50,180,50,180,"smallbutton.png", btnclone); //1
+	create_label(&gui->lblok, &gui->btnok,75,10,80,25,0,0,0,120,FALSE,2,8,FALSE,"OK"); //2
+	gui->lblok.action |= WIDGET_CAN_CLICK_BEHIND;
 	control->action |= WIDGET_CAN_FOCUS;
+	control->control = gui;
 }
 
 void status_box_set_click_event(widget *control, void(*mousepress)(widget *,int,int))
 {
-	control->shown.data[0]->shown.data[1]->mousepress = mousepress;
+	statusbox_t *gui = (statusbox_t *)control->control;
+	gui->btnok.mousepress = mousepress;
 }
 
 void status_box_text(widget *control, char *text)
 {
-	update_label_string(control->shown.data[0]->shown.data[0], text);
+	statusbox_t *gui = (statusbox_t *)control->control;
+	update_label_string(&gui->lbltext, text);
 }

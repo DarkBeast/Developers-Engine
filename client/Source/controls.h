@@ -20,7 +20,7 @@ typedef struct textbox_w textbox_w;
 typedef struct listbox listbox;
 typedef struct progressbar progressbar;
 typedef struct clipbox clipbox;
-typedef struct statusbox statusbox;
+typedef struct statusbox_t statusbox_t;
 
 enum control_types
 {
@@ -76,12 +76,11 @@ struct textbox{
 	line_buffer cursorbuffer;
 };
 
-struct statusbox{
-	sbool accepted;
-	sbool canaccept;
-	double counter;
-	double timer;
-	widget *lbltext;
+struct statusbox_t{
+	widget hide;
+	widget btnok;
+	widget lbltext;
+	widget lblok;
 };
 
 struct textbox_w{
@@ -111,6 +110,8 @@ void set_control_alpha(widget *control, uint8 alpha);
 void use_control_image(widget *control, widget *main, sbool freeit);
 void clone_control_images(widget *control, widget *main, sbool freeit, sbool update);
 void free_control_images(widget *control, widget *main);
+void unload_base(widget *control);
+void unload_base2(widget *control);
 
 void create_button(widget *control, widget *parent, uint16 x, uint16 y, uint16 height, uint16 width, uint16 sizey, uint16 sizex, char *path, widget *clone);
 void draw_buttons(widget *control);
@@ -119,11 +120,10 @@ void handle_button_release(widget *control, int button, int pressed);
 void handle_button_move(widget *control);
 void handle_button_mouse_over(widget *control);
 void handle_button_mouse_exit(widget *control);
-void unload_button(widget *control, sbool hidden);
 
 void create_label(widget *control, widget *parent, uint16 x, uint16 y, uint16 width, uint16 height, uint8 red, uint8 blue, uint8 green, uint8 alpha, sbool events, uint8 fontid, uint16 maxcharspl, sbool multi_lined, char *string);
 void draw_label(widget *control);
-void unload_label(widget *control, sbool hidden);
+void unload_label(widget *control);
 void handle_label_click(widget *control, int button, int pressed);
 void handle_slabel_move(widget *control);
 void handle_mlabel_move(widget *control);
@@ -134,17 +134,15 @@ void create_window_framed(widget *control, widget *parent, uint16 x, uint16 y, u
 void draw_windows(widget *control);
 void handle_window_click(widget *control, int button, int pressed);
 void handle_windows_move(widget *control);
-void unload_window(widget *control, sbool hidden);
 
 void create_checkbox(widget *control, widget *parent, uint16 x, uint16 y, uint16 height, uint16 width, uint16 sizey, uint16 sizex, char *path, widget *clone);
 void draw_checkbox(widget *control);
 void handle_check_click(widget *control, int button, int pressed);
 void handle_check_move(widget *control);
-void unload_checkbox(widget *control, sbool hidden);
 
 void create_radio(widget *control, widget *parent, uint16 x, uint16 y, uint16 height, uint16 width, uint16 sizey, uint16 sizex, sbool istrue, char *path,widget *linkparent, widget *clone);
 void draw_radio(widget *control);
-void unload_radio(widget *control, sbool hidden);
+void unload_radio(widget *control);
 void reset_radio(widget *control);
 void link_radio(widget *main, widget *control);
 void handle_radio_click(widget *control, int button, int pressed);
@@ -163,7 +161,6 @@ void draw_picturebox(widget *control);
 void handle_picturebox_click(widget *control, int button, int pressed);
 void update_picturebox(widget *control, uint16 x, uint16 y, uint16 imgposx, uint16 imgposy, uint16 height, uint16 width, uint16 sizex, uint16 sizey, char *imagepath, widget *clone);
 void handle_picturebox_move(widget *control);
-void unload_picturebox(widget *control, sbool hidden);
 
 void create_hscrollbar(widget *control, widget *parent, uint16 x, uint16 y, uint16 height, uint16 width, uint16 buttonheight, uint16 buttonwidth, uint16 sizey, uint16 sizex, uint16 value, uint16 max_value, char *background,char *buttonleft, char *buttonright,char *scrollbar, widget *clone);
 void draw_hscrollbar(widget *control);
@@ -185,7 +182,6 @@ void handle_harrowright_exit(widget *control);
 void handle_harrowleft_exit(widget *control);
 void handle_hbar_exit(widget *control);
 void handle_hbar_over(widget *control);
-void unload_scrollbar(widget *control, sbool hidden);
 
 void create_vscrollbar(widget *control, widget *parent, uint16 x, uint16 y, uint16 height, uint16 width, uint16 buttonheight, uint16 buttonwidth, uint16 sizey, uint16 sizex, uint16 value, uint16 max_value, char *background,char *buttontop, char *buttonbottom,char *scrollbar, widget *clone);
 void draw_vscrollbar(widget *control);
@@ -211,7 +207,6 @@ void draw_vprogressbar(widget *control);
 void handle_vprogressbar_click(widget *control, int button, int pressed);
 void handle_vprogressbar_move(widget *control);
 void handle_vprogressbars_move(widget *control);
-void unload_progressbar(widget *control, sbool hidden);
 
 void create_stextbox(widget *control, widget *parent, uint16 x, uint16 y, uint16 width, uint16 height, uint8 offsetx, uint8 offsety, uint16 sx, uint16 sy, uint8 red, uint8 blue, uint8 green, uint8 alpha, uint16 maxchars, uint8 fontid, sbool ispass, char *imgpath, widget *clone);
 void draw_stextbox(widget *control);
@@ -220,7 +215,7 @@ void handle_stextbox_move(widget *control);
 void draw_stextbox_text(widget *control);
 void handle_stextbox_input(widget *control, int key);
 void handle_stextbox_text_move(widget *control);
-void unload_textbox(widget *control, sbool hidden);
+void unload_textbox(widget *control);
 
 void create_mtextbox(widget *control, widget *parent, uint16 x, uint16 y, uint16 width, uint16 height, uint8 offsetx, uint8 offsety, uint16 sx, uint16 sy, uint8 red, uint8 blue, uint8 green, uint8 alpha, uint16 maxchars, uint16 maxcharpl, uint8 fontid, char *imgpath, widget *clone);
 void draw_mtextbox(widget *control);
@@ -232,7 +227,7 @@ void handle_mtextbox_text_move(widget *control);
 
 void create_listbox(widget *control, widget *parent, uint16 x, uint16 y, uint16 height, uint16 width,uint16 barwidth, uint16 buttonheight, uint16 buttonwidth, uint16 sizey, uint16 sizex, uint8 offsetx, uint8 offsety, uint32 amount, uint8 maxchars, uint8 fontid, uint8 red, uint8 green, uint8 blue, uint8 alpha, char *imglistbg, char *imgbg, char *imgup, char *imgdown, char *bar, char *select, char *mouseover, widget *clone);
 void draw_listbox(widget *control);
-void unload_listbox(widget *control, sbool hidden);
+void unload_listbox(widget *control);
 void handle_listbox_release(widget *control, int button, int pressed);
 void handle_listbox_click(widget *control, int button, int pressed);
 void handle_listbox_mouse_over(widget *control);
@@ -249,10 +244,8 @@ listbox *get_list(widget *control);
 void create_frame(widget *control, widget *parent, uint16 x, uint16 y, uint16 height, uint16 width, sbool events, sbool window_moveable);
 void handle_frame_click(widget *control, int button, int pressed);
 void handle_frame_move(widget *control);
-void unload_frame(widget *control, sbool hidden);
 
 void create_clipbox(widget *control, widget *parent, uint16 x, uint16 y, uint16 height, uint16 width, uint16 sizey, uint16 sizex);
-void unload_clipbox(widget *control, sbool hidden);
 void handle_clipbox_move(widget *control);
 void draw_clipbox(widget *control, image *img, sbuffer buf);
 
