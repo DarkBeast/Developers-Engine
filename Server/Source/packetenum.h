@@ -67,6 +67,7 @@ enum clientpackets{
 enum serverpackets{
 	SNONE = 0,
 	SLOGINOK,
+	SSTATUS,
 	SALERTMSG,
 	SINGAME,
 	SPLAYERINV,
