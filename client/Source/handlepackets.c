@@ -11,6 +11,7 @@
 #include "function.h"
 #include "path.h"
 #include "newaccount.h"
+#include "login.h"
 
 void(*packets[SMSG_COUNT])(buffer_t *);
 
@@ -72,14 +73,14 @@ void incomming_packets(buffer_t *data)
 	uint8 id = SNONE;
 
 	if(data->offset > 0){
-		error_handler(DE_ERROR_INVALID_PACKET_OFFSET);
+		error_handler(DE_ERROR_INVALID_PACKET_OFFSET, "offset is 0 in incomming_packets()\n");
 		return;
 	}
 
 	take_buffer(&id,data,1);
 
-	if(id == SNONE){
-		error_handler(DE_ERROR_INVALID_PACKET_ID);
+	if(id == SNONE || id >= SMSG_COUNT){
+		error_handler(DE_ERROR_INVALID_PACKET_ID, "packet id == SNONE or id >= SMSG_COUNT\n");
 		return;
 	}
 
@@ -97,6 +98,22 @@ void handle_loginok(buffer_t *data)
 	//frmChars.Visible = False
 }
 
+void handle_status_message(buffer_t *data)
+{
+	char *string;
+	uint32 size;
+	widget *statusbox1 = (widget *)calloc(1,sizeof(widget));
+
+	take_buffer(&size,data,SIZE32);
+	string = (char *)calloc(size,sizeof(char));
+	take_string(string,data);
+
+	printf("%s \n",string);
+
+	if(get_menu_state() == MENU_STATE_STATUS){
+	}
+}
+
 void handle_alert_message(buffer_t *data)
 {
 	char *string;
@@ -108,20 +125,17 @@ void handle_alert_message(buffer_t *data)
 	take_string(string,data);
 
 	printf("%s \n",string);
-	
+
 	switch(get_menu_state()){
-		case MENU_STATE_MAIN:
-			break;
-		case MENU_STATE_CREDITS:
-			break;
-		case MENU_STATE_LOGIN:
-			break;
-		case MENU_STATE_CREATE:
-			newacc_status_message(string);
-			break;
-		case MENU_STATE_EXIT:
-			break;
-		}
+	case MENU_STATE_LOGIN:
+		login_status_message(string);
+		break;
+	case MENU_STATE_CREATE:
+		newacc_status_message(string);
+		break;
+	default:
+		break;
+	}
 }
 
 void handle_in_game(buffer_t *data)
