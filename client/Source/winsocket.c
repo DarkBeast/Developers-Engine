@@ -3,6 +3,7 @@
 #include "error.h"
 #include <stdio.h>
 #include "handlepackets.h"
+#include "path.h"
 
 desocket *sock; //short for socket
 WSADATA wsadata;
@@ -23,11 +24,11 @@ void initsocket(void)
 	sock = (desocket *)calloc(1,sizeof(desocket));
 
 	if (WSAStartup(0x0202, &wsadata) != 0) /* Load Winsock 2.0 DLL */
-		error_handler(DE_ERROR_SOCKET_WSASTARTUP);
+		error_handler(DE_ERROR_SOCKET_WSASTARTUP,NULL);
 
 	/* Create a reliable, stream socket using TCP */
 	if ((sock->socket = socket(PF_INET, SOCK_STREAM, IPPROTO_TCP)) < 0)
-		error_handler(DE_ERROR_SOCKET_INIT);
+		error_handler(DE_ERROR_SOCKET_INIT, NULL);
 
 	/* Construct the server address structure */
 	memset(&sock->host_address, 0, sizeof(struct sockaddr_in));     /* Zero out structure */
@@ -87,7 +88,7 @@ void socketsend(buffer_t *data)
 	add_buffer(&buff, &data->buff, data->offset);
 
 	if (send(sock->socket, buff.buff, buff.offset, 0) != buff.offset)
-		error_handler(DE_ERROR_SOCKET_SEND_SIZE);
+		error_handler(DE_ERROR_SOCKET_SEND_SIZE, buff.buff);
 }
 
 void unloadsocket(void)
