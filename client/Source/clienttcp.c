@@ -7,9 +7,8 @@
 
 void send_data(buffer_t *data)
 {
-	if(isconnected()){
+	if(isconnected())
 		socketsend(data);
-	}
 }
 
 void send_new_account(char *name, char *charname, char *password, uint8 job, uint8 sex)
@@ -18,9 +17,9 @@ void send_new_account(char *name, char *charname, char *password, uint8 job, uin
 
 	clear_buffer(&buffer);
 	add_opcode(&buffer,CNEWACCOUNT);
-	add_string(&buffer, name);
-	add_string(&buffer, charname);
-	add_string(&buffer, password);
+	add_encypt_string(&buffer, name);
+	add_encypt_string(&buffer, charname);
+	add_encypt_string(&buffer, password);
 	add_buffer(&buffer, &job, SIZE8);
 	add_buffer(&buffer, &sex, SIZE8);
 
@@ -30,14 +29,14 @@ void send_new_account(char *name, char *charname, char *password, uint8 job, uin
 void send_login(char *name, char *password)
 {
 	buffer_t buffer;
-
+	int major = VERSION_MAJOR, minor = VERSION_MINOR, rev = VERSION_REV;
 	clear_buffer(&buffer);
-	add_opcode(&buffer,CNEWACCOUNT);
-	add_string(&buffer, name);
-	add_string(&buffer, password);
-	add_buffer(&buffer, (int *)VERSION_MAJOR, SIZE8);
-	add_buffer(&buffer, (int *)VERSION_MINOR, SIZE8);
-	add_buffer(&buffer, (int *)VERSION_REV, SIZE8);
+	add_opcode(&buffer,CLOGIN);
+	add_encypt_string(&buffer, name);
+	add_encypt_string(&buffer, password);
+	add_buffer(&buffer, &major, SIZE8);
+	add_buffer(&buffer, &minor, SIZE8);
+	add_buffer(&buffer, &rev, SIZE8);
 
 	send_data(&buffer);
 }
