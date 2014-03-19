@@ -35,6 +35,10 @@ int  add_opcode(buffer_t* buffer, uint8 opcode);
 
 int  add_string(buffer_t* buffer, char* str);
 
+int add_encypt_string( buffer_t* buffer, char* str);
+
+void take_encypt_string(char* dest, buffer_t *buffer);
+
 int  buffer_full(buffer_t* buffer, size_t size);
 
 int  set_raw_string(buffer_t *buffer, char* str);
@@ -45,8 +49,8 @@ void take_buffer(void* dest, buffer_t* buffer, size_t size);
 
 void take_string(char* dest, buffer_t *buffer);
 
-void encrypt_packet(buffer_t* buffer);
+int encrypt_packet(buffer_t* buffer, size_t size);
 
-void decrypt_packet(buffer_t* buffer);
+int decrypt_packet(buffer_t* buffer, size_t size);
 
 #endif
