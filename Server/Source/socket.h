@@ -60,6 +60,8 @@ sbool clear_temp_player(struct bufferevent *bev);
 
 void clear_temp_player_onindex(int16 index);
 
+void free_temp_index(struct bufferevent *bev);
+
 int16 get_temp_player_index(struct bufferevent *bev);
 
 struct bufferevent * get_temp_player_bufferevent(int16 index);

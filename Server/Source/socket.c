@@ -83,8 +83,10 @@ sbool clear_temp_player(struct bufferevent *bev)
 
 	if(i != TEMP_NO_MATCH){
 		temp_player_array.index[i].loggedin = FALSE;
+		free_temp_index(bev);
 		temp_player_array.index[i].bev = NULL;
 		temp_player_array.used--;
+		clear_player(i);
 		return TRUE;
 	}
 
@@ -94,8 +96,24 @@ sbool clear_temp_player(struct bufferevent *bev)
 void clear_temp_player_onindex(int16 index)
 {
 	temp_player_array.index[index].loggedin = FALSE;
+	free_temp_index(temp_player_array.index[index].bev);
 	temp_player_array.index[index].bev = NULL;
+	clear_player(index);
 	temp_player_array.used--;
+}
+
+void free_temp_index(struct bufferevent *bev)
+{
+	void *i = NULL;
+
+	if(bev != NULL){
+		bufferevent_getcb(bev,NULL,NULL,NULL,&i);
+
+		if( i != NULL)
+			free(i);
+
+		i = NULL;
+	}
 }
 
 int16 get_temp_player_index(struct bufferevent *bev)
@@ -187,6 +205,20 @@ void send_data_to_map_but(buffer_t *data, uint32 mapnum, int16 index)
 
 void unload_socket(void)
 {
+	int32 i = 0;
+	void *data = NULL;
+
+	for(i = 0; i < MAX_PLAYERS; i++){
+		if(temp_player_array.index[i].bev != NULL){
+			bufferevent_getcb(temp_player_array.index[i].bev,NULL,NULL,NULL,&data);
+
+			if(data != NULL)
+				free(data);
+
+			data = NULL;
+		}
+	}
+
 	free(temp_player_array.index);
 	endsocket();
 }
