@@ -69,6 +69,11 @@ int load_data(void *arg)
 	status_message("Loading Sockets");
 	initsocket();
 	_sleep(700);
+	status_message("Checking if server is online.");
+
+	if(socketconnect())
+		thrd_create(&t1, socketlisten, (void*)0);
+
 	set_menu_state(MENU_STATE_MAIN);
 	return TRUE;
 }
