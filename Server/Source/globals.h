@@ -51,9 +51,9 @@
 #define MAX_LEVELS   100
 #define MAX_JOBS  3
 
-//encrypt key must be string!
+//encrypt key must be string and be at minimal 32 characters long
 //Server and Client encrypt key must match.
-#define ENCRYPT_KEY  "Aab456"
+#define ENCRYPT_KEY  "Aab456sdfg5gf89d5h41r68d49f8gh4rhrt651dr8tg41d6h5g1h"
 
 /* network defines*/
 #define SERVER_IP     "localhost"
