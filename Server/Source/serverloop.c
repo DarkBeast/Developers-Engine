@@ -147,9 +147,8 @@ void ai_hp_regen(double  tickcount, uint32  mapnum, uint8 mapnpcnum)
 		if(map(mapnum)->npc[mapnpcnum].vitals[VITAL_HP]){
 			map(mapnum)->npc[mapnpcnum].vitals[VITAL_HP] += get_npc_vital_regen(map(mapnum)->npc[mapnpcnum].num, VITAL_HP);
 
-			if(map(mapnum)->npc[mapnpcnum].vitals[VITAL_HP] > get_npc_max_vital(map(mapnum)->npc[mapnpcnum].num,VITAL_HP)){
+			if(map(mapnum)->npc[mapnpcnum].vitals[VITAL_HP] > get_npc_max_vital(map(mapnum)->npc[mapnpcnum].num,VITAL_HP))
 				map(mapnum)->npc[mapnpcnum].vitals[VITAL_HP] = get_npc_max_vital(map(mapnum)->npc[mapnpcnum].num,VITAL_HP);
-			}
 		}
 		givenpchptimer = tickcount;
 	}
@@ -199,32 +198,28 @@ sbool ai_npc_move(uint32 mapnum, uint8 mapnpcnum, uint16 target)
 	case 0:
 		if(map(mapnum)->npc[mapnpcnum].y > player(target)->y && !ai_npc_move(mapnum,mapnpcnum,target)){
 			if(can_npc_move(mapnum, mapnpcnum,DIR_UP)){
-				npc_move(mapnum, mapnpcnum, DIR_UP);
-				return TRUE;
+				npc_move(mapnum, mapnpcnum, DIR_UP); return TRUE;
 			}
 			break;
 		}
 	case 1:
 		if(map(mapnum)->npc[mapnpcnum].y < player(target)->y && !ai_npc_move(mapnum,mapnpcnum,target)){
 			if(can_npc_move(mapnum, mapnpcnum,DIR_DOWN)){
-				npc_move(mapnum, mapnpcnum, DIR_DOWN);
-				return TRUE;
+				npc_move(mapnum, mapnpcnum, DIR_DOWN); return TRUE;
 			}
 		}
 		break;
 	case 2:
 		if(map(mapnum)->npc[mapnpcnum].x > player(target)->x && !ai_npc_move(mapnum,mapnpcnum,target)){
 			if(can_npc_move(mapnum, mapnpcnum,DIR_LEFT)){
-				npc_move(mapnum, mapnpcnum, DIR_LEFT);
-				return TRUE;
+				npc_move(mapnum, mapnpcnum, DIR_LEFT); return TRUE;
 			}
 		}
 		break;
 	case 3:
 		if(map(mapnum)->npc[mapnpcnum].x < player(target)->x && !ai_npc_move(mapnum,mapnpcnum,target)){
 			if(can_npc_move(mapnum, mapnpcnum,DIR_RIGHT)){
-				npc_move(mapnum, mapnpcnum, DIR_RIGHT);
-				return TRUE;
+				npc_move(mapnum, mapnpcnum, DIR_RIGHT); return TRUE;
 			}
 		}
 		break;
@@ -301,20 +296,18 @@ void update_save_players(void)
 	}
 }
 
-
 void set_server_offline(void)
 {
+	//destroy_server();
 	server_is_online = FALSE;
-	destroy_server();
 }
 
 void handle_shutdown(void)
 {
 	char *string = NULL;
 
-	if(secs <= 0){
+	if(secs <= 0)
 		secs = 30;
-	}
 
 	if( (secs % 5) == 0 || secs <= 5){
 		string = comb_3str("Server Shutdown in ", int_to_string(secs)," seconds.");
@@ -326,6 +319,5 @@ void handle_shutdown(void)
 	if(secs <= 0){
 		global_msg("Server Shutting down. \n", 1); //bright red
 		server_is_online = FALSE;
-		destroy_server();
 	}
 }
