@@ -66,9 +66,8 @@ uint8 add_new_map_image(uint8 id)
 	uint8 i = 0;
 
 	for( i = 0; i < map_img.max; i++){
-		if(id = map_img.id[i]){
+		if(id = map_img.id[i])
 			return i;
-		}
 
 		if(map_img.img[i].texid == 0){
 			char *path = get_path(TILE_PATH,id,IMAGE_ENDING);
@@ -140,9 +139,8 @@ void init_maps(void)
 	tile_buffer_t.anim = (tile_layout_data *)calloc(MAX_MAPX * MAX_MAPY, sizeof(tile_layout_data));
 	tile_buffer_t.fringe = (tile_layout_data *)calloc(MAX_MAPX * MAX_MAPY, sizeof(tile_layout_data));
 
-	for( n = 0; n < MAX_MAP_NPCS; n++){
+	for( n = 0; n < MAX_MAP_NPCS; n++)
 		map_data.npc[n].vitals = (uint16 *)calloc(VITAL_COUNT, sizeof(uint16));
-	}
 
 	check_dir(MAP_PATH);
 }
@@ -199,9 +197,9 @@ void unload_maps(void)
 {
 	uint32 n = 0;
 
-	for( n = 0; n < MAX_MAP_NPCS; n++){
+	for( n = 0; n < MAX_MAP_NPCS; n++)
 		free(map_data.npc[n].vitals);
-	}
+
 	free(map_data.name);
 	free(map_data.npc);
 	free(map_data.items);
