@@ -174,8 +174,7 @@ void menustate(void)
 			if(get_status_type() == STATUS_TYPE_SOCKET)
 				init_status("");
 			else
-				init_status_loader("");
-
+				init_status_loader("Widget System Initialized.");
 			status();
 			break;
 		case MENU_STATE_EXIT:
