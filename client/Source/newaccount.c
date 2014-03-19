@@ -12,7 +12,6 @@
 #include "general.h"
 #include "function.h"
 #include "winsocket.h"
-#include "tinycthread.h"
 
 new_account_t gui;
 sprite box;
@@ -20,7 +19,6 @@ sprite box;
 float time1;
 float lpstimer = 0;
 uint8 set = 1;
-thrd_t t1;
 char *string_newacc;
 sbool update_status = FALSE;
 
@@ -54,10 +52,8 @@ void new_account(void)
 
 		// Check if ESC key was pressed or window was closed
 		running = is_window_open();
-		if(get_menu_state() != MENU_STATE_CREATE){
-			TerminateThread(&t1,0);
+		if(get_menu_state() != MENU_STATE_CREATE)
 			break;
-		}
 	}
 }
 
@@ -130,21 +126,15 @@ void init_new_account(void)
 	box.pos.y = gui.clipsprite.actualpos.y;
 	load_image(get_path(SPRITE_PATH,job(0)->sprite,IMAGE_ENDING), &box.img);
 	create_sprite_vertex_buffer(&box);
-
-	if(socketconnect()){ //just to test for server connection.
-		thrd_create(&t1, socketlisten, (void*)0);
-	}
 }
 
 void newacc_btnclose_press(widget *control, int button, int pressed)
 {
-	TerminateThread(t1,0);
 	set_menu_state(MENU_STATE_EXIT);
 }
 
 void newacc_btnback_press(widget *control, int button, int pressed)
 {
-	TerminateThread(t1,0);
 	set_menu_state(MENU_STATE_MAIN);
 }
 
