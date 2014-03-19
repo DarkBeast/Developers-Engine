@@ -65,31 +65,32 @@ void initpackets(void)
 	packets[CQUIT] = &handle_quit;
 }
 
-void handle_data(buffer_t *data, struct bufferevent *bev, void *index)
+void handle_data(buffer_t *data, struct bufferevent *bev)
 {
 	uint8 id = SNONE;
 
 	take_buffer(&id, data, SIZE8);
 
 	if(data->offset == 0){
-		error_handler(DE_ERROR_INVALID_PACKET_OFFSET);
-		return;
+		error_handler(DE_ERROR_INVALID_PACKET_OFFSET); return;
 	}
 
 	if(id == SNONE || id >= CMSG_COUNT){
-		error_handler(DE_ERROR_INVALID_PACKET_ID);
-		return;
+		error_handler(DE_ERROR_INVALID_PACKET_ID); return;
 	}
 
 	switch(id){
 	case CLOGIN:
-
 		handle_login(data, bev); break;
 	case CNEWACCOUNT:
 		handle_new_account(data, bev); break;
 	default:
-		if(index != NULL)
-		packets[id](data, (int16)index);
+		{
+			int16 index = get_temp_player_index(bev);
+
+			if(index < 0)
+				packets[id](data, (int16)index);
+		}
 	}
 }
 
@@ -104,8 +105,8 @@ void handle_login(buffer_t *data, struct bufferevent *bev)
 	uint8 client_rev;
 	int16 index;
 
-	take_string(name,data);
-	take_string(password,data);
+	take_encypt_string(name,data);
+	take_encypt_string(password,data);
 	take_buffer(&client_major, data, SIZE8);
 	take_buffer(&client_minor, data, SIZE8);
 	take_buffer(&client_rev, data, SIZE8);
@@ -113,45 +114,41 @@ void handle_login(buffer_t *data, struct bufferevent *bev)
 	if(client_major < VERSION_MAJOR || client_minor < VERSION_MINOR || client_rev < VERSION_REV){
 		string = comb_2str("Version outdated, please visit ", GAME_WEBSTIE);
 		alert_msg_socket(bev, string);
-		return;
+		goto free;
 	}
 
 	if(shutting_down()){
-		alert_msg_socket(bev, "Server is either rebooting or being shutdown.");
-		return;
+		alert_msg_socket(bev, "Server is either rebooting or being shutdown."); return;
 	}
 
 	index = get_temp_player_index(bev);
 
 	if(index == TEMP_NO_MATCH){
-		if((index = set_temp_player_index(bev)) == TEMP_FULL){
+		if((index = set_temp_player_index(bev)) == TEMP_FULL)
 			alert_msg_socket(bev, "Server is full.");
-		}
 	}
 	else{
-		if(temp_player(index)->loggedin)
-			return;
+		if(index < 0) goto free;
+		if(temp_player(index)->loggedin) goto free;
 	}
 
 	if(strlen(name) < 3 || strlen(password) < 3){
-		alert_msg(index, "Your name and password must be at least three characters in length");
-		return;
+		alert_msg(index, "Your name and password must be at least three characters in length"); goto free;
 	}
 
 	if(account_exists(name)){
 		if(is_multi_accounts(name)){
-			alert_msg(index, "Multiple account logins is not authorized.");
-			return;
+			alert_msg(index, "Multiple account logins is not authorized."); goto free;
 		}
 
 		path = get_path_name(PLAYER_PATH, name, FILE_ENDING);
 		read_player(path, index);
 
-		if(!strcmp(player(index)->password, password)){
+		if(!comp_str(player(index)->password, password)){
 			alert_msg(index, "Either your password or username where not correct. Or your account does not exist");
 			clear_player(index);
 			clear_user_socket(bev);
-			return;
+			goto free;
 		}
 
 		string = comb_2str(player(index)->charname, " has logged in.");
@@ -161,10 +158,12 @@ void handle_login(buffer_t *data, struct bufferevent *bev)
 
 		join_game(index);
 	}
-	else{
+	else
 		alert_msg(index, "Either your password or username where not correct. Or your account does not exist");
-		return;
-	}
+
+free:
+	free(name);
+	free(password);
 }
 
 void handle_new_account(buffer_t *data, struct bufferevent *bev)
@@ -178,22 +177,21 @@ void handle_new_account(buffer_t *data, struct bufferevent *bev)
 	char *path;
 
 	if(get_temp_player_index(bev) == TEMP_NO_MATCH){
-
-		take_string(name, data);
-		take_string(charname, data);
-		take_string(password, data);
+		take_encypt_string(name, data);
+		take_encypt_string(charname, data);
+		take_encypt_string(password, data);
 		take_buffer(&sex, data, SIZE8);
 		take_buffer(&type, data, SIZE8);
 
 		if(strlen(name) < 3 || strlen(password) < 3){
 			alert_msg_socket(bev, "Your name and password must be at least three characters in length");
-			return;
+			goto free;
 		}
 
 		for( i = 0; i < strlen(name); i++){
 			if(!isnamelegal(name[i])){
 				alert_msg_socket(bev, "Invalid name, only letters, numbers, spaces, and _ allowed in names.");
-				return;
+				goto free;
 			}
 		}
 
@@ -206,10 +204,14 @@ void handle_new_account(buffer_t *data, struct bufferevent *bev)
 			add_log(string, PLAYER_LOG);
 			alert_msg_socket(bev, "Your account has been created!");
 		}
-		else{
+		else
 			alert_msg_socket(bev, "Sorry, that account name is already taken!");
-		}
 	}
+
+free:
+	free(name);
+	free(charname);
+	free(password);
 }
 
 void handle_say_message(buffer_t *data, int16 index)
@@ -308,10 +310,8 @@ void handle_player_message(buffer_t *data, int16 index)
 			player_msg(index,string,1);
 		}
 	}
-	else{
-		//white
-		player_msg(index,"Player is not online.",1);
-	}
+	else
+		player_msg(index,"Player is not online.",1); //white
 }
 
 void handle_player_move(buffer_t *data, int16 index)
@@ -326,19 +326,16 @@ void handle_player_move(buffer_t *data, int16 index)
 	take_buffer(&movement, data, SIZE8);
 
 	if( dir == 0 || dir >= DIR_COUNT){
-		hacking_attempt(index,"Invalid Direction");
-		return;
+		hacking_attempt(index,"Invalid Direction"); return;
 	}
 
 	if(movement < MOVEMENT_WALKING || movement >= MOVEMENT_COUNT){
-		hacking_attempt(index,"Invalid Movement");
-		return;
+		hacking_attempt(index,"Invalid Movement"); return;
 	}
 
 	if(temp_player(index)->castedspell){
-		if( gettickcount() > temp_player(index)->attacktimer + 1000){
+		if( gettickcount() > temp_player(index)->attacktimer + 1000)
 			temp_player(index)->castedspell = 0;
-		}
 		else{
 			send_player_xy(index);
 			return;
@@ -358,8 +355,7 @@ void handle_player_dir(buffer_t *data, int16 index)
 	take_buffer(&dir, data, SIZE8);
 
 	if( dir == 0 || dir >= DIR_COUNT){
-		hacking_attempt(index,"Invalid Direction");
-		return;
+		hacking_attempt(index,"Invalid Direction"); return;
 	}
 
 	player(index)->dir = dir;
@@ -386,13 +382,11 @@ void handle_use_item(buffer_t *data, int16 index)
 	take_buffer(&invnum, data, SIZE8);
 
 	if(!temp_player(index)->loggedin){
-		hacking_attempt(index, "Attempted hacking of use item");
-		return;
+		hacking_attempt(index, "Attempted hacking of use item"); return;
 	}
 
 	if(invnum > MAX_INV){
-		hacking_attempt(index, "Invalid InvNum");
-		return;
+		hacking_attempt(index, "Invalid InvNum"); return;
 	}
 
 	itemnum = player(index)->inv[invnum].id;
@@ -408,9 +402,9 @@ void handle_use_item(buffer_t *data, int16 index)
 				}
 				player(index)->equipment[EQUIPMENT_ARMOR] = invnum;
 			}
-			else{
+			else
 				player(index)->equipment[EQUIPMENT_ARMOR] = 0;
-			}
+
 			send_worn_equipment(index);
 			break;
 
@@ -423,9 +417,9 @@ void handle_use_item(buffer_t *data, int16 index)
 				}
 				player(index)->equipment[EQUIPMENT_WEAPON] = invnum;
 			}
-			else{
+			else
 				player(index)->equipment[EQUIPMENT_WEAPON] = 0;
-			}
+
 			send_worn_equipment(index);
 			break;
 
@@ -438,9 +432,9 @@ void handle_use_item(buffer_t *data, int16 index)
 				}
 				player(index)->equipment[EQUIPMENT_HELMET] = invnum;
 			}
-			else{
+			else
 				player(index)->equipment[EQUIPMENT_HELMET] = 0;
-			}
+
 			send_worn_equipment(index);
 			break;
 
@@ -453,9 +447,8 @@ void handle_use_item(buffer_t *data, int16 index)
 				}
 				player(index)->equipment[EQUIPMENT_SHIELD] = invnum;
 			}
-			else{
+			else
 				player(index)->equipment[EQUIPMENT_SHIELD] = 0;
-			}
 
 			send_worn_equipment(index);
 			break;
@@ -535,13 +528,11 @@ void handle_use_item(buffer_t *data, int16 index)
 							player_msg(index, "You study the spell carefully...", 1); //yellow
 							player_msg(index, "You have learned a new spell!", 1); //white
 						}
-						else{
+						else
 							player_msg(index, "You have already learned this spell!", 1); //bright red
-						}
 					}
-					else{
+					else
 						player_msg(index,  "You have learned all that you can learn!", 1); //bright red
-					}
 				}
 				else
 					string = comb_3str("You must be level ",int_to_string(spell(item(itemnum)->data1)->levelreq)," to learn this spell.");
@@ -567,9 +558,8 @@ void handle_attack(buffer_t *data, int16 index)
 		if( tempindex != index){
 			if(can_attack_player(index,tempindex)){
 				if(!can_player_block_hit(tempindex)){
-					if(!can_player_critical_hit(index)){
+					if(!can_player_critical_hit(index))
 						damage = get_player_damage(index) - get_player_protection(tempindex);
-					}
 					else{
 						n = get_player_damage(index);
 						damage = n + (rand() % (n / 2)) + 1 - get_player_protection(tempindex);
@@ -593,18 +583,16 @@ void handle_attack(buffer_t *data, int16 index)
 
 	for(i = 0; i < MAX_MAP_NPCS; i++){
 		if(can_attack_npc(index, i)){
-			if(!can_player_critical_hit(index)){
+			if(!can_player_critical_hit(index))
 				damage = get_player_damage(index) - (npc(map(player(index)->map)->npc[i].num)->stat[STAT_DEFENSE] / 2);
-			}
 			else{
 				n = get_player_damage(index);
 				damage = n + (rand() % (n / 2)) + 1 - (npc(map(player(index)->map)->npc[i].num)->stat[STAT_DEFENSE] / 2);
 				player_msg(index,  "You feel a surge of energy upon swinging!", 1); //BrightCyan
 			}
 
-			if(damage > 0){
+			if(damage > 0)
 				attack_npc(index,i,damage);
-			}
 			else
 				player_msg(tempindex, "Your attack does nothing.", 1); //Bright red
 		}
@@ -618,8 +606,7 @@ void handle_use_stat_points(buffer_t *data, int16 index)
 	take_buffer(&point_type,data,SIZE8);
 
 	if(point_type >= STAT_COUNT){
-		hacking_attempt(index, "Invalid Point Type");
-		return;
+		hacking_attempt(index, "Invalid Point Type"); return;
 	}
 
 	if(player(index)->points > 0){
@@ -658,8 +645,7 @@ void handle_warp_me_to(buffer_t *data, int16 index)
 	char *string = NULL;
 
 	if(player(index)->group < GROUP_MAPPER){
-		hacking_attempt(index, "Admin Cloning");
-		return;
+		hacking_attempt(index, "Admin Cloning"); return;
 	}
 
 	take_string(string,data);
@@ -674,13 +660,11 @@ void handle_warp_me_to(buffer_t *data, int16 index)
 			string = comb_3str(player(index)->charname, " has warped to ",player(n)->charname);
 			add_log(string, ADMIN_LOG);
 		}
-		else{
+		else
 			player_msg(index, "Player is not online.", 1); //white
-		}
 	}
-	else{
+	else
 		player_msg(index, "You cannot warp to yourself!", 1); //white
-	}
 }
 
 void handle_warp_to_me(buffer_t *data, int16 index)
@@ -689,8 +673,7 @@ void handle_warp_to_me(buffer_t *data, int16 index)
 	char *string = NULL;
 
 	if(player(index)->group < GROUP_MAPPER){
-		hacking_attempt(index, "Admin Cloning");
-		return;
+		hacking_attempt(index, "Admin Cloning"); return;
 	}
 
 	take_string(string,data);
@@ -707,13 +690,11 @@ void handle_warp_to_me(buffer_t *data, int16 index)
 			string = comb_4str(player(index)->charname, " has warped ",player(n)->charname," to self.");
 			add_log(string, ADMIN_LOG);
 		}
-		else{
+		else
 			player_msg(index, "Player is not online.", 1); //white
-		}
 	}
-	else{
+	else
 		player_msg(index, "You cannot warp yourself to yourself!", 1); //white
-	}
 }
 
 void handle_warp_to(buffer_t *data, int16 index)
@@ -722,15 +703,13 @@ void handle_warp_to(buffer_t *data, int16 index)
 	char *string = NULL;
 
 	if(player(index)->group < GROUP_MAPPER){
-		hacking_attempt(index, "Admin Cloning");
-		return;
+		hacking_attempt(index, "Admin Cloning"); return;
 	}
 
 	take_buffer(&n,data,SIZE32);
 
 	if( n == 0 || n > MAX_MAPS){
-		hacking_attempt(index, "Invalid map");
-		return;
+		hacking_attempt(index, "Invalid map"); return;
 	}
 
 	player_warp(index, n,player(index)->x,player(index)->y);
@@ -745,8 +724,7 @@ void handle_set_spirit(buffer_t *data, int16 index)
 	uint32 n;
 
 	if(player(index)->group < GROUP_MAPPER){
-		hacking_attempt(index, "Admin Cloning");
-		return;
+		hacking_attempt(index, "Admin Cloning"); return;
 	}
 	take_buffer(&n,data,SIZE32);
 	player(index)->sprite = n;
@@ -760,8 +738,7 @@ void handle_request_new_map(buffer_t *data, int16 index)
 	take_buffer(&dir,data,SIZE8);
 
 	if(dir >= DIR_COUNT || dir == 0){
-		hacking_attempt(index, "Invalid Direction");
-		return;
+		hacking_attempt(index, "Invalid Direction"); return;
 	}
 
 	player_move(index,dir,1);
@@ -773,8 +750,7 @@ void handle_map_data(buffer_t *data, int16 index)
 	char *string = NULL;
 
 	if(player(index)->group < GROUP_MAPPER){
-		hacking_attempt(index, "Admin Cloning");
-		return;
+		hacking_attempt(index, "Admin Cloning"); return;
 	}
 
 	take_string(map(player(index)->map)->name ,data);
@@ -821,9 +797,8 @@ void handle_map_data(buffer_t *data, int16 index)
 	mapcache_create(player(index)->map);
 
 	for(x = 0; x < total_players_online(); x++){
-		if(player(player_online(x))->map == player(index)->map){
+		if(player(player_online(x))->map == player(index)->map)
 			player_warp(player_online(x),player(index)->map,player(player_online(x))->x,player(player_online(x))->y);
-		}
 	}
 }
 
@@ -862,17 +837,16 @@ void handle_map_drop_item(buffer_t *data, int16 index)
 	take_buffer(&amount, data,SIZE32);
 
 	if(invnum < 1 || invnum > MAX_INV){
-		hacking_attempt(index,"Invalid InvNum");
+		hacking_attempt(index,"Invalid InvNum"); return;
 	}
 
 	if(amount > player(index)->inv[invnum].value){
-		hacking_attempt(index,"Item amount modification");
+		hacking_attempt(index,"Item amount modification"); return;
 	}
 
 	if(item(player(index)->inv[invnum].id)->type == ITEM_TYPE_CURRENCY){
 		if(amount <= 0){
-			take_item(index, player(index)->inv[invnum].id, 0);
-			return;
+			take_item(index, player(index)->inv[invnum].id, 0); return;
 		}
 	}
 
@@ -884,8 +858,7 @@ void handle_map_respawn(buffer_t *data, int16 index)
 	uint8 i = 0;
 
 	if(player(index)->group < GROUP_MAPPER){
-		hacking_attempt(index, "Admin Cloning");
-		return;
+		hacking_attempt(index, "Admin Cloning"); return;
 	}
 
 	for(i = 0; i < MAX_MAP_ITEMS; i++){
@@ -900,9 +873,8 @@ void handle_map_respawn(buffer_t *data, int16 index)
 
 	spawn_map_items(player(index)->map);
 
-	for(i = 0; i < MAX_MAP_NPCS; i++){
+	for(i = 0; i < MAX_MAP_NPCS; i++)
 		spawn_npc(i, player(index)->map);
-	}
 
 	player_msg(index,"Map Respawned", 1); //blue
 }
@@ -913,8 +885,7 @@ void handle_kick_player(buffer_t *data, int16 index)
 	int16 n;
 
 	if(player(index)->group < GROUP_MONITOR){
-		hacking_attempt(index, "Admin Cloning");
-		return;
+		hacking_attempt(index, "Admin Cloning"); return;
 	}
 
 	take_string(string, data);
@@ -928,17 +899,14 @@ void handle_kick_player(buffer_t *data, int16 index)
 				add_log(string, ADMIN_LOG);
 				alert_msg(n, "You have been kicked from the game!");
 			}
-			else{
+			else
 				player_msg(index,"That is a higher or same access admin then you!", 1);//white
-			}
 		}
-		else{
+		else
 			player_msg(index,"Player is not online.", 1);//white
-		}
 	}
-	else{
+	else
 		player_msg(index,"You cannot kick yourself!", 1);//white
-	}
 }
 
 void handle_ban_player(buffer_t *data, int16 index)
@@ -947,8 +915,7 @@ void handle_ban_player(buffer_t *data, int16 index)
 	int16 n;
 
 	if(player(index)->group < GROUP_MAPPER){
-		hacking_attempt(index, "Admin Cloning");
-		return;
+		hacking_attempt(index, "Admin Cloning"); return;
 	}
 
 	take_string(string, data);
@@ -961,17 +928,14 @@ void handle_ban_player(buffer_t *data, int16 index)
 				player(n)->banned = TRUE;
 				alert_msg(n, "You have been banned from the game!");
 			}
-			else{
+			else
 				player_msg(index,"That is a higher or same access admin then you!", 1);//white
-			}
 		}
-		else{
+		else
 			player_msg(index,"Player is not online.", 1);//white
-		}
 	}
-	else{
+	else
 		player_msg(index,"You cannot ban yourself!", 1);//white
-	}
 }
 
 void handle_request_map_edit(buffer_t *data, int16 index)
@@ -979,8 +943,7 @@ void handle_request_map_edit(buffer_t *data, int16 index)
 	buffer_t buffer;
 
 	if(player(index)->group < GROUP_MAPPER){
-		hacking_attempt(index, "Admin Cloning");
-		return;
+		hacking_attempt(index, "Admin Cloning"); return;
 	}
 	clear_buffer(&buffer);
 	add_opcode(&buffer, SEDITMAP);
@@ -992,8 +955,7 @@ void handle_request_edit_item(buffer_t *data, int16 index)
 	buffer_t buffer;
 
 	if(player(index)->group < GROUP_DEVELOPER){
-		hacking_attempt(index, "Admin Cloning");
-		return;
+		hacking_attempt(index, "Admin Cloning"); return;
 	}
 
 	clear_buffer(&buffer);
@@ -1008,15 +970,13 @@ void handle_edit_item(buffer_t *data, int16 index)
 	char *string = NULL;
 
 	if(player(index)->group < GROUP_DEVELOPER){
-		hacking_attempt(index, "Admin Cloning");
-		return;
+		hacking_attempt(index, "Admin Cloning"); return;
 	}
 
 	take_buffer(&n,data,SIZE16);
 
 	if(n <= 0 || n >= MAX_ITEMS){
-		hacking_attempt(index,  "Invalid Item Index");
-		return;
+		hacking_attempt(index,  "Invalid Item Index"); return;
 	}
 
 	string = comb_4str(player(index)->charname, " is editing item #", int_to_string(n), ".");
@@ -1032,8 +992,7 @@ void handle_delete(buffer_t *data, int16 index)
 	char *string = NULL;
 
 	if(player(index)->group < GROUP_DEVELOPER){
-		hacking_attempt(index, "Admin Cloning");
-		return;
+		hacking_attempt(index, "Admin Cloning"); return;
 	}
 
 	take_buffer(&editor, data, SIZE8);
@@ -1041,8 +1000,9 @@ void handle_delete(buffer_t *data, int16 index)
 
 	switch(editor){
 	case EDITOR_ITEM:
-		if(n == 0 || n > MAX_ITEMS)
+		if(n == 0 || n > MAX_ITEMS){
 			hacking_attempt(index, "Invalid Item Index"); return;
+		}
 
 		clear_item(n);
 		send_update_item_to_all(n);
@@ -1052,8 +1012,9 @@ void handle_delete(buffer_t *data, int16 index)
 		add_log(string, ADMIN_LOG);
 
 	case EDITOR_NPC:
-		if(n == 0 || n > MAX_NPCS)
+		if(n == 0 || n > MAX_NPCS){
 			hacking_attempt(index, "Invalid Npc Index"); return;
+		}
 
 		clear_npc(n);
 		send_update_npc_to_all(n);
@@ -1062,8 +1023,9 @@ void handle_delete(buffer_t *data, int16 index)
 		add_log(string, ADMIN_LOG);
 
 	case EDITOR_SPELL:
-		if(n == 0 || n > MAX_SPELLS)
+		if(n == 0 || n > MAX_SPELLS){
 			hacking_attempt(index, "Invalid Spell Index"); return;
+		}
 
 		clear_spell(n);
 		send_update_spell_to_all(n);
@@ -1072,8 +1034,9 @@ void handle_delete(buffer_t *data, int16 index)
 		add_log(string, ADMIN_LOG);
 
 	case EDITOR_SHOP:
-		if(n == 0 || n > MAX_SHOPS)
+		if(n == 0 || n > MAX_SHOPS){
 			hacking_attempt(index, "Invalid Shop Index"); return;
+		}
 
 		clear_shop(n);
 		send_update_shop_to_all(n);
@@ -1094,14 +1057,14 @@ void handle_save_item(buffer_t *data, int16 index)
 	char *string = NULL;
 
 	if(player(index)->group < GROUP_DEVELOPER){
-		hacking_attempt(index, "Admin Cloning");
-		return;
+		hacking_attempt(index, "Admin Cloning"); return;
 	}
 
 	take_buffer(&n,data,SIZE16);
 
-	if(n == 0 || n > MAX_ITEMS)
+	if(n == 0 || n > MAX_ITEMS){
 		hacking_attempt(index, "Invalid Item Index"); return;
+	}
 
 	take_string(item(n)->name, data);
 	take_buffer(&item(n)->type, data, SIZE8);
@@ -1121,8 +1084,7 @@ void handle_request_edit_npc(buffer_t *data, int16 index)
 	buffer_t buffer;
 
 	if(player(index)->group < GROUP_DEVELOPER){
-		hacking_attempt(index, "Admin Cloning");
-		return;
+		hacking_attempt(index, "Admin Cloning"); return;
 	}
 
 	clear_buffer(&buffer);
@@ -1137,14 +1099,14 @@ void handle_edit_npc(buffer_t *data, int16 index)
 	char *string = NULL;
 
 	if(player(index)->group < GROUP_DEVELOPER){
-		hacking_attempt(index, "Admin Cloning");
-		return;
+		hacking_attempt(index, "Admin Cloning"); return;
 	}
 
 	take_buffer(&n,data,SIZE16);
 
-	if(n == 0 || n > MAX_NPCS)
+	if(n == 0 || n > MAX_NPCS){
 		hacking_attempt(index, "Invalid Npc Index"); return;
+	}
 
 	string = comb_4str(player(index)->charname, " editing Npc #", int_to_string(n), ".");
 	add_log(string, ADMIN_LOG);
@@ -1158,14 +1120,14 @@ void handle_save_npc(buffer_t *data, int16 index)
 	char *string = NULL;
 
 	if(player(index)->group < GROUP_DEVELOPER){
-		hacking_attempt(index, "Admin Cloning");
-		return;
+		hacking_attempt(index, "Admin Cloning"); return;
 	}
 
 	take_buffer(&n,data,SIZE16);
 
-	if(n == 0 || n > MAX_NPCS)
+	if(n == 0 || n > MAX_NPCS){
 		hacking_attempt(index, "Invalid Npc Index"); return;
+	}
 
 	take_string(npc(n)->name, data);
 	take_string(npc(n)->say, data);
@@ -1189,8 +1151,7 @@ void handle_request_edit_shop(buffer_t *data, int16 index)
 	buffer_t buffer;
 
 	if(player(index)->group < GROUP_DEVELOPER){
-		hacking_attempt(index, "Admin Cloning");
-		return;
+		hacking_attempt(index, "Admin Cloning"); return;
 	}
 
 	clear_buffer(&buffer);
@@ -1205,14 +1166,14 @@ void handle_edit_shop(buffer_t *data, int16 index)
 	char *string = NULL;
 
 	if(player(index)->group < GROUP_DEVELOPER){
-		hacking_attempt(index, "Admin Cloning");
-		return;
+		hacking_attempt(index, "Admin Cloning"); return;
 	}
 
 	take_buffer(&n,data,SIZE16);
 
-	if(n == 0 || n > MAX_SHOPS)
+	if(n == 0 || n > MAX_SHOPS){
 		hacking_attempt(index, "Invalid Shop Index"); return;
+	}
 
 	string = comb_4str(player(index)->charname, " editing Shop #", int_to_string(n), ".");
 	add_log(string, ADMIN_LOG);
@@ -1226,14 +1187,14 @@ void handle_save_shop(buffer_t *data, int16 index)
 	char *string = NULL;
 
 	if(player(index)->group < GROUP_DEVELOPER){
-		hacking_attempt(index, "Admin Cloning");
-		return;
+		hacking_attempt(index, "Admin Cloning"); return;
 	}
 
 	take_buffer(&n,data,SIZE16);
 
-	if(n == 0 || n > MAX_SHOPS)
+	if(n == 0 || n > MAX_SHOPS){
 		hacking_attempt(index, "Invalid Shop Index"); return;
+	}
 
 	take_string(shop(n)->name, data);
 	take_string(shop(n)->joinsay, data);
@@ -1252,8 +1213,7 @@ void handle_request_edit_spell(buffer_t *data, int16 index)
 	buffer_t buffer;
 
 	if(player(index)->group < GROUP_DEVELOPER){
-		hacking_attempt(index, "Admin Cloning");
-		return;
+		hacking_attempt(index, "Admin Cloning"); return;
 	}
 
 	clear_buffer(&buffer);
@@ -1268,14 +1228,14 @@ void handle_edit_spell(buffer_t *data, int16 index)
 	char *string = NULL;
 
 	if(player(index)->group < GROUP_DEVELOPER){
-		hacking_attempt(index, "Admin Cloning");
-		return;
+		hacking_attempt(index, "Admin Cloning"); return;
 	}
 
 	take_buffer(&n,data,SIZE16);
 
-	if(n == 0 || n > MAX_SPELLS)
+	if(n == 0 || n > MAX_SPELLS){
 		hacking_attempt(index, "Invalid Spell Index"); return;
+	}
 
 	string = comb_4str(player(index)->charname, " editing Spell #", int_to_string(n), ".");
 	add_log(string, ADMIN_LOG);
@@ -1289,14 +1249,14 @@ void handle_save_spell(buffer_t *data, int16 index)
 	char *string = NULL;
 
 	if(player(index)->group < GROUP_DEVELOPER){
-		hacking_attempt(index, "Admin Cloning");
-		return;
+		hacking_attempt(index, "Admin Cloning"); return;
 	}
 
 	take_buffer(&n,data,SIZE16);
 
-	if(n == 0 || n > MAX_SPELLS)
+	if(n == 0 || n > MAX_SPELLS){
 		hacking_attempt(index, "Invalid Spell Index"); return;
+	}
 
 	take_string(spell(n)->name,data);
 	take_buffer(&spell(n)->pic, data, SIZE16);
@@ -1343,13 +1303,11 @@ void handle_set_group(buffer_t *data, int16 index)
 			string = comb_4str(player(index)->charname, " has modified ", player(n)->charname, "'s group.");
 			add_log(string, ADMIN_LOG);
 		}
-		else{
+		else
 			player_msg(index,"Player is not online.",1); //white
-		}
 	}
-	else{
+	else
 		player_msg(index, "Invalid group.",1); //red
-	}
 }
 
 void handle_who_is_online(buffer_t *data, int16 index)
@@ -1400,8 +1358,9 @@ void handle_fix_item(buffer_t *data, int16 index)
 
 	take_buffer(&n,data,SIZE16);
 
-	if(n == 0 || n > MAX_INV)
+	if(n == 0 || n > MAX_INV){
 		hacking_attempt(index, "Fix Item Modification."); return;
+	}
 
 	if(player(index)->inv[n].id == 0 || player(index)->inv[n].id >= MAX_ITEMS)
 		return;
@@ -1422,8 +1381,9 @@ void handle_fix_item(buffer_t *data, int16 index)
 
 	if(goldneeded == 0) goldneeded = 1;
 
-	if(durneeded == 0)
+	if(durneeded == 0){
 		player_msg(index,"This item is in perfect condition!",1); return;//white
+	}
 
 	if(hasitem = has_item(index,1)){
 		if(hasitem >= goldneeded){
@@ -1479,8 +1439,6 @@ void handle_search(buffer_t *data, int16 index)
 								else{
 									if(player(player_online(i))->level < player(index)->level)
 										player_msg(index, "You would have an advantage over that player.", 1); //bright blue
-									else{
-									}
 								}
 							}
 						}

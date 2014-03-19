@@ -14,12 +14,12 @@
 /*************************************************************
 CLOGIN and CNEWACCOUNT are not used in this function.
 These 2 are used for clients who have no index yet. Clients
-which have no index yet are not logged in so we can handle 
+which have no index yet are not logged in so we can handle
 them as plain new connections.
 *************************************************************/
 void initpackets(void);
 
-void handle_data(buffer_t *data, struct bufferevent *bev, void *index);
+void handle_data(buffer_t *data, struct bufferevent *bev);
 
 void handle_login(buffer_t *data, struct bufferevent *bev);
 
