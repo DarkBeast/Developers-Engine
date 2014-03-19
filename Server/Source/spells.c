@@ -32,12 +32,10 @@ void init_spells(void)
 
 		check_dir(SPELL_PATH);
 
-		if(file_readable(path)){
+		if(file_readable(path))
 			read_spell(path,i);
-		}
-		else{
+		else
 			write_spell(path,i);
-		}
 	}
 }
 
@@ -85,9 +83,9 @@ void unload_spells(void)
 {
 	uint32 i = 0;
 
-	for(i = 0; i < MAX_SPELLS; i++){
+	for(i = 0; i < MAX_SPELLS; i++)
 		free(spell_array[i].name);
-	}
+
 	free(spell_array);
 }
 
