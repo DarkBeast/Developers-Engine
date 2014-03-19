@@ -15,13 +15,16 @@ mtx_t gmutex;
 cnd_t gcond;
 thrd_t t1, t2;
 
+#define _DEBUG 1
+
+#if _DEBUG
+#include <vld.h>
+#endif
+
 int commands(void *arg);
 
 int main(void)
 {
-	char *input = (char *)calloc(2000, sizeof(char));
-	sbool n = TRUE;
-	
 	SetConsoleTitle(TITLE);
 
 	mtx_init(&gmutex, mtx_plain);
@@ -33,17 +36,23 @@ int main(void)
 	thrd_create(&t1, initsocket, (void*)0);
 	thrd_create(&t2, commands, (void*)0);
 	server_loop();
-	TerminateThread(t1,0);
-	TerminateThread(t2,0);
+	destroy_server();
+	//TerminateThread(t2,0);
 	mtx_destroy(&gmutex);
 	cnd_destroy(&gcond);
+#if _DEBUG
+	VLDReportLeaks();
+#endif
+
 	exit(TRUE);// Exit program
 }
 
 int commands(void *arg)
 {
-	char *p = (char *)calloc(256, sizeof(char));
+	char *p = NULL;
+	char c[500];
 	sbool running = TRUE;
+	p = c;
 
 	puts("Type /help for a list of commands");
 reloop:
@@ -90,19 +99,20 @@ reloop:
 								break;
 							}
 
-							if( comp_str(p, "hutdown"))
+							if( comp_str(++p, "hutdown")){
 								set_shut_down();
+							}
 
 							break;
 						}
 					case 'c':
-						if( comp_str(p, "lose")){
+						if( comp_str(++p, "lose")){
 							set_server_offline();
-							return;
+							return 0;
 						}
 						break;
 					case 'h':
-						if( comp_str(p, "elp")){
+						if( comp_str(++p, "elp")){
 							puts("::::Server Commands::::");
 							puts("/close: Instant shutdown of server.");
 							puts("/shutdown: Timed shutdown of server.");
@@ -119,4 +129,5 @@ reloop:
 			}
 		}
 	}
+	return 0;
 }
