@@ -11,10 +11,8 @@
 #include "globals.h"
 #include "general.h"
 #include "winsocket.h"
-#include "tinycthread.h"
 
 login_t gui;
-thrd_t t1;
 char *string_login;
 sbool login_update_status = FALSE;
 
@@ -45,10 +43,8 @@ void login(void)
 
 		// Check if ESC key was pressed or window was closed
 		running = is_window_open();
-		if(get_menu_state() != MENU_STATE_LOGIN){
-			TerminateThread(&t1,0);
+		if(get_menu_state() != MENU_STATE_LOGIN)
 			break;
-		}
 	}
 }
 
@@ -70,16 +66,13 @@ void init_login(void)
 
 	gui.btnclose.mousepress = &login_btnclose_press;
 	gui.btnback.mousepress = &login_btnback_press;
+	gui.btnlogin.mousepress = &login_btnlogin_press;
 	gui.lblback.action |= WIDGET_CAN_CLICK_BEHIND;
 	gui.lbllogin.action |= WIDGET_CAN_CLICK_BEHIND;
 	gui.lbllogintxt.action |= WIDGET_CAN_CLICK_BEHIND;
 	gui.lblpasstxt.action |= WIDGET_CAN_CLICK_BEHIND;
 	widget_manual_focused(&gui.wndlogin);
 	widget_hide(&gui.status);
-
-	if(socketconnect()){ //just to test for server connection.
-		thrd_create(&t1, socketlisten, (void*)0);
-	}
 }
 
 void login_btnclose_press(widget *control, int button, int pressed)
