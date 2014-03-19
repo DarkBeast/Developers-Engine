@@ -17,6 +17,8 @@ struct main_menu_t{
 	widget frmmain;
 	widget wndmainmenu;
 	widget testbox;
+	widget lblonline;
+	widget lblisonline;
 };
 
 void main_menu(void);

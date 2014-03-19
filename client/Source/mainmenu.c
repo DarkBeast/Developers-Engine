@@ -9,20 +9,21 @@
 #include "bool.h"
 #include "globals.h"
 #include "general.h"
+#include "winsocket.h"
 
 main_menu_t gui;
 
 void main_menu(void)
 {
-	//uint32 time;
-	//uint32 lpstimer = 0;
-	//uint32 lps = 0;
+	uint32 time;
+	uint32 lpstimer = 0;
+	uint32 lps = 0;
 	int running = TRUE;
 
 	draw_state_reset();
 
 	while(running){
-		//	time = (uint32 )glfwGetTime();
+		time = (uint32 )glfwGetTime();
 
 		clear_screen(0,0,0,255);
 
@@ -33,16 +34,16 @@ void main_menu(void)
 		glfwSwapBuffers(get_the_window());
 		glfwPollEvents();
 
-		//if(lpstimer < time){//calculates the loops per second the code does, through everything
-		//	printf("%i\n",lps);
-		//	lpstimer = time + 1;
+		if(lpstimer < time){//calculates the loops per second the code does, through everything
+			printf("%i\n",lps);
+			lpstimer = time + 1;
 
-		//	lps = 0;
-		//}
+			lps = 0;
+		}
 
-		//lps += 1;
+		lps += 1;
 
-		_sleep(30);
+		//_sleep(30);
 
 		// Check if ESC key was pressed or window was closed
 		running = is_window_open();
@@ -63,6 +64,15 @@ void init_main_menu(void)
 	create_label(&gui.lbllogin, &gui.btnlogin,170,10,80,25,0,0,0,120,FALSE,2,8,FALSE,"LOGIN");
 	create_label(&gui.lblcreate, &gui.btncreate,120,10,80,25,0,0,0,120,FALSE,2,8,FALSE,"NEW ACCOUNT");
 	create_label(&gui.lblcredits, &gui.btncredits,155,10,80,25,0,0,0,120,FALSE,2,8,FALSE,"CREDITS");
+
+	if(isconnected()){
+		create_label(&gui.lblonline, &gui.wndmainmenu,470,480,100,5,0,0,0,180,FALSE,0,8,FALSE,"SERVER STATUS:");
+		create_label(&gui.lblisonline, &gui.wndmainmenu,575,480,45,5,0,0,255,160,FALSE,0,8,FALSE,"ONLINE");
+	}
+	else{
+		create_label(&gui.lblonline, &gui.wndmainmenu,470,480,100,5,0,0,0,180,FALSE,0,8,FALSE,"SERVER STATUS:");
+		create_label(&gui.lblisonline, &gui.wndmainmenu,575,480,45,5,255,0,0,160,FALSE,0,8,FALSE,"OFFLINE");
+	}
 
 	gui.btnclose.mousepress = &main_btnclose_press;
 	gui.btncredits.mousepress = &main_btncredits_press;
