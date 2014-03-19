@@ -35,12 +35,10 @@ void init_shops(void)
 
 		check_dir(SHOP_PATH);
 
-		if(file_readable(path)){
+		if(file_readable(path))
 			read_shop(path,i);
-		}
-		else{
+		else
 			write_shop(path,i);
-		}
 	}
 }
 
