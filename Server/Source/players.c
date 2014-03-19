@@ -76,16 +76,14 @@ void init_players(void)
 		job_array[i].stat = (uint8 *)calloc(STAT_COUNT, sizeof(uint8));
 	}
 
-	if(file_readable(USED_CHAR_LIST_PATH)){
+	if(file_readable(USED_CHAR_LIST_PATH))
 		read_usedchars_list();
-	}
 	else{
 		used_name.charname = (charname_t *)calloc(32 ,sizeof(charname_t));
 		used_name.size = 32;
 
-		for(i = 0; i < used_name.size; i++){
+		for(i = 0; i < used_name.size; i++)
 			used_name.charname->name = (char *)calloc(MAX_NAME_LENGTH, sizeof(char));
-		}
 
 		write_usedchars_list();
 	}
@@ -114,8 +112,7 @@ void update_players_online(void)
 	uint16 array_index = 0;
 	buffer_t buffer;
 	if(online.players_online < 0){
-		online.max_index = 0;
-		return;
+		online.max_index = 0; return;
 	}
 
 	for(i = 0; i < MAX_PLAYERS; i++){
@@ -124,16 +121,14 @@ void update_players_online(void)
 			online.index[array_index] = i;
 			array_index++;
 
-			if(array_index >= online.players_online){
-				break;
-			}
+			if(array_index >= online.players_online) break;
 		}
-
-		clear_buffer(&buffer);
-		add_opcode(&buffer, SHIGHINDEX);
-		add_buffer(&buffer, &online.max_index, SIZE16);
-		send_data_to_all(&buffer);
 	}
+
+	clear_buffer(&buffer);
+	add_opcode(&buffer, SHIGHINDEX);
+	add_buffer(&buffer, &online.max_index, SIZE16);
+	send_data_to_all(&buffer);
 }
 
 int16 get_total_map_players(uint32 mapnum)
@@ -142,9 +137,9 @@ int16 get_total_map_players(uint32 mapnum)
 	uint16 n = 0;
 
 	for( i = 0; i < players_online_count(); i++){
-		if(temp_player(player_online(i))->loggedin && player(player_online(i))->map == mapnum){
+		if(temp_player(player_online(i))->loggedin && player(player_online(i))->map == mapnum)
 			n++;
-		}
+
 		return n;
 	}
 	return 0;
@@ -199,6 +194,13 @@ void read_player(char *path, int32 i)
 	if((fp = fopen(path, "rb")) == NULL)
 		error_handler(DE_ERROR_FILE_ERROR);
 
+	if(player_array[i].username == NULL)
+		player_array[i].username = (char *)calloc(MAX_NAME_LENGTH, sizeof(char));
+	if(player_array[i].charname == NULL)
+		player_array[i].charname = (char *)calloc(MAX_NAME_LENGTH, sizeof(char));
+	if(player_array[i].password == NULL)
+		player_array[i].password = (char *)calloc(MAX_PASS_LENGTH, sizeof(char));
+
 	fread(player_array[i].username, sizeof(char), MAX_NAME_LENGTH, fp);
 	fread(player_array[i].password, sizeof(char), MAX_PASS_LENGTH, fp);
 	fread(player_array[i].charname, sizeof(char), MAX_NAME_LENGTH, fp);
@@ -235,9 +237,8 @@ void write_usedchars_list(void)
 	fwrite(&used_name.size, sizeof(uint32), 1, fp);
 	fwrite(&used_name.count, sizeof(uint32), 1, fp);
 
-	for(i = 0; i < used_name.count; i++){
+	for(i = 0; i < used_name.count; i++)
 		fwrite(used_name.charname[i].name, sizeof(char), MAX_NAME_LENGTH, fp);
-	}
 
 	fclose(fp);
 }
@@ -254,13 +255,11 @@ void read_usedchars_list(void)
 
 	used_name.charname = (charname_t *)calloc(used_name.size ,sizeof(charname_t));
 
-	for(i = 0; i < used_name.size; i++){
-		used_name.charname->name = (char *)calloc(MAX_NAME_LENGTH, sizeof(char));
-	}
+	for(i = 0; i < used_name.size; i++)
+		used_name.charname[i].name = (char *)calloc(MAX_NAME_LENGTH, sizeof(char));
 
-	for(i = 0; i < used_name.count; i++){
+	for(i = 0; i < used_name.count; i++)
 		fread(used_name.charname[i].name, sizeof(char), MAX_NAME_LENGTH, fp);
-	}
 
 	fclose(fp);
 }
@@ -279,13 +278,11 @@ void add_to_charname_list(char *name)
 		strdata = (charname_t *)realloc(used_name.charname, next_power_of_two(used_name.size) * sizeof(charname_t));
 
 		if(strdata == NULL){
-			error_handler(DE_ERROR_POINTER_NULL);
-			return;
+			error_handler(DE_ERROR_POINTER_NULL); return;
 		}
 
-		for(i = used_name.count; i <= used_name.size; i++){
+		for(i = used_name.count; i <= used_name.size; i++)
 			strdata[i].name = NULL;
-		}
 
 		used_name.charname = strdata;
 	}
@@ -296,9 +293,16 @@ void add_to_charname_list(char *name)
 
 void clear_player(int32 index)
 {
-	player_array[index].username = "";
-	player_array[index].charname = "";
-	player_array[index].password = "";
+	if(player_array[index].username != NULL)
+		free(player_array[index].username);
+	if(player_array[index].charname != NULL)
+		free(player_array[index].charname);
+	if(player_array[index].password != NULL)
+		free(player_array[index].password);
+
+	player_array[index].username = NULL;
+	player_array[index].charname = NULL;
+	player_array[index].password = NULL;
 	player_array[index].exp = 0;
 	player_array[index].dir = 0;
 	player_array[index].group = 0;
@@ -320,14 +324,16 @@ void unload_players(void)
 		free(job_array[i].stat);
 	}
 
-	for(i = 0; i < used_name.size; i++){
+	for(i = 0; i < used_name.size; i++)
 		free(used_name.charname[i].name);
-	}
 
 	for( i = 0; i < MAX_PLAYERS; i++){
-		free(player_array[i].username);
-		free(player_array[i].charname);
-		free(player_array[i].password);
+		if(player_array[i].username != NULL)
+			free(player_array[i].username);
+		if(player_array[i].charname != NULL)
+			free(player_array[i].charname);
+		if(player_array[i].password != NULL)
+			free(player_array[i].password);
 		free(player_array[i].equipment);
 		free(player_array[i].vitals);
 		free(player_array[i].inv);
@@ -370,9 +376,7 @@ sbool is_multi_accounts( char *name)
 	uint32 i = 0;
 
 	for(i = 0; i < online.max_index; i++){
-		if(strcmp(player(player_online(i))->username, name)){
-			return TRUE;
-		}
+		if(strcmp(player(player_online(i))->username, name)) return TRUE;
 	}
 
 	return FALSE;
@@ -383,9 +387,7 @@ int16 find_player(char *name)
 	uint32 i = 0;
 
 	for(i = 0; i < online.max_index; i++){
-		if(strcmp(player(player_online(i))->username, name)){
-			return player_online(i);
-		}
+		if(strcmp(player(player_online(i))->username, name)) return player_online(i);
 	}
 
 	return -1;
