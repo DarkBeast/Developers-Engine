@@ -39,6 +39,32 @@ void take_string(char* dest, buffer_t *buffer)
 	take_buffer(dest, buffer, len);
 }
 
+int add_encypt_string( buffer_t* buffer, char* str)
+{
+	size_t len = strlen(str)+1;
+	buffer_t string;
+
+	clear_buffer(&string);
+
+	if(add_buffer(buffer, &len, sizeof(len))) return 1;
+	if(add_buffer(&string, str, len)) return 1;
+	if(encrypt_packet(&string,len)) return 1;
+	if(add_buffer(buffer, string.buff, string.offset)) return 1;
+	return 0;
+}
+
+void take_encypt_string(char* dest, buffer_t *buffer)
+{
+	size_t len;
+	buffer_t string;
+
+	clear_buffer(&string);
+	take_buffer(&len, buffer, sizeof(len));
+	take_buffer(string.buff, buffer, len);
+	decrypt_packet(&string,len);
+	take_buffer(dest, &string, len);
+}
+
 void clear_buffer(buffer_t *buffer)
 {
 	memset(buffer->buff, 0, PACKET_SIZE);
@@ -63,35 +89,31 @@ int  buffer_full(buffer_t* buffer, size_t size)
 	return ((buffer->offset >= PACKET_SIZE) && (buffer->offset+size > PACKET_SIZE))? 1 : 0;
 }
 
-void encrypt_packet(buffer_t* buffer)
+int encrypt_packet(buffer_t* buffer, size_t size)
 {
 	uint32 x = 0;
-	char *encrypted = (char *)calloc(buffer->offset, sizeof(char));
-	uint32 buffersize = buffer->offset;
+	char *encrypted = (char *)calloc(size, sizeof(char));
+	uint32 buffersize = size;
 
-	for (x = 0; x < buffer->offset; x++){
-		encrypted[x] = buffer->buff[x] ^ ((uint32)ENCRYPT_KEY + x) % 255;
-		encrypted[x] ^= (1 << 5);
-		encrypted[x] ^= (1 << 2);
-		encrypted[x] ^= (1 << 7);
-	}
+	for (x = 0; x < size; x++)
+		encrypted[x] = (buffer->buff[x] ^ ENCRYPT_KEY[x]);
+
 	clear_buffer(buffer);
-	add_buffer(buffer, encrypted, buffersize);
+	if(add_buffer(buffer, encrypted, buffersize)) return 1;
+	return 0;
 }
 
-void decrypt_packet(buffer_t* buffer)
+int decrypt_packet(buffer_t* buffer, size_t size)
 {
 	uint32 x = 0;
-	char *decrypted = (char *)calloc(buffer->offset, sizeof(char));
-	uint32 buffersize = buffer->offset;
+	char *decrypted = (char *)calloc(size, sizeof(char));
+	uint32 buffersize = size;
 
-	for (x = 0; x < buffer->offset; x++){
-		buffer->buff[x] ^= (1 << 7);
-		buffer->buff[x] ^= (1 << 2);
-		buffer->buff[x] ^= (1 << 5);
-		decrypted[x] = buffer->buff[x] ^ ((uint32)ENCRYPT_KEY + x) % 255;
-	}
+	for (x = 0; x < size; x++)
+		decrypted[x] = (buffer->buff[x] ^ ENCRYPT_KEY[x]);
+
 	clear_buffer(buffer);
-	add_buffer(buffer, decrypted, buffersize);
+	if(add_buffer(buffer, decrypted, buffersize)) return 1;
 	buffer->offset = 0;
+	return 0;
 }
