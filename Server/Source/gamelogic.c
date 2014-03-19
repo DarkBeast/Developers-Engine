@@ -34,8 +34,7 @@ void attack_npc(int16 attacker, uint8 mapnpcnum, uint32 damage)
 	uint32 npcnum;
 	buffer_t buffer;
 
-	if(temp_player(attacker)->loggedin == FALSE|| mapnpcnum >= MAX_MAP_NPCS)
-		return;
+	if(temp_player(attacker)->loggedin == FALSE|| mapnpcnum >= MAX_MAP_NPCS) return;
 
 	mapnum = player(attacker)->map;
 	npcnum = map(mapnum)->npc[mapnpcnum].num;
@@ -124,8 +123,7 @@ void attack_player(int16 attacker, int16 victim, uint32 damage)
 	buffer_t buffer;
 	char *string = NULL;
 
-	if(temp_player(attacker)->loggedin == FALSE || temp_player(victim)->loggedin == FALSE)
-		return;
+	if(temp_player(attacker)->loggedin == FALSE || temp_player(victim)->loggedin == FALSE) return;
 
 	if(player(attacker)->equipment[EQUIPMENT_WEAPON] > 0)
 		n = player(attacker)->inv[player(attacker)->equipment[EQUIPMENT_WEAPON]].id;
@@ -230,8 +228,7 @@ void attack_npc_with_magic(int16 attacker, uint8 mapnpcnum, uint32 damage, uint1
 	uint32 npcnum;
 	buffer_t buffer;
 
-	if(temp_player(attacker)->loggedin == FALSE|| mapnpcnum >= MAX_MAP_NPCS)
-		return;
+	if(temp_player(attacker)->loggedin == FALSE|| mapnpcnum >= MAX_MAP_NPCS) return;
 
 	mapnum = player(attacker)->map;
 	npcnum = map(mapnum)->npc[mapnpcnum].num;
@@ -301,8 +298,7 @@ void attack_player_with_magic(int16 attacker, int16 victim, uint32 damage, uint1
 	buffer_t buffer;
 	char *string = NULL;
 
-	if(temp_player(attacker)->loggedin == FALSE || temp_player(victim)->loggedin == FALSE)
-		return;
+	if(temp_player(attacker)->loggedin == FALSE || temp_player(victim)->loggedin == FALSE) return;
 
 	clear_buffer(&buffer);
 	add_opcode(&buffer,SATTACK);
@@ -378,12 +374,10 @@ uint32 find_open_map_item_slot(uint32 mapnum)
 {
 	uint32 i = 1;
 
-	if(mapnum >= MAX_MAPS)
-		return 0;
+	if(mapnum >= MAX_MAPS) return 0;
 
 	for(i = 1; i < MAX_MAP_ITEMS; i++){
-		if(map(mapnum)->items[i].num == 0)
-			return i;
+		if(map(mapnum)->items[i].num == 0) return i;
 	}
 
 	return 0;
@@ -401,12 +395,10 @@ void join_game(int16 index)
 
 	string = comb_3str(player(index)->charname," has joined ",GAME_NAME);
 
-	if(player(index)->group <= GROUP_MONITOR){
+	if(player(index)->group <= GROUP_MONITOR)
 		global_msg(string,1); //dark grey
-	}
-	else{
+	else
 		global_msg(string,1); //white
-	}
 
 	clear_buffer(&buffer);
 	add_opcode(&buffer,SLOGINOK);
@@ -421,9 +413,8 @@ void join_game(int16 index)
 	send_inventory(index);
 	send_worn_equipment(index);
 
-	for(i = 0; i < VITAL_COUNT; i++){
+	for(i = 0; i < VITAL_COUNT; i++)
 		send_vital(index, i);
-	}
 
 	send_stats(index);
 	player_warp(index, player(index)->map, player(index)->x, player(index)->y);
@@ -442,9 +433,8 @@ void left_game(int16 index)
 	if(temp_player(index)->loggedin){
 		temp_player(index)->loggedin = FALSE;
 
-		if(players_on_map(player(index)->map) > 0){
+		if(players_on_map(player(index)->map) > 0)
 			players_on_map_minus(player(index)->map);
-		}
 
 		if(map(player(index)->map)->bootmap > -1){
 			player(index)->x = map(player(index)->map)->bootx;
@@ -456,12 +446,10 @@ void left_game(int16 index)
 
 		string = comb_3str(player(index)->charname," has left ",GAME_NAME);
 
-		if(player(index)->group <= GROUP_MONITOR){
+		if(player(index)->group <= GROUP_MONITOR)
 			global_msg(string,1); //dark grey
-		}
-		else{
+		else
 			global_msg(string,1); //white
-		}
 
 		printf("%s has disconnected from %s \n", player(index)->charname, GAME_NAME);
 
@@ -477,8 +465,7 @@ void spawn_item(uint16 itemnum, uint32 itemval, uint32 mapnum, uint8 x, uint8 y)
 {
 	uint8 i = 0;
 
-	if(itemnum == 0 || itemnum >= MAX_ITEMS || mapnum >= MAX_MAPS)
-		return;
+	if(itemnum == 0 || itemnum >= MAX_ITEMS || mapnum >= MAX_MAPS) return;
 
 	i = find_open_map_item_slot(mapnum);
 
@@ -489,18 +476,15 @@ void spawn_item_slot(uint8 mapitemslot, uint16 itemnum, uint32 itemval, uint32 i
 {
 	buffer_t buffer;
 
-	if( mapitemslot >= MAX_MAP_ITEMS || itemnum == 0 || itemnum >= MAX_ITEMS || mapnum >= MAX_MAPS)
-		return;
+	if( mapitemslot >= MAX_MAP_ITEMS || itemnum == 0 || itemnum >= MAX_ITEMS || mapnum >= MAX_MAPS) return;
 
 	map(mapnum)->items[mapitemslot].num = itemnum;
 	map(mapnum)->items[mapitemslot].value = itemval;
 
-	if(item(itemnum)->type >= ITEM_TYPE_WEAPON && item(itemnum)->type <= ITEM_TYPE_SHIELD){
+	if(item(itemnum)->type >= ITEM_TYPE_WEAPON && item(itemnum)->type <= ITEM_TYPE_SHIELD)
 		map(mapnum)->items[mapitemslot].dur = itemdur;
-	}
-	else{
+	else
 		map(mapnum)->items[mapitemslot].dur = 0;
-	}
 
 	map(mapnum)->items[mapitemslot].x = x;
 	map(mapnum)->items[mapitemslot].y = y;
@@ -522,9 +506,8 @@ void spawn_all_maps_items(void)
 {
 	uint32 i = 0;
 
-	for(i = 1; i < MAX_ITEMS; i++){
+	for(i = 1; i < MAX_ITEMS; i++)
 		spawn_map_items(i);
-	}
 }
 
 void spawn_map_items(uint32 mapnum)
@@ -532,18 +515,15 @@ void spawn_map_items(uint32 mapnum)
 	uint8 x;
 	uint8 y;
 
-	if(mapnum >= MAX_MAPS)
-		return;
+	if(mapnum >= MAX_MAPS) return;
 
 	for( x = 0; x < MAX_MAPX; x++){
 		for( y = 0; y < MAX_MAPY; y++){
 			if(map(mapnum)->tile[GETXY(x,y)].type == TILE_TYPE_ITEM){
-				if(item(map(mapnum)->tile[GETXY(x,y)].data1)->type == ITEM_TYPE_CURRENCY && map(mapnum)->tile[GETXY(x,y)].data2 == 0){
+				if(item(map(mapnum)->tile[GETXY(x,y)].data1)->type == ITEM_TYPE_CURRENCY && map(mapnum)->tile[GETXY(x,y)].data2 == 0)
 					spawn_item(map(mapnum)->tile[GETXY(x,y)].data1, 1, mapnum, x, y);
-				}
-				else{
+				else
 					spawn_item(map(mapnum)->tile[GETXY(x,y)].data1, map(mapnum)->tile[GETXY(x,y)].data2, mapnum, x, y);
-				}
 			}
 		}
 	}
@@ -558,8 +538,7 @@ void spawn_npc(uint8 mapnpcnum, uint32 mapnum)
 	sbool spawned = FALSE;
 	buffer_t buffer;
 
-	if(mapnpcnum >= MAX_MAP_NPCS || mapnum >= MAX_MAPS)
-		return;
+	if(mapnpcnum >= MAX_MAP_NPCS || mapnum >= MAX_MAPS) return;
 
 	if(map(mapnum)->npc[mapnpcnum].num > 0){
 		map(mapnum)->npc[mapnpcnum].target = 0;
@@ -611,35 +590,29 @@ void spawn_map_npcs(uint32 mapnum)
 {
 	uint8 i = 0;
 
-	for( i = 0; i < MAX_MAP_NPCS; i++){
+	for( i = 0; i < MAX_MAP_NPCS; i++)
 		spawn_npc(i, mapnum);
-	}
 }
 
 void spawn_all_map_npcs(void)
 {
 	uint32 i = 0;
 
-	for(i = 0; i < MAX_MAPS; i++){
+	for(i = 0; i < MAX_MAPS; i++)
 		spawn_map_npcs(i);
-	}
 }
 
 sbool can_attack_player(int16 attacker, int16 victim)
 {
 	char *string = NULL;
 
-	if(gettickcount() < temp_player(attacker)->attacktimer + 1000)
-		return FALSE;
+	if(gettickcount() < temp_player(attacker)->attacktimer + 1000) return FALSE;
 
-	if(!temp_player(victim)->loggedin || !temp_player(attacker)->loggedin)
-		return FALSE;
+	if(!temp_player(victim)->loggedin || !temp_player(attacker)->loggedin) return FALSE;
 
-	if(player(victim)->map != player(attacker)->map)
-		return FALSE;
+	if(player(victim)->map != player(attacker)->map) return FALSE;
 
-	if(temp_player(victim)->gettingmap)
-		return FALSE;
+	if(temp_player(victim)->gettingmap) return FALSE;
 
 	switch(player(attacker)->dir){
 	case DIR_UP:
@@ -669,8 +642,7 @@ sbool can_attack_player(int16 attacker, int16 victim)
 		}
 	}
 
-	if(player(victim)->vitals[VITAL_HP] == 0)
-		return FALSE;
+	if(player(victim)->vitals[VITAL_HP] == 0) return FALSE;
 
 	if(player(attacker)->group > GROUP_MONITOR){
 		player_msg(attacker, "You cannot attack any player for thou art an admin!", 1); //bright blue
@@ -703,14 +675,11 @@ sbool can_attack_npc(int16 attacker, uint8 mapnpcnum)
 	uint8 npcx;
 	uint8 npcy;
 
-	if(!temp_player(attacker)->loggedin || mapnpcnum >= MAX_MAP_NPCS)
-		return FALSE;
+	if(!temp_player(attacker)->loggedin || mapnpcnum >= MAX_MAP_NPCS) return FALSE;
 
-	if(map(player(attacker)->map)->npc[mapnpcnum].num == 0)
-		return FALSE;
+	if(map(player(attacker)->map)->npc[mapnpcnum].num == 0) return FALSE;
 
-	if(map(player(attacker)->map)->npc[mapnpcnum].vitals[VITAL_HP] == 0)
-		return FALSE;
+	if(map(player(attacker)->map)->npc[mapnpcnum].vitals[VITAL_HP] == 0) return FALSE;
 
 	if(gettickcount() >temp_player(attacker)->attacktimer + 1000){
 		switch(player(attacker)->dir){
@@ -752,20 +721,15 @@ sbool can_npc_attack_player(uint8 mapnpcnum, int16 index)
 	uint8 playerx;
 	uint8 playery;
 
-	if(!temp_player(index)->loggedin || mapnpcnum >= MAX_MAP_NPCS)
-		return FALSE;
+	if(!temp_player(index)->loggedin || mapnpcnum >= MAX_MAP_NPCS) return FALSE;
 
-	if(map(player(index)->map)->npc[mapnpcnum].num == 0)
-		return FALSE;
+	if(map(player(index)->map)->npc[mapnpcnum].num == 0) return FALSE;
 
-	if(map(player(index)->map)->npc[mapnpcnum].vitals[VITAL_HP] == 0)
-		return FALSE;
+	if(map(player(index)->map)->npc[mapnpcnum].vitals[VITAL_HP] == 0) return FALSE;
 
-	if(gettickcount() < map(player(index)->map)->npc[mapnpcnum].attacktimer + 1000)
-		return FALSE;
+	if(gettickcount() < map(player(index)->map)->npc[mapnpcnum].attacktimer + 1000) return FALSE;
 
-	if(temp_player(index)->gettingmap)
-		return FALSE;
+	if(temp_player(index)->gettingmap) return FALSE;
 
 	map(player(index)->map)->npc[mapnpcnum].attacktimer = gettickcount();
 
@@ -802,11 +766,9 @@ void npc_attack_player(uint8 mapnpcnum, int16 victim, uint32 damage)
 	uint32 exp;
 	buffer_t buffer;
 
-	if(mapnpcnum >= MAX_MAP_NPCS || !temp_player(victim)->loggedin)
-		return;
+	if(mapnpcnum >= MAX_MAP_NPCS || !temp_player(victim)->loggedin) return;
 
-	if(map(player(victim)->map)->npc[mapnpcnum].num == 0)
-		return;
+	if(map(player(victim)->map)->npc[mapnpcnum].num == 0) return;
 
 	clear_buffer(&buffer);
 	add_opcode(&buffer, SNPCATTACK);
@@ -825,9 +787,8 @@ void npc_attack_player(uint8 mapnpcnum, int16 victim, uint32 damage)
 
 		exp = player(victim)->exp / 3;
 
-		if(exp == 0){
+		if(exp == 0)
 			player_msg(victim, "You lost no experience points.", 1); //bright red
-		}
 		else{
 			player(victim)->exp -= exp;
 			string = comb_3str("You lost ",int_to_string(exp), " experience points.");
@@ -910,24 +871,18 @@ void npc_move(uint32 mapnum, uint8 mapnpcnum, uint8 dir)
 {
 	buffer_t buffer;
 
-	if(mapnum >= MAX_MAPS || mapnpcnum >= MAX_MAP_NPCS)
-		return;
+	if(mapnum >= MAX_MAPS || mapnpcnum >= MAX_MAP_NPCS) return;
 
 	switch(dir){
 	case DIR_UP:
-		map(mapnum)->npc[mapnpcnum].y--;
-		break;
+		map(mapnum)->npc[mapnpcnum].y--; break;
 	case DIR_DOWN:
-		map(mapnum)->npc[mapnpcnum].y++;
-		break;
+		map(mapnum)->npc[mapnpcnum].y++; break;
 	case DIR_LEFT:
-		map(mapnum)->npc[mapnpcnum].x--;
-		break;
+		map(mapnum)->npc[mapnpcnum].x--; break;
 	case DIR_RIGHT:
-		map(mapnum)->npc[mapnpcnum].x++;
-		break;
-	default:
-		return;
+		map(mapnum)->npc[mapnpcnum].x++; break;
+	default: return;
 	}
 
 	map(mapnum)->npc[mapnpcnum].dir = dir;
@@ -961,8 +916,7 @@ void npc_dir(uint32 mapnum, uint8 mapnpcnum, uint8 dir)
 
 uint32 get_npc_max_vital(uint32 npcnum, uint8 vital)
 {
-	if(npcnum == 0 || npcnum >= MAX_NPCS)
-		return 0;
+	if(npcnum == 0 || npcnum >= MAX_NPCS) return 0;
 
 	switch(vital){
 	case VITAL_HP:
@@ -980,14 +934,12 @@ uint32 get_npc_vital_regen(uint32 npcnum, uint8 vital)
 {
 	uint32 i = 0;
 
-	if(npcnum == 0 || npcnum >= MAX_NPCS)
-		return 0;
+	if(npcnum == 0 || npcnum >= MAX_NPCS) return 0;
 
 	switch(vital){
 	case VITAL_HP:
 		i = npc(npcnum)->stat[STAT_DEFENSE] / 3;
-		if( i <= 0)
-			return 1;
+		if( i <= 0) return 1;
 
 		return i;
 	default:
@@ -998,13 +950,11 @@ uint32 get_npc_vital_regen(uint32 npcnum, uint8 vital)
 uint32 get_player_damage(int16 index)
 {
 	uint32 damage;
-	if(!temp_player(index)->loggedin)
-		return 0;
+	if(!temp_player(index)->loggedin) return 0;
 
 	damage = player(index)->stat[STAT_STRENGTH] / 2;
 
-	if(damage == 0)
-		damage = 1;
+	if(damage == 0) damage = 1;
 
 	if(player(index)->equipment[EQUIPMENT_WEAPON] > 0)
 		damage += item(player(index)->inv[player(index)->equipment[EQUIPMENT_WEAPON]].id)->data2;
@@ -1016,8 +966,7 @@ uint32 get_player_protection(int16 index)
 {
 	uint32 protection;
 
-	if(!temp_player(index)->loggedin)
-		return 0;
+	if(!temp_player(index)->loggedin) return 0;
 
 	protection = player(index)->stat[STAT_DEFENSE] / 5;
 
@@ -1042,8 +991,7 @@ sbool can_player_critical_hit(int16 index)
 
 			n = (rand() % 100) + 1;
 
-			if(n <= i)
-				return TRUE;
+			if(n <= i) return TRUE;
 		}
 	}
 	return FALSE;
@@ -1061,8 +1009,7 @@ sbool can_player_block_hit(int16 index)
 
 			n = (rand() % 100) + 1;
 
-			if(n <= i)
-				return TRUE;
+			if(n <= i) return TRUE;
 		}
 	}
 	return FALSE;
@@ -1081,13 +1028,11 @@ void cast_spell(int16 index, uint16 spellslot)
 	uint8 x;
 	uint8 y;
 
-	if(spellslot >= MAX_PLAYER_SPELLS)
-		return;
+	if(spellslot >= MAX_PLAYER_SPELLS) return;
 
 	spellnum = player(index)->spells[spellslot];
 
-	if(!has_spell(index, spellnum))
-		return;
+	if(!has_spell(index, spellnum)) return;
 
 	if(player(index)->vitals[VITAL_MP] < spell(spellnum)->mpreq){
 		player_msg(index, "Not enough mana to cast this spell", 1); //light blue.
@@ -1142,9 +1087,8 @@ void cast_spell(int16 index, uint16 spellslot)
 				if(map(player(index)->map)->moral == MAP_TYPE_NONE){
 					damage = (player(index)->stat[STAT_MAGIC] / 4) + spell(spellnum)->data1 - get_player_protection(n);
 
-					if(damage){
+					if(damage)
 						attack_player_with_magic(index, n, damage, spellnum);
-					}
 					else{
 						string = comb_3str("The spell was to weak to hurt ", player(n)->charname, "!");
 						player_msg(index, string, 1); //bright red
@@ -1191,9 +1135,8 @@ void cast_spell(int16 index, uint16 spellslot)
 			case SPELL_SUBHP:
 				damage = (player(index)->stat[STAT_MAGIC] / 4) + spell(spellnum)->data1 - (npc(map(player(index)->map)->npc[n].num)->stat[STAT_DEFENSE] / 2);
 
-				if(damage){
+				if(damage)
 					attack_npc_with_magic(index, n, damage, spellnum);
-				}
 				else{
 					string = comb_3str("The spell was to weak to hurt ", npc(map(player(index)->map)->npc[n].num)->name, "!");
 					player_msg(index, string, 1); //bright red
@@ -1412,13 +1355,11 @@ uint32 find_open_inv_slot(int16 index, uint16 itemnum)
 
 	if(item(itemnum)->type == ITEM_TYPE_CURRENCY){
 		for(i = 1; i < MAX_INV; i++){
-			if(player(index)->inv[i].id == itemnum)
-				return i;
+			if(player(index)->inv[i].id == itemnum) return i;
 		}
 	}
 	for(i = 1; i < MAX_INV; i++){
-		if(player(index)->inv[i].id == 0)
-			return i;
+		if(player(index)->inv[i].id == 0) return i;
 	}
 	return 0;
 }
@@ -1561,8 +1502,7 @@ sbool has_spell(int16 index, uint32 spellnum)
 	uint32 i = 1;
 
 	for(i = 1; i < MAX_PLAYER_SPELLS; i++){
-		if(player(index)->spells[i] == spellnum)
-			return TRUE;
+		if(player(index)->spells[i] == spellnum) return TRUE;
 	}
 	return FALSE;
 }
@@ -1572,8 +1512,7 @@ uint16 find_open_spell_slot(int16 index)
 	uint16 i = 1;
 
 	for(i = 1; i < MAX_PLAYER_SPELLS; i++){
-		if(player(index)->spells[i] == 0)
-			return i;
+		if(player(index)->spells[i] == 0) return i;
 	}
 
 	return 0;
@@ -1674,9 +1613,9 @@ uint64 get_player_next_level(int16 index)
 {
 	uint64 exp = 0;
 	if(player(index)->level + 1 >= MAX_PLAYER_LEVEL){
-		if(player(index)->level + 1 >= 50){
+		if(player(index)->level + 1 >= 50)
 			return (player(index)->level + 1) * 10000;
-		}
+
 		return (player(index)->level + 1) * 100;
 	}
 	return 0;
