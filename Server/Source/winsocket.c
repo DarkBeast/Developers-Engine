@@ -20,13 +20,12 @@ int initsocket(void *arg)
 
 	sock = (desocket *)calloc(1,sizeof(desocket));
 
-		if (WSAStartup(0x0202, &wsadata) != 0)
-			error_handler(DE_ERROR_SOCKET_WSASTARTUP);
+	if (WSAStartup(0x0202, &wsadata) != 0)
+		error_handler(DE_ERROR_SOCKET_WSASTARTUP);
 
 	sock->base = event_base_new();
 	if (!sock->base) {
-		puts("Couldn't open event base");
-		return 0;
+		puts("Couldn't open event base"); return 0;
 	}
 
 	//set socket address
@@ -39,14 +38,15 @@ int initsocket(void *arg)
 	sock->listener = evconnlistener_new_bind(sock->base, accept_connection, NULL,LEV_OPT_CLOSE_ON_FREE | LEV_OPT_REUSEABLE, -1,(struct sockaddr *) &sock->host_address, length);
 
 	if (!sock->listener) {
-		perror("Couldn't create listener");
-		return 0;
+		perror("Couldn't create listener"); return 0;
 	}
 
 	//sets up the error event so if a error happens in the socket this allows us to link that error for handling.
 	evconnlistener_set_error_cb(sock->listener, event_error_handler);
 
 	event_base_dispatch(sock->base);
+	event_base_free(sock->base);
+	free(sock);
 	return 0;
 }
 
@@ -76,7 +76,6 @@ void socket_read(struct bufferevent *bev, void *index)
 	uint32 size;
 
 	while(evbuffer_get_length(input) > 4){
-
 		clear_buffer(&buffer);
 		evbuffer_remove(input,buffer.buff,4);
 		take_buffer(&size, &buffer, SIZE32);
@@ -84,7 +83,7 @@ void socket_read(struct bufferevent *bev, void *index)
 		clear_buffer(&buffer);
 		evbuffer_remove(input,buffer.buff,size);
 
-		handle_data(&buffer, bev, index);
+		handle_data(&buffer, bev);
 	}
 }
 
@@ -92,7 +91,6 @@ void socket_event(struct bufferevent *bev, short events, void *index)
 {
 	if (events & BEV_EVENT_ERROR){
 		//Error handler here.++++
-
 	}
 	clear_temp_player(bev);
 	bufferevent_free(bev);
@@ -100,16 +98,19 @@ void socket_event(struct bufferevent *bev, short events, void *index)
 
 void socketsend(buffer_t *data, struct bufferevent *bev)
 {
-	struct evbuffer *output = bufferevent_get_output(bev);
+	if(bev != NULL){
+		struct evbuffer *output = bufferevent_get_output(bev);
 
-	evbuffer_add(output,data->buff,data->offset);
+		if(output == NULL) return;
+
+		evbuffer_add(output,data->buff,data->offset);
+	}
 }
 
 void endsocket(void)
 {
 	event_base_loopexit(sock->base, NULL);
-	event_base_free(sock->base);
-	free(sock);
+	evconnlistener_free(sock->listener);
 	libevent_global_shutdown();
 	WSACleanup();
 }
