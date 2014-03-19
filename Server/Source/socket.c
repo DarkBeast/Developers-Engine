@@ -4,6 +4,7 @@
 #include "socket.h"
 #include "tinycthread.h"
 #include "players.h"
+#include "error.h"
 
 temp_index temp_player_array;
 
@@ -43,29 +44,32 @@ void init_temp_player_index(void)
 
 int16 set_temp_player_index(struct bufferevent *bev)
 {
-	int16 i = 0;
+	int16 *i = (int16 *)calloc(1, sizeof(int16));
+
+	if(i == NULL)
+		error_handler(DE_ERROR_POINTER_NULL);
 
 	if( temp_player_array.used < temp_player_array.count){
-		for( i = 0; i < temp_player_array.count; i++){
-			if(!temp_player_array.index[i].loggedin){
-				temp_player_array.index[i].loggedin = TRUE;
-				temp_player_array.index[i].bev = bev;
+		for( *i = 0; *i < temp_player_array.count; *i++){
+			if(!temp_player_array.index[*i].loggedin){
+				temp_player_array.index[*i].loggedin = TRUE;
+				temp_player_array.index[*i].bev = bev;
 				temp_player_array.used++;
-				bufferevent_setcbarg(bev, &i);
-				return i; //return the index
+				bufferevent_setcbarg(bev, i);
+				return *i; //return the index
 			}
 		}
 	}
 
 	if( temp_player_array.count < MAX_PLAYERS){
-		for( i = temp_player_array.count; i < MAX_PLAYERS; i++){
-			if(!temp_player_array.index[i].loggedin){
-				temp_player_array.index[i].loggedin = TRUE;
-				temp_player_array.index[i].bev = bev;
+		for( *i = temp_player_array.count; *i < MAX_PLAYERS; *i++){
+			if(!temp_player_array.index[*i].loggedin){
+				temp_player_array.index[*i].loggedin = TRUE;
+				temp_player_array.index[*i].bev = bev;
 				temp_player_array.used++;
 				temp_player_array.count++;
-				bufferevent_setcbarg(bev, &i);
-				return i; //return the index
+				bufferevent_setcbarg(bev, i);
+				return *i; //return the index
 			}
 		}
 	}
@@ -78,10 +82,10 @@ sbool clear_temp_player(struct bufferevent *bev)
 	int16 i = get_temp_player_index(bev);
 
 	if(i != TEMP_NO_MATCH){
-			temp_player_array.index[i].loggedin = FALSE;
-			temp_player_array.index[i].bev = NULL;
-			temp_player_array.used--;
-			return TRUE;
+		temp_player_array.index[i].loggedin = FALSE;
+		temp_player_array.index[i].bev = NULL;
+		temp_player_array.used--;
+		return TRUE;
 	}
 
 	return TEMP_NO_MATCH;//no player to clear
@@ -97,15 +101,17 @@ void clear_temp_player_onindex(int16 index)
 int16 get_temp_player_index(struct bufferevent *bev)
 {
 	void *i;
+	int16 *index;
 
 	bufferevent_getcb(bev,NULL,NULL,NULL,&i);
-	
-	if(i != NULL)
-	return (int16)i;
-	
+
+	if(i != NULL){
+		index = (int16 *)i;
+		return *index;
+	}
+
 	return TEMP_NO_MATCH; //return -1 if none matched
 }
-
 
 struct bufferevent * get_temp_player_bufferevent(int16 index)
 {
@@ -144,9 +150,8 @@ void send_data_to_all(buffer_t *data)
 	uint32 i = 0;
 
 	for( i = 0; i < total_players_online(); i++){
-		if(get_temp_player(player_online(i))->loggedin){
+		if(get_temp_player(player_online(i))->loggedin)
 			send_data(data, player_online(i));
-		}
 	}
 }
 
@@ -155,9 +160,8 @@ void send_data_to_all_but(buffer_t *data, int16 index)
 	uint32 i = 0;
 
 	for( i = 0; i < total_players_online(); i++){
-		if(player_online(i) != index && get_temp_player(player_online(i))->loggedin){
+		if(player_online(i) != index && get_temp_player(player_online(i))->loggedin)
 			send_data(data, player_online(i));
-		}
 	}
 }
 
@@ -166,9 +170,8 @@ void send_data_to_map(buffer_t *data, uint32 mapnum)
 	uint32 i = 0;
 
 	for( i = 0; i < total_players_online(); i++){
-		if(get_temp_player(player_online(i))->loggedin && player(player_online(i))->map == mapnum){
+		if(get_temp_player(player_online(i))->loggedin && player(player_online(i))->map == mapnum)
 			send_data(data, player_online(i));
-		}
 	}
 }
 
@@ -177,9 +180,8 @@ void send_data_to_map_but(buffer_t *data, uint32 mapnum, int16 index)
 	uint32 i = 0;
 
 	for( i = 0; i < total_players_online(); i++){
-		if(player_online(i) != index && get_temp_player(player_online(i))->loggedin && player(player_online(i))->map == mapnum){
+		if(player_online(i) != index && get_temp_player(player_online(i))->loggedin && player(player_online(i))->map == mapnum)
 			send_data(data, player_online(i));
-		}
 	}
 }
 
