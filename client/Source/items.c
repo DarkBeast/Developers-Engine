@@ -22,18 +22,16 @@ void init_items(void)
 
 	item_array = (item_t *)calloc(MAX_ITEMS, sizeof(item_t));
 
-	for(i = 0; i < MAX_ITEMS; i++){
+	for(i = 0; i < MAX_ITEMS; i++)
 		item_array[i].name = (char *)calloc(MAX_NAME_LENGTH, sizeof(char));
-	}
 }
 
 void unload_items(void)
 {
 	uint32 i = 0;
 
-	for(i = 0; i < MAX_ITEMS; i++){
+	for(i = 0; i < MAX_ITEMS; i++)
 		free(item_array[i].name);
-	}
 
 	free(item_array);
 }

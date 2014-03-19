@@ -26,9 +26,9 @@ void load_png(const char *path, image *image)
 
 	FILE *png_file = fopen(path, "rb");
 
-	if (!png_file){
+	if (!png_file)
 		error_handler(DE_ERROR_FILE_ERROR, "error in load_png(), image not found.\n");
-	}
+
 	fread(header, 1, PNGSIGBYTES, png_file);
 	if(png_sig_cmp(header, 0, PNGSIGBYTES))
 		error_handler(DE_ERROR_FILE_ERROR, "libpng error\n");
@@ -66,15 +66,13 @@ void load_png(const char *path, image *image)
 
 	if(color_type == PNG_COLOR_TYPE_PALETTE)
 		png_set_palette_to_rgb(png_ptr);
-	else if(color_type == PNG_COLOR_TYPE_GRAY || color_type == PNG_COLOR_TYPE_GRAY_ALPHA){
+	else if(color_type == PNG_COLOR_TYPE_GRAY || color_type == PNG_COLOR_TYPE_GRAY_ALPHA)
 		png_set_gray_to_rgb(png_ptr);
-	}
 
 	if (png_get_valid(png_ptr, info_ptr, PNG_INFO_tRNS))
 		png_set_tRNS_to_alpha(png_ptr);
-	else if(color_type == PNG_COLOR_TYPE_RGB_ALPHA){
+	else if(color_type == PNG_COLOR_TYPE_RGB_ALPHA)
 		image->format = GL_RGBA;
-	}
 	else
 		png_set_filler(png_ptr, 0xff, PNG_FILLER_AFTER);
 
@@ -85,10 +83,8 @@ void load_png(const char *path, image *image)
 	pixelz = (png_byte*)malloc(numbytes);
 	row_ptrs = (png_byte**)malloc((image->height) * sizeof(png_byte*));
 
-	if(row_ptrs == NULL || pixelz == NULL){
+	if(row_ptrs == NULL || pixelz == NULL)
 		error_handler(DE_ERROR_POINTER_NULL, "row_ptrs or pixelz in load_png()\n");
-		return;
-	}
 
 	for (i=0; i<((uint32)image->height); i++)
 		row_ptrs[i] = pixelz + ((image->height) - 1 - i)*rowbytes;
@@ -97,10 +93,8 @@ void load_png(const char *path, image *image)
 
 	image->pixels = (unsigned char *)calloc(1, numbytes);
 
-	if(image->pixels == NULL){
+	if(image->pixels == NULL)
 		error_handler(DE_ERROR_POINTER_NULL, "image->pixels in load_png()\n");
-		return;
-	}
 
 	memcpy(image->pixels, pixelz, image->width * image->height * 4);
 

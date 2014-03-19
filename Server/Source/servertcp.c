@@ -352,9 +352,8 @@ void send_worn_equipment(int16 index)
 
 	add_opcode(&buffer, SPLAYERWORNEQ);
 
-	for(i = 0; i < EQUIPMENT_COUNT; i++){
+	for(i = 0; i < EQUIPMENT_COUNT; i++)
 		add_buffer(&buffer, &player(index)->equipment[i], SIZE16);
-	}
 
 	send_data(&buffer,index);
 }
@@ -386,9 +385,8 @@ void send_stats(int16 index)
 
 	add_opcode(&buffer, SPLAYERSTATS);
 
-	for(i = 0; i < STAT_COUNT; i++){
+	for(i = 0; i < STAT_COUNT; i++)
 		add_buffer(&buffer, &player(index)->stat[i], SIZE8);
-	}
 
 	send_data(&buffer,index);
 }
@@ -680,9 +678,8 @@ void send_players_spells(int16 index)
 	clear_buffer(&buffer);
 
 	add_opcode(&buffer, SSPELLS);
-	for(i = 1; i > MAX_PLAYER_SPELLS; i++){
+	for(i = 1; i > MAX_PLAYER_SPELLS; i++)
 		add_buffer(&buffer, &player(index)->spells[i], SIZE16);
-	}
 
 	send_data(&buffer,index);
 }

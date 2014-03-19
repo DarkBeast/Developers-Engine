@@ -41,20 +41,17 @@ void init_maps(void)
 		map_array[i].tile = (tile_t *)calloc(MAX_MAPX * MAX_MAPY, sizeof(tile_t));
 		map_array[i].items = (map_item_t *)calloc(MAX_MAP_ITEMS, sizeof(map_item_t));
 
-		for( n = 0; n < MAX_MAP_NPCS; n++){
+		for( n = 0; n < MAX_MAP_NPCS; n++)
 			map_array[i].npc[n].vitals = (uint16 *)calloc(VITAL_COUNT, sizeof(uint16));
-		}
 
 		path = get_path(MAP_PATH, i, FILE_ENDING);
 
 		check_dir(MAP_PATH);
 
-		if(file_readable(path)){
+		if(file_readable(path))
 			read_map(path,i);
-		}
-		else{
+		else
 			write_map(path,i);
-		}
 
 		mapcache_create(i);
 	}
@@ -116,9 +113,9 @@ void unload_maps(void)
 	uint32 n = 0;
 
 	for( i = 0; i < MAX_MAPS; i++){
-		for( n = 0; n < MAX_MAP_NPCS; n++){
+		for( n = 0; n < MAX_MAP_NPCS; n++)
 			free(map_array[i].npc[n].vitals);
-		}
+
 		free(map_array[i].name);
 		free(map_array[i].npc);
 		free(map_array[i].items);
@@ -150,9 +147,8 @@ void mapcache_create(uint32 mapnum)
 	add_buffer(&buffer, &map(mapnum)->booty,SIZE8);
 	add_buffer(&buffer, &map(mapnum)->revision,SIZE32);
 
-	for( x = 0; x < MAX_MAP_NPCS; x++){
+	for( x = 0; x < MAX_MAP_NPCS; x++)
 		add_buffer(&buffer, &map(mapnum)->npc[x].num,SIZE16);
-	}
 
 	add_buffer(&buffer, map(mapnum)->tile,(MAX_MAPX * MAX_MAPY) * sizeof(tile_t));
 

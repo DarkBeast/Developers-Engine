@@ -28,18 +28,17 @@ void init_spells(void)
 	spell_anim_array = (spell_anim_t *)calloc(MAX_SPELLANIM, sizeof(spell_anim_t));
 	spell_array = (spells_t *)calloc(MAX_SPELLS, sizeof(spells_t));
 
-	for(i = 0; i < MAX_SPELLS; i++){
+	for(i = 0; i < MAX_SPELLS; i++)
 		spell_array[i].name = (char *)calloc(MAX_NAME_LENGTH, sizeof(char));
-	}
 }
 
 void unload_spells(void)
 {
 	uint32 i = 0;
 
-	for(i = 0; i < MAX_SPELLS; i++){
+	for(i = 0; i < MAX_SPELLS; i++)
 		free(spell_array[i].name);
-	}
+
 	free(spell_array);
 	free(spell_anim_array);
 }

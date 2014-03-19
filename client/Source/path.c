@@ -30,18 +30,14 @@ char* get_path(char *file_path, int32 file_number, char *file_type)
 
 		temp = (char *)realloc(string, path_size);
 
-		if(temp == NULL){
+		if(temp == NULL)
 			error_handler(DE_ERROR_POINTER_NULL,",Variable temp in comb_7str()\n");
-			return NULL;
-		}
 
 		path = temp;
 	}
 
-	if(path == NULL){
+	if(path == NULL)
 		error_handler(DE_ERROR_POINTER_NULL,",Variable path in comb_7str()\n");
-		return NULL;
-	}
 
 	strcpy(path ,file_path);
 	strcat(path ,"\\");
@@ -64,18 +60,14 @@ char* get_path_name(char *file_path, char *file_name, char *file_type)
 
 		temp = (char *)realloc(string, path_size);
 
-		if(temp == NULL){
+		if(temp == NULL)
 			error_handler(DE_ERROR_POINTER_NULL,",Variable temp in get_path_name()\n");
-			return NULL;
-		}
 
 		path = temp;
 	}
 
-	if(path == NULL){
+	if(path == NULL)
 		error_handler(DE_ERROR_POINTER_NULL,",Variable path in get_path_name()\n");
-		return NULL;
-	}
 
 	strcpy(path ,file_path);
 	strcat(path ,"\\");
@@ -146,23 +138,17 @@ char *comb_str(char *a, char *b, char *c, char *d, char *e, char *f, char *g)
 	uint32 size = strlen(a);
 	char* temp;
 
-	if(b != "" || b != NULL)
-		size += strlen(b);
+	if(b != "" || b != NULL) size += strlen(b);
 
-	if(c != "" || c != NULL)
-		size += strlen(c);
+	if(c != "" || c != NULL) size += strlen(c);
 
-	if(d != "" || d != NULL)
-		size += strlen(d);
+	if(d != "" || d != NULL) size += strlen(d);
 
-	if(e != "" || e != NULL)
-		size += strlen(e);
+	if(e != "" || e != NULL) size += strlen(e);
 
-	if(f != "" || f != NULL)
-		size += strlen(f);
+	if(f != "" || f != NULL) size += strlen(f);
 
-	if(g != "" || g != NULL)
-		size += strlen(g);
+	if(g != "" || g != NULL) size += strlen(g);
 
 	if(size >= string_size){
 		if(string_size * 2 > size)
@@ -172,38 +158,28 @@ char *comb_str(char *a, char *b, char *c, char *d, char *e, char *f, char *g)
 
 		temp = (char *)realloc(string, string_size);
 
-		if(temp == NULL){
+		if(temp == NULL)
 			error_handler(DE_ERROR_POINTER_NULL,",Variable temp in comb_str()\n");
-			return NULL;
-		}
 
 		string = temp;
 	}
 
-	if(string == NULL){
+	if(string == NULL)
 		error_handler(DE_ERROR_POINTER_NULL,",Variable string in comb_str()\n");
-		return NULL;
-	}
 
 	strcpy(string ,a);
 
-	if(b != "" || b != NULL)
-		strcat(string ,b);
+	if(b != "" || b != NULL) strcat(string ,b);
 
-	if(c != "" || c != NULL)
-		strcat(string ,c);
+	if(c != "" || c != NULL) strcat(string ,c);
 
-	if(d != "" || d != NULL)
-		strcat(string ,d);
+	if(d != "" || d != NULL) strcat(string ,d);
 
-	if(e != "" || e != NULL)
-		strcat(string ,e);
+	if(e != "" || e != NULL) strcat(string ,e);
 
-	if(f != "" || f != NULL)
-		strcat(string ,f);
+	if(f != "" || f != NULL) strcat(string ,f);
 
-	if(g != "" || g != NULL)
-		strcat(string ,g);
+	if(g != "" || g != NULL) strcat(string ,g);
 
 	return string;
 }
@@ -213,8 +189,7 @@ char *comb_2str(char *a, char *b)
 	uint32 size = strlen(a);
 	char* temp;
 
-	if(b != "" || b != NULL)
-		size += strlen(b);
+	if(b != "" || b != NULL) size += strlen(b);
 
 	if(size >= string_size){
 		if(string_size * 2 > size)
@@ -224,23 +199,18 @@ char *comb_2str(char *a, char *b)
 
 		temp = (char *)realloc(string, string_size);
 
-		if(temp == NULL){
+		if(temp == NULL)
 			error_handler(DE_ERROR_POINTER_NULL,",Variable temp in comb_2str()\n");
-			return NULL;
-		}
 
 		string = temp;
 	}
 
-	if(string == NULL){
+	if(string == NULL)
 		error_handler(DE_ERROR_POINTER_NULL,",Variable string in comb_2str()\n");
-		return NULL;
-	}
 
 	strcpy(string ,a);
 
-	if(b != "" || b != NULL)
-		strcat(string ,b);
+	if(b != "" || b != NULL) strcat(string ,b);
 
 	return string;
 }
@@ -250,11 +220,9 @@ char *comb_3str(char *a, char *b, char *c)
 	uint32 size = strlen(a);
 	char* temp;
 
-	if(b != "" || b != NULL)
-		size += strlen(b);
+	if(b != "" || b != NULL) size += strlen(b);
 
-	if(c != "" || c != NULL)
-		size += strlen(c);
+	if(c != "" || c != NULL) size += strlen(c);
 
 	if(size >= string_size){
 		if(string_size * 2 > size)
@@ -264,26 +232,20 @@ char *comb_3str(char *a, char *b, char *c)
 
 		temp = (char *)realloc(string, string_size);
 
-		if(temp == NULL){
+		if(temp == NULL)
 			error_handler(DE_ERROR_POINTER_NULL,",Variable temp in comb_3str()\n");
-			return NULL;
-		}
 
 		string = temp;
 	}
 
-	if(string == NULL){
+	if(string == NULL)
 		error_handler(DE_ERROR_POINTER_NULL,",Variable string in comb_3str()\n");
-		return NULL;
-	}
 
 	strcpy(string ,a);
 
-	if(b != "" || b != NULL)
-		strcat(string ,b);
+	if(b != "" || b != NULL) strcat(string ,b);
 
-	if(c != "" || c != NULL)
-		strcat(string ,c);
+	if(c != "" || c != NULL) strcat(string ,c);
 
 	return string;
 }
@@ -293,14 +255,11 @@ char *comb_4str(char *a, char *b, char *c, char *d)
 	uint32 size = strlen(a);
 	char* temp;
 
-	if(b != "" || b != NULL)
-		size += strlen(b);
+	if(b != "" || b != NULL) size += strlen(b);
 
-	if(c != "" || c != NULL)
-		size += strlen(c);
+	if(c != "" || c != NULL) size += strlen(c);
 
-	if(d != "" || d != NULL)
-		size += strlen(d);
+	if(d != "" || d != NULL) size += strlen(d);
 
 	if(size >= string_size){
 		if(string_size * 2 > size)
@@ -310,29 +269,22 @@ char *comb_4str(char *a, char *b, char *c, char *d)
 
 		temp = (char *)realloc(string, string_size);
 
-		if(temp == NULL){
+		if(temp == NULL)
 			error_handler(DE_ERROR_POINTER_NULL,",Variable temp in comb_4str()\n");
-			return NULL;
-		}
 
 		string = temp;
 	}
 
-	if(string == NULL){
+	if(string == NULL)
 		error_handler(DE_ERROR_POINTER_NULL,",Variable string in comb_4str()\n");
-		return NULL;
-	}
 
 	strcpy(string ,a);
 
-	if(b != "" || b != NULL)
-		strcat(string ,b);
+	if(b != "" || b != NULL) strcat(string ,b);
 
-	if(c != "" || c != NULL)
-		strcat(string ,c);
+	if(c != "" || c != NULL) strcat(string ,c);
 
-	if(d != "" || d != NULL)
-		strcat(string ,d);
+	if(d != "" || d != NULL) strcat(string ,d);
 
 	return string;
 }
@@ -342,17 +294,13 @@ char *comb_5str(char *a, char *b, char *c, char *d, char *e)
 	uint32 size = strlen(a);
 	char* temp;
 
-	if(b != "" || b != NULL)
-		size += strlen(b);
+	if(b != "" || b != NULL) size += strlen(b);
 
-	if(c != "" || c != NULL)
-		size += strlen(c);
+	if(c != "" || c != NULL) size += strlen(c);
 
-	if(d != "" || d != NULL)
-		size += strlen(d);
+	if(d != "" || d != NULL) size += strlen(d);
 
-	if(e != "" || e != NULL)
-		size += strlen(e);
+	if(e != "" || e != NULL) size += strlen(e);
 
 	if(size >= string_size){
 		if(string_size * 2 > size)
@@ -362,32 +310,24 @@ char *comb_5str(char *a, char *b, char *c, char *d, char *e)
 
 		temp = (char *)realloc(string, string_size);
 
-		if(temp == NULL){
+		if(temp == NULL)
 			error_handler(DE_ERROR_POINTER_NULL,",Variable temp in comb_5str()\n");
-			return NULL;
-		}
 
 		string = temp;
 	}
 
-	if(string == NULL){
+	if(string == NULL)
 		error_handler(DE_ERROR_POINTER_NULL,",Variable string in comb_5str()\n");
-		return NULL;
-	}
 
 	strcpy(string ,a);
 
-	if(b != "" || b != NULL)
-		strcat(string ,b);
+	if(b != "" || b != NULL) strcat(string ,b);
 
-	if(c != "" || c != NULL)
-		strcat(string ,c);
+	if(c != "" || c != NULL) strcat(string ,c);
 
-	if(d != "" || d != NULL)
-		strcat(string ,d);
+	if(d != "" || d != NULL) strcat(string ,d);
 
-	if(e != "" || e != NULL)
-		strcat(string ,e);
+	if(e != "" || e != NULL) strcat(string ,e);
 
 	return string;
 }
@@ -397,23 +337,17 @@ char *comb_7str(char *a, char *b, char *c, char *d, char *e, char *f, char *g)
 	uint32 size = strlen(a);
 	char* temp;
 
-	if(b != "" || b != NULL)
-		size += strlen(b);
+	if(b != "" || b != NULL) size += strlen(b);
 
-	if(c != "" || c != NULL)
-		size += strlen(c);
+	if(c != "" || c != NULL) size += strlen(c);
 
-	if(d != "" || d != NULL)
-		size += strlen(d);
+	if(d != "" || d != NULL) size += strlen(d);
 
-	if(e != "" || e != NULL)
-		size += strlen(e);
+	if(e != "" || e != NULL) size += strlen(e);
 
-	if(f != "" || f != NULL)
-		size += strlen(f);
+	if(f != "" || f != NULL) size += strlen(f);
 
-	if(g != "" || g != NULL)
-		size += strlen(g);
+	if(g != "" || g != NULL) size += strlen(g);
 
 	if(size >= string_size){
 		if(string_size * 2 > size)
@@ -423,38 +357,28 @@ char *comb_7str(char *a, char *b, char *c, char *d, char *e, char *f, char *g)
 
 		temp = (char *)realloc(string, string_size);
 
-		if(temp == NULL){
+		if(temp == NULL)
 			error_handler(DE_ERROR_POINTER_NULL,",Variable temp in comb_7str()\n");
-			return NULL;
-		}
 
 		string = temp;
 	}
 
-	if(string == NULL){
+	if(string == NULL)
 		error_handler(DE_ERROR_POINTER_NULL,",Variable string in comb_7str()\n");
-		return NULL;
-	}
 
 	strcpy(string ,a);
 
-	if(b != "" || b != NULL)
-		strcat(string ,b);
+	if(b != "" || b != NULL) strcat(string ,b);
 
-	if(c != "" || c != NULL)
-		strcat(string ,c);
+	if(c != "" || c != NULL) strcat(string ,c);
 
-	if(d != "" || d != NULL)
-		strcat(string ,d);
+	if(d != "" || d != NULL) strcat(string ,d);
 
-	if(e != "" || e != NULL)
-		strcat(string ,e);
+	if(e != "" || e != NULL) strcat(string ,e);
 
-	if(f != "" || f != NULL)
-		strcat(string ,f);
+	if(f != "" || f != NULL) strcat(string ,f);
 
-	if(g != "" || g != NULL)
-		strcat(string ,g);
+	if(g != "" || g != NULL) strcat(string ,g);
 
 	return string;
 }
@@ -467,9 +391,8 @@ char* int_to_string(int64 number)
 	uint16 index = 0;
 	char negative_number = 0; // pseudo bool variable holding whether or not the number is negative
 
-	if((int64)help == 0) {
+	if((int64)help == 0)
 		return "0";
-	}
 
 	if((int64)help < 0) {
 		negative_number = 1;
@@ -511,28 +434,23 @@ char *trim_string(char *str)
 	if(str == NULL)
 		return NULL;
 
-	for(i = 0; is_space(str[i]) == 1; i++)
-		;
+	for(i = 0; is_space(str[i]) == 1; i++);
 
 	first_nonspace = i;
 
-	for( ; str[i] != '\0'; i++)
-		;
+	for( ; str[i] != '\0'; i++);
 
-	for(i--; is_space(str[i]) == 1; i--)
-		;
+	for(i--; is_space(str[i]) == 1; i--);
 
 	last_nonspace = i;
 
 	if(first_nonspace != 0) {
-		for(i = 0; i != last_nonspace - first_nonspace + 1; i++) {
+		for(i = 0; i != last_nonspace - first_nonspace + 1; i++)
 			str[i] = str[i + first_nonspace];
-		}
 
 		str[i] = '\0';
-	} else {
+	} else
 		str[last_nonspace + 1] = '\0';
-	}
 
 	return str;
 }

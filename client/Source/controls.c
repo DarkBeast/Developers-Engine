@@ -155,9 +155,9 @@ void clone_control_images(widget *control, widget *main, sbool freeit, sbool upd
 	default:
 		control->action |= WIDGET_USED_CLONE;
 		control->img = main->img;
-		if(update){
+		if(update)
 			update_widget_vertex_buffer(control);
-		}
+
 		break;
 	}
 }
@@ -294,27 +294,21 @@ void create_label(widget *control, widget *parent, uint16 x, uint16 y, uint16 wi
 		control->action |= WIDGET_IS_MULTI_LINED;
 		control->controlupdatepos = &handle_mlabel_move;
 	}
-	else{
+	else
 		control->controlupdatepos = &handle_slabel_move;
-	}
 
-	if(events){
+	if(events)
 		control->action |= WIDGET_CAN_USE_EVENT;
-	}
 
 	init_text = (label *)calloc(1,sizeof(label));
 
-	if(init_text == NULL){
+	if(init_text == NULL)
 		error_handler(DE_ERROR_POINTER_NULL,",init_text in create_label()\n");
-		return;
-	}
 
 	init_text->string = (text *)calloc(1,sizeof(text));
 
-	if(init_text->string == NULL){
+	if(init_text->string == NULL)
 		error_handler(DE_ERROR_POINTER_NULL,",init_text->string in create_label()\n");
-		return;
-	}
 
 	text_set(init_text->string,0,0,width,height,0,0,0,maxcharspl,fontid,red,blue,green,alpha,string);
 
@@ -349,16 +343,14 @@ void draw_label(widget *control)
 {
 	label *data = (label *)control->control;
 
-	if(data->string->buf.isize > 0){
+	if(data->string->buf.isize > 0)
 		text_draw(data->string);
-	}
 }
 
 void handle_label_click(widget *control, int button, int pressed)
 {
-	if(control->action & WIDGET_CAN_USE_EVENT){
+	if(control->action & WIDGET_CAN_USE_EVENT)
 		control->mousepress(control,button,pressed);
-	}
 }
 
 void update_label_string(widget *control, char *string)
@@ -395,10 +387,8 @@ void create_window(widget *control, widget *parent, uint16 x, uint16 y, uint16 h
 {
 	window *init_window = (window *)calloc(1,sizeof(window));
 
-	if(init_window == NULL){
+	if(init_window == NULL)
 		error_handler(DE_ERROR_POINTER_NULL,",init_window in create_window()\n");
-		return;
-	}
 
 	widget_init(control);
 	control->pos.x = x;
@@ -436,8 +426,7 @@ void create_window_framed(widget *control, widget *parent, uint16 x, uint16 y, u
 	window *init_window = (window *)calloc(1,sizeof(window));
 
 	if(init_window == NULL){
-		error_handler(DE_ERROR_POINTER_NULL,",init_window in create_window_framed()\n");
-		return;
+		error_handler(DE_ERROR_POINTER_NULL,",init_window in create_window_framed()\n"); return;
 	}
 
 	widget_init(control);
@@ -514,14 +503,11 @@ void draw_checkbox(widget *control)
 
 void handle_check_click(widget *control, int button, int pressed)
 {
-	if(button == 0 && pressed == TRUE)
-	{
-		if(control->action & WIDGET_CHECKED){
+	if(button == 0 && pressed == TRUE){
+		if(control->action & WIDGET_CHECKED)
 			control->action &= ~(WIDGET_CHECKED);
-		}
-		else{
+		else
 			control->action |= WIDGET_CHECKED;
-		}
 	}
 
 	if (control->action & WIDGET_CHECKED){
@@ -546,10 +532,8 @@ void create_radio(widget *control, widget *parent, uint16 x, uint16 y, uint16 he
 {
 	radio *init_radio = (radio *)calloc(1,sizeof(radio));
 
-	if(init_radio == NULL){
+	if(init_radio == NULL)
 		error_handler(DE_ERROR_POINTER_NULL,",init_radio in create_radio()\n");
-		return;
-	}
 
 	widget_init(control);
 	control->pos.x = x;
@@ -622,12 +606,12 @@ void resize_radio_list(radio *controls, uint16 size)
 	widget **data;
 
 	if(controls == NULL)
-		return;//TODO: add error handler here.
+		error_handler(DE_ERROR_POINTER_NULL,"controls in resize_radio_list");
 
 	data = (widget **)realloc(controls->list, size * sizeof(widget*));
 
 	if (data == NULL)
-		return;
+		error_handler(DE_ERROR_POINTER_NULL,"data in resize_radio_list");
 
 	controls->list = data;
 }
@@ -638,18 +622,15 @@ void link_radio(widget *main, widget *control)
 	radio *data = (radio *)main->control;
 	radio *controldata = (radio *)control->control;
 
-	if(main == NULL && control == NULL){
-		return;
-	}
+	if(main == NULL && control == NULL)
+		error_handler(DE_ERROR_POINTER_NULL,"main or control in resize_radio_list");
 
 	if(data->count == 0)
 	{
 		data->list = (widget **)calloc(1,8 * sizeof(widget));
 
-		if(data->list == NULL){
+		if(data->list == NULL)
 			error_handler(DE_ERROR_POINTER_NULL,",data->list in link_radio()\n");
-			return;
-		}
 
 		data->amount = 4;
 		data->list[0]= control;
@@ -706,8 +687,7 @@ void handle_radio_click(widget *control, int button, int pressed)
 {
 	radio *data = (radio *)control->control;
 
-	if(button == 0 && pressed == TRUE)
-	{
+	if(button == 0 && pressed == TRUE){
 		if(data->main){
 			reset_radio(control);
 			control->action |= WIDGET_CHECKED;
@@ -718,12 +698,10 @@ void handle_radio_click(widget *control, int button, int pressed)
 				control->action |= WIDGET_CHECKED;
 			}
 			else{
-				if (control->action & WIDGET_CHECKED){
+				if (control->action & WIDGET_CHECKED)
 					control->action &= ~(WIDGET_CHECKED);
-				}
-				else{
+				else
 					control->action |= WIDGET_CHECKED;
-				}
 			}
 		}
 	}
@@ -768,10 +746,8 @@ void create_hprogressbar(widget *control, widget *parent, uint16 x, uint16 y, ui
 {
 	progressbar *bar = (progressbar *)calloc(1, sizeof(progressbar));
 
-	if(bar == NULL){
+	if(bar == NULL)
 		error_handler(DE_ERROR_POINTER_NULL,",bar in create_hprogressbar()\n");
-		return;
-	}
 
 	widget_init(control);
 	widget_init(&bar->bar);
@@ -906,10 +882,8 @@ void create_hscrollbar(widget *control, widget *parent, uint16 x, uint16 y, uint
 {
 	scrollbar_t *scroll_t = (scrollbar_t *)calloc(1, sizeof(scrollbar_t));
 
-	if(scroll_t == NULL ){
+	if(scroll_t == NULL )
 		error_handler(DE_ERROR_POINTER_NULL,",scroll_t in create_hscrollbar()\n");
-		return;
-	}
 
 	widget_init(control);
 	widget_init(&scroll_t->bar);//moving bar.
@@ -1232,16 +1206,14 @@ void handle_harrowleft_exit(widget *control)
 
 void handle_hscrollbar_release(widget *control, int button, int pressed)
 {
-	if(control->shown.data[2]->action & WIDGET_MOVING){
+	if(control->shown.data[2]->action & WIDGET_MOVING)
 		control->shown.data[2]->action &= ~(WIDGET_MOVING);
-	}
 }
 
 void handle_hbar_release(widget *control, int button, int pressed)
 {
-	if(control->action & WIDGET_MOVING){
+	if(control->action & WIDGET_MOVING)
 		control->action &= ~(WIDGET_MOVING);
-	}
 
 	if (widget_has_mouse_over(control)){
 		control->imgpos.y = 0;
@@ -1253,9 +1225,8 @@ void handle_hbar_release(widget *control, int button, int pressed)
 
 void handle_hbar_click(widget *control, int button, int pressed)
 {
-	if(!(control->action & WIDGET_MOVING)){
+	if(!(control->action & WIDGET_MOVING))
 		control->action |= WIDGET_MOVING;
-	}
 
 	if (widget_has_mouse_over(control)){
 		if (control->action & WIDGET_CLICKED){
@@ -1268,9 +1239,8 @@ void handle_hbar_click(widget *control, int button, int pressed)
 
 void handle_harrowleft_release(widget *control, int button, int pressed)
 {
-	if(control->parent->shown.data[2]->action & WIDGET_MOVING){
+	if(control->parent->shown.data[2]->action & WIDGET_MOVING)
 		control->parent->shown.data[2]->action &= ~(WIDGET_MOVING);
-	}
 
 	if (widget_has_mouse_over(control)){
 		control->imgpos.y = 0;
@@ -1284,9 +1254,8 @@ void handle_harrowleft_release(widget *control, int button, int pressed)
 
 void handle_harrowright_release(widget *control, int button, int pressed)
 {
-	if(control->parent->shown.data[2]->action & WIDGET_MOVING){
+	if(control->parent->shown.data[2]->action & WIDGET_MOVING)
 		control->parent->shown.data[2]->action &= ~(WIDGET_MOVING);
-	}
 
 	if (widget_has_mouse_over(control)){
 		control->imgpos.y = 0;
@@ -1303,10 +1272,8 @@ void create_vscrollbar(widget *control, widget *parent, uint16 x, uint16 y, uint
 {
 	scrollbar_t *scroll_t = (scrollbar_t *)calloc(1, sizeof(scrollbar_t));
 
-	if(scroll_t == NULL){
+	if(scroll_t == NULL)
 		error_handler(DE_ERROR_POINTER_NULL,",scroll_t in create_vscrollbar()\n");
-		return;
-	}
 
 	widget_init(control);
 	widget_init(&scroll_t->bar);//moving bar.
@@ -1573,16 +1540,14 @@ void handle_vscrollbar_click(widget *control, int button, int pressed)
 
 void handle_vscrollbar_release(widget *control, int button, int pressed)
 {
-	if(control->shown.data[2]->action & WIDGET_MOVING){
+	if(control->shown.data[2]->action & WIDGET_MOVING)
 		control->shown.data[2]->action &= ~(WIDGET_MOVING);
-	}
 }
 
 void handle_vbar_release(widget *control, int button, int pressed)
 {
-	if(control->action & WIDGET_MOVING){
+	if(control->action & WIDGET_MOVING)
 		control->action &= ~(WIDGET_MOVING);
-	}
 
 	if (widget_has_mouse_over(control)){
 		control->imgpos.y = 0;
@@ -1594,9 +1559,8 @@ void handle_vbar_release(widget *control, int button, int pressed)
 
 void handle_vbar_click(widget *control, int button, int pressed)
 {
-	if(!(control->action & WIDGET_MOVING)){
+	if(!(control->action & WIDGET_MOVING))
 		control->action |= WIDGET_MOVING;
-	}
 
 	if (widget_has_mouse_over(control)){
 		if (control->action & WIDGET_CLICKED){
@@ -1609,9 +1573,8 @@ void handle_vbar_click(widget *control, int button, int pressed)
 
 void handle_varrowtop_release(widget *control, int button, int pressed)
 {
-	if(control->parent->shown.data[2]->action & WIDGET_MOVING){
+	if(control->parent->shown.data[2]->action & WIDGET_MOVING)
 		control->parent->shown.data[2]->action &= ~(WIDGET_MOVING);
-	}
 
 	if (widget_has_mouse_over(control)){
 		control->imgpos.y = 0;
@@ -1624,9 +1587,8 @@ void handle_varrowtop_release(widget *control, int button, int pressed)
 
 void handle_varrowbottom_release(widget *control, int button, int pressed)
 {
-	if(control->parent->shown.data[2]->action & WIDGET_MOVING){
+	if(control->parent->shown.data[2]->action & WIDGET_MOVING)
 		control->parent->shown.data[2]->action &= ~(WIDGET_MOVING);
-	}
 
 	if (widget_has_mouse_over(control)){
 		control->imgpos.y = 0;
@@ -1647,9 +1609,8 @@ void handle_varrowtop_click(widget *control, int button, int pressed)
 		}
 	}
 
-	if(control->parent->shown.data[2]->action & WIDGET_MOVING){
+	if(control->parent->shown.data[2]->action & WIDGET_MOVING)
 		control->parent->shown.data[2]->action &= ~(WIDGET_MOVING);
-	}
 
 	if(control->parent->value > 0)
 		--control->parent->value;
@@ -1670,9 +1631,8 @@ void handle_varrowbottom_click(widget *control, int button, int pressed)
 		}
 	}
 
-	if(control->parent->shown.data[2]->action & WIDGET_MOVING){
+	if(control->parent->shown.data[2]->action & WIDGET_MOVING)
 		control->parent->shown.data[2]->action &= ~(WIDGET_MOVING);
-	}
 
 	if(control->parent->value + 1 <= control->parent->shown.data[2]->value)
 		++control->parent->value;
@@ -1692,10 +1652,8 @@ void create_vprogressbar(widget *control, widget *parent, uint16 x, uint16 y, ui
 {
 	progressbar *bar = (progressbar *)calloc(1, sizeof(progressbar));
 
-	if(bar == NULL){
+	if(bar == NULL)
 		error_handler(DE_ERROR_POINTER_NULL,",bar in create_vprogressbar()\n");
-		return;
-	}
 
 	widget_init(control);
 	control->pos.x = x;
@@ -1769,10 +1727,8 @@ void create_stextbox(widget *control, widget *parent, uint16 x, uint16 y, uint16
 	textbox *init_text = (textbox *)calloc(1,sizeof(textbox));
 	textbox_w *init_widget = (textbox_w *)calloc(1,sizeof(textbox_w));
 
-	if(init_text == NULL || init_widget == NULL){
+	if(init_text == NULL || init_widget == NULL)
 		error_handler(DE_ERROR_POINTER_NULL,",init_text or init_widget in create_stextbox()\n");
-		return;
-	}
 
 	widget_init(control);
 	control->pos.x = x;
@@ -1802,16 +1758,13 @@ void create_stextbox(widget *control, widget *parent, uint16 x, uint16 y, uint16
 	init_widget->wstring.controlmousepress = &handle_stextbox_click;
 	init_widget->wstring.controlupdatepos = &handle_stextbox_text_move;
 
-	if(ispass){
+	if(ispass)
 		init_widget->wstring.action |= WIDGET_IS_PASSWORD;
-	}
 
 	init_text->string = (text *)calloc(1,sizeof(text));
 
-	if(init_text->string == NULL){
+	if(init_text->string == NULL)
 		error_handler(DE_ERROR_POINTER_NULL, ",init_text->string in create_stextbox()\n");
-		return;
-	}
 
 	text_set(init_text->string,init_widget->wstring.pos.x,init_widget->wstring.pos.y,width,height,offsetx,offsety,maxchars,0,fontid,red,blue,green,alpha,NULL);
 
@@ -1875,24 +1828,20 @@ void draw_stextbox_text(widget *control)
 {
 	textbox *data = (textbox *)control->control;
 
-	if(data->string->buf.isize > 0){
+	if(data->string->buf.isize > 0)
 		text_draw(data->string);
-	}
 
 	if(data->cusorenabled){
 		double tick = glfwGetTime();
 
-		if(control->parent != widget_get_focused()){
+		if(control->parent != widget_get_focused())
 			data->cusorenabled = FALSE;
-		}
 
-		if(data->cursortime > tick){
+		if(data->cursortime > tick)
 			draw_cursor(control);
-		}
 		else{
-			if(data->cursortime + data->cursorblink < tick || data ->cursortime == 0){
+			if(data->cursortime + data->cursorblink < tick || data ->cursortime == 0)
 				data->cursortime = tick + data->cursorblink;
-			}
 		}
 	}
 }
@@ -1901,9 +1850,8 @@ void handle_stextbox_click(widget *control, int button, int pressed)
 {
 	textbox *data = (textbox *)control->shown.data[0]->control;
 
-	if(data->cusorenabled == FALSE){
+	if(data->cusorenabled == FALSE)
 		data->cusorenabled = TRUE;
-	}
 
 	control->mousepress(control,button,pressed);
 }
@@ -1934,20 +1882,16 @@ void handle_stextbox_input(widget *control, int key)
 		case GLFW_KEY_BACKSPACE:
 			if(data->string->data){
 				if(data->string->count > 0){
-					if(data->string->displayoffset > 0){
+					if(data->string->displayoffset > 0)
 						data->string->displayoffset--;
-					}
 
-					if(control->shown.data[0]->action & WIDGET_IS_PASSWORD){
+					if(control->shown.data[0]->action & WIDGET_IS_PASSWORD)
 						data->string->textwidth -= (uint16)(data->string->font.c['*'].ax + data->string->font.c['*'].left);
-					}
 					else{
-						if(data->string->font.c[data->string->data[data->string->count - 1]].left >= 0){
+						if(data->string->font.c[data->string->data[data->string->count - 1]].left >= 0)
 							data->string->textwidth -= (uint16)(data->string->font.c[data->string->data[data->string->count - 1]].ax + data->string->font.c[data->string->data[data->string->count - 1]].left);
-						}
-						else{
+						else
 							data->string->textwidth -= (uint16)data->string->font.c[data->string->data[data->string->count - 1]].ax;
-						}
 					}
 					data->string->count--;
 				}
@@ -1973,9 +1917,9 @@ void handle_stextbox_input(widget *control, int key)
 							for(i = data->string->displayoffset; i <= data->string->count + 1; i++){
 								offset += (uint16)(data->string->font.c['*'].ax + data->string->font.c['*'].left);
 
-								if(i == data->string->count +1){
+								if(i == data->string->count +1)
 									offset += (uint16)(data->string->font.c['*'].ax + data->string->font.c['*'].left);
-								}
+
 								if(offset >= data->string->width - data->string->offsetx){
 									data->string->displayoffset++;
 									i = data->string->displayoffset;
@@ -1995,12 +1939,10 @@ void handle_stextbox_input(widget *control, int key)
 						stextbox_text_update(data->string, control->shown.data[0]);
 					}
 					else{
-						if(data->string->font.c[key].left >= 0){
+						if(data->string->font.c[key].left >= 0)
 							data->string->textwidth += (uint16)(data->string->font.c[key].ax + data->string->font.c[key].left);
-						}
-						else{
+						else
 							data->string->textwidth += (uint16)(data->string->font.c[key].ax);
-						}
 
 						if(data->string->textwidth >= data->string->width - data->string->offsetx){
 							uint16 offset = 0;
@@ -2008,20 +1950,16 @@ void handle_stextbox_input(widget *control, int key)
 							data->string->displayoffset++;
 
 							for(i = data->string->displayoffset; i <= data->string->count + 1; i++){
-								if(data->string->font.c[data->string->data[i]].left >= 0){
+								if(data->string->font.c[data->string->data[i]].left >= 0)
 									offset += (uint16)(data->string->font.c[data->string->data[i]].ax + data->string->font.c[data->string->data[i]].left);
-								}
-								else{
+								else
 									offset += (uint16)(data->string->font.c[data->string->data[i]].ax);
-								}
 
 								if(i == data->string->count +1){
-									if(data->string->font.c[key].left >= 0){
+									if(data->string->font.c[key].left >= 0)
 										offset += (uint16)(data->string->font.c[key].ax + data->string->font.c[key].left);
-									}
-									else{
+									else
 										offset += (uint16)(data->string->font.c[key].ax);
-									}
 								}
 								if(offset >= data->string->width - data->string->offsetx){
 									data->string->displayoffset++;
@@ -2052,10 +1990,8 @@ void create_mtextbox(widget *control, widget *parent, uint16 x, uint16 y, uint16
 	textbox *init_text = (textbox *)calloc(1,sizeof(textbox));
 	textbox_w *init_widget = (textbox_w *)calloc(1,sizeof(textbox_w));
 
-	if(init_text == NULL || init_widget == NULL){
+	if(init_text == NULL || init_widget == NULL)
 		error_handler(DE_ERROR_POINTER_NULL,",init_text or init_widget in create_mtextbox()\n");
-		return;
-	}
 
 	widget_init(control);
 	control->pos.x = x;
@@ -2089,10 +2025,8 @@ void create_mtextbox(widget *control, widget *parent, uint16 x, uint16 y, uint16
 
 	init_text->string = (text *)calloc(1,sizeof(text));
 
-	if(init_text->string == NULL){
+	if(init_text->string == NULL)
 		error_handler(DE_ERROR_POINTER_NULL, ",init_text->string in create_mtextbox()\n");
-		return;
-	}
 
 	text_set(init_text->string,init_widget->wstring.pos.x,init_widget->wstring.pos.y,sx,sy,offsetx,offsety,maxchars,maxcharpl,fontid,red,blue,green,alpha,NULL);
 	init_text->cursorblink = .8;
@@ -2124,24 +2058,20 @@ void draw_mtextbox_text(widget *control)
 {
 	textbox *data = (textbox *)control->control;
 
-	if(data->string->buf.isize > 0){
+	if(data->string->buf.isize > 0)
 		text_draw(data->string);
-	}
 
 	if(data->cusorenabled){
 		double tick = glfwGetTime();
 
-		if(control->parent != widget_get_focused()){
+		if(control->parent != widget_get_focused())
 			data->cusorenabled = FALSE;
-		}
 
-		if(data->cursortime > tick){
+		if(data->cursortime > tick)
 			draw_cursor(control);
-		}
 		else{
-			if(data->cursortime + data->cursorblink < tick || data ->cursortime == 0){
+			if(data->cursortime + data->cursorblink < tick || data ->cursortime == 0)
 				data->cursortime = tick + data->cursorblink;
-			}
 		}
 	}
 }
@@ -2150,9 +2080,8 @@ void handle_mtextbox_click(widget *control, int button, int pressed)
 {
 	textbox *data = (textbox *)control->shown.data[0]->control;
 
-	if(data->cusorenabled == FALSE){
+	if(data->cusorenabled == FALSE)
 		data->cusorenabled = TRUE;
-	}
 
 	control->mousepress(control,button,pressed);
 }
@@ -2182,9 +2111,9 @@ void handle_mtextbox_input(widget *control, int key)
 		{
 		case GLFW_KEY_BACKSPACE:
 			if(data->string->data){
-				if(data->string->count > 0){
+				if(data->string->count > 0)
 					data->string->count--;
-				}
+
 				data->string->data[data->string->count] = '\0';
 
 				mtextbox_text_update(data->string, control->shown.data[0]);
@@ -2222,10 +2151,8 @@ void create_listbox(widget *control, widget *parent, uint16 x, uint16 y, uint16 
 	list->select = (widget *)calloc(1,sizeof(widget));
 	list->selectover = (widget *)calloc(1,sizeof(widget));
 
-	if(list == NULL || list->list == NULL || list->select == NULL || list->selectover == NULL){
+	if(list == NULL || list->list == NULL || list->select == NULL || list->selectover == NULL)
 		error_handler(DE_ERROR_POINTER_NULL, ",list, list->list,list->select or list->selectover in create_listbox()\n");
-		return;
-	}
 
 	widget_init(control);
 	if(clone){
@@ -2293,10 +2220,8 @@ void create_listbox(widget *control, widget *parent, uint16 x, uint16 y, uint16 
 
 		list->list[i] = (widget *)calloc(1,sizeof(widget));
 
-		if(init_text == NULL || list->list[i] == NULL){
+		if(init_text == NULL || list->list[i] == NULL)
 			error_handler(DE_ERROR_POINTER_NULL,"init_text or list->list[i] in create_listbox()\n");
-			return;
-		}
 
 		widget_init(list->list[i]);
 
@@ -2313,10 +2238,8 @@ void create_listbox(widget *control, widget *parent, uint16 x, uint16 y, uint16 
 
 		init_text->string = (text *)calloc(1,sizeof(text));
 
-		if(init_text->string == NULL){
+		if(init_text->string == NULL)
 			error_handler(DE_ERROR_POINTER_NULL,"init_text->string in create_listbox()\n");
-			return;
-		}
 
 		text_set(init_text->string,0,0,width - 22,prefont.h,offsetx,offsety,maxchars,0,fontid,red,blue,green,alpha,int_to_string(i + 1));
 
@@ -2442,9 +2365,8 @@ void draw_listbox(widget *control)
 	if(list->selectover->value)
 		draw_widget(list->selectover);
 
-	for(i = list->voffset; i < list->voffset + list->max; i++){
+	for(i = list->voffset; i < list->voffset + list->max; i++)
 		list->list[i]->controldraw(list->list[i]);
-	}
 }
 
 void handle_listbox_release(widget *control, int button, int pressed)
@@ -2555,9 +2477,8 @@ void handle_listbox_label_mouse_exit(widget *control)
 	sbool isover = FALSE;
 
 	for(i = list->voffset; i < list->voffset + list->max; i++){
-		if(list->list[i]->action & WIDGET_MOUSE_OVER){
+		if(list->list[i]->action & WIDGET_MOUSE_OVER)
 			isover = TRUE;
-		}
 	}
 
 	if(!isover)
@@ -2596,9 +2517,8 @@ void handle_listbox_scroll(widget *control, int button, int pressed)
 		list->select->value = TRUE;
 		widget_update_vector(list->select);
 	}
-	else{
+	else
 		list->select->value = FALSE;
-	}
 }
 
 void handle_listbox_move(widget *control)
@@ -2609,9 +2529,8 @@ void handle_listbox_move(widget *control)
 	widget_update_vector(control);
 
 	//clear all if mouse was still preset to over after moving off the list box.
-	for(i = list->voffset; i < list->voffset + list->max; i++){
+	for(i = list->voffset; i < list->voffset + list->max; i++)
 		list->list[i]->controlupdatepos(list->list[i]);
-	}
 }
 
 void *get_list_data(widget *control)
@@ -2662,9 +2581,8 @@ void unload_frame(widget *control)
 
 void handle_frame_click(widget *control, int button, int pressed)
 {
-	if(control->action & WIDGET_CAN_USE_EVENT){
+	if(control->action & WIDGET_CAN_USE_EVENT)
 		control->mousepress(control,button,pressed);
-	}
 
 	if(control->action & WIDGET_WINDOW_MOVEABLE){
 		if(pressed == 1)
@@ -2722,9 +2640,8 @@ void create_statusbox(widget *control, widget *parent, uint16 x, uint16 y, char 
 {
 	statusbox_t *gui = (statusbox_t *)calloc(1, sizeof(statusbox_t));
 
-	if(gui == NULL){
-		error_handler(DE_ERROR_POINTER_NULL,"status box is NULL in create_statusbox"); return;
-	}
+	if(gui == NULL)
+		error_handler(DE_ERROR_POINTER_NULL,"status box is NULL in create_statusbox");
 
 	create_picturebox(control,NULL,0,0,32,32,get_screen_height(),get_screen_width(),comb_2str(GUI_PATH, "hide.png"), NULL);
 	create_window(&gui->hide,control,x,y,170,378,170,378,"statuswidget.png",stsclone);

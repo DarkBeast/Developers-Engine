@@ -34,12 +34,10 @@ void init_npcs(void)
 
 		check_dir(NPC_PATH);
 
-		if(file_readable(path)){
+		if(file_readable(path))
 			read_npc(path,i);
-		}
-		else{
+		else
 			write_npc(path,i);
-		}
 	}
 }
 

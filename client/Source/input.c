@@ -26,18 +26,16 @@ void handle_key_callback(GLFWwindow *window, int key, int scancode, int action, 
 	if(widget_get_focused()->type == CONTROL_TEXTBOX && key == GLFW_KEY_BACKSPACE && action == GLFW_PRESS || widget_get_focused()->type == CONTROL_TEXTBOX && action == GLFW_REPEAT){
 		switch(key){
 		case GLFW_KEY_BACKSPACE:
-			if(action == GLFW_PRESS || action == GLFW_REPEAT){
+			if(action == GLFW_PRESS || action == GLFW_REPEAT)
 				widget_get_focused()->controlkeypressed(widget_get_focused(),key);
-			}
 
 			break;
 		default:
 			break;
 		}
 	}
-	else{
+	else
 		check_input_keys(key,action);
-	}
 }
 
 void handle_mouse_pos(GLFWwindow * screen, double x, double y)
@@ -56,20 +54,16 @@ void handle_mouse_press(GLFWwindow * screen, int button, int pressed, int mods)
 	widget_set_ui_click_event((int8)button, (int8)pressed);
 
 	if(widget_check_focus()){
-		if(pressed == 1){
+		if(pressed == 1)
 			widget_mouse_press(widget_get_focused());
-		}
-		else{
+		else
 			widget_mouse_release(widget_get_focused());
-		}
 	}
 	else{
-		if(pressed == 1){
+		if(pressed == 1)
 			widget_mouse_press(widget_get_uip()->root);
-		}
-		else{
+		else
 			widget_mouse_release(widget_get_uip()->root);
-		}
 	}
 }
 

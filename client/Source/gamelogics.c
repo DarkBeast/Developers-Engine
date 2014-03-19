@@ -47,15 +47,13 @@ void GameLoop(void)
 
 		//Process movements (actually move them)
 		if(walktimer < tick){
-			for( i = 0; i < players_on_map(); i++){
+			for( i = 0; i < players_on_map(); i++)
 				process_movement(player_on_map(i));
-			}
 
 			for( i = 0; i < MAX_MAP_NPCS; i++){
 				if(map()->npc[i].num){
-					if(map()->npc[i].moving){
+					if(map()->npc[i].moving)
 						process_npc_movement(i);
-					}
 				}
 			}
 

@@ -83,9 +83,8 @@ void destroy_server(void)
 
 	printf("Saving online players.\n");
 
-	for(i = 0; i < total_players_online(); i++){
+	for(i = 0; i < total_players_online(); i++)
 		left_game(player_online(i));
-	}
 
 	printf("Clearing Data.\n");
 	unload_shops();
@@ -96,5 +95,4 @@ void destroy_server(void)
 	unload_maps();
 	unload_socket();
 	path_destroy();
-	
 }

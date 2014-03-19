@@ -33,12 +33,10 @@ void init_items(void)
 
 		check_dir(ITEM_PATH);
 
-		if(file_readable(path)){
+		if(file_readable(path))
 			read_item(path,i);
-		}
-		else{
+		else
 			write_item(path,i);
-		}
 	}
 }
 
@@ -80,9 +78,8 @@ void unload_items(void)
 {
 	uint32 i = 0;
 
-	for(i = 0; i < MAX_ITEMS; i++){
+	for(i = 0; i < MAX_ITEMS; i++)
 		free(item_array[i].name);
-	}
 
 	free(item_array);
 }

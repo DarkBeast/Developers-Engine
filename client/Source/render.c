@@ -125,10 +125,8 @@ void init_screen(int swidth, int sheight, GLFWmonitor *monitor, GLFWwindow *shar
 	err = glewInit();
 
 	if(err!=GLEW_OK)
-	{
-		//Problem: glewInit failed, something is seriously wrong.
 		error_handler(DE_ERROR_GLEWINIT_ERROR, NULL);
-	}
+
 	handle_resize(the_window,swidth,sheight);
 }
 
